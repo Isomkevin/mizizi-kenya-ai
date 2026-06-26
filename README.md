@@ -4,8 +4,7 @@
 
 Mizizi is a platform for the [Kenya AI Challenge 2026 — AgriFin Finance Challenge](https://kenyaai.go.ke). It helps lenders, cooperatives, and field officers see, verify, and explain agricultural credit risk using signals that already exist in the field — cooperative history, mobile money, input purchases, climate, and community relationships — instead of treating farmers as opaque profiles in a spreadsheet.
 
-Built by **LESOM Dynamics**.
----
+## Built by **LESOM Dynamics**.
 
 ## The problem
 
@@ -17,12 +16,12 @@ Agricultural finance rarely fails for lack of capital. It fails because risk is 
 
 Four intelligence layers work together:
 
-| Layer | Purpose |
-| ----- | ------- |
-| **Graph intelligence** | Entity relationships — farmers, cooperatives, loans, dealers, climate zones — for trust paths and risk propagation |
-| **Explainable AI** | Grounded recommendations with factor breakdowns, graph evidence, and officer override with audit trail |
-| **Climate intelligence** | County- and parcel-level weather signals tied to lending impact |
-| **Financial analytics** | Portfolio KPIs, repayment behaviour, geographic exposure, and decision quality metrics |
+| Layer                    | Purpose                                                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| **Graph intelligence**   | Entity relationships — farmers, cooperatives, loans, dealers, climate zones — for trust paths and risk propagation |
+| **Explainable AI**       | Grounded recommendations with factor breakdowns, graph evidence, and officer override with audit trail             |
+| **Climate intelligence** | County- and parcel-level weather signals tied to lending impact                                                    |
+| **Financial analytics**  | Portfolio KPIs, repayment behaviour, geographic exposure, and decision quality metrics                             |
 
 Design principles throughout: **trust**, **transparency**, **explainability**, and **financial confidence**. Every surfaced fact should be traceable to a data source.
 
@@ -32,14 +31,14 @@ Design principles throughout: **trust**, **transparency**, **explainability**, a
 
 The app lives at `/app` behind an enterprise shell (sidebar, command bar, role-aware navigation). Planned and in-progress routes:
 
-| Route | Purpose |
-| ----- | ------- |
-| `/app` | Executive dashboard — KPIs, risk distribution, Kenya map, activity feed |
-| `/app/farmers` | Farmer search, filters, and profile command center |
-| `/app/graph` | Force-directed graph workspace — explore entities and paths |
-| `/app/decisions` | Pending queue and officer decision workspace |
-| `/app/analytics` | BI views — executive, lending, geographic, climate, graph, explainability |
-| `/app/portfolio`, `/app/climate` | Portfolio and climate slices (may merge into analytics) |
+| Route                            | Purpose                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| `/app`                           | Executive dashboard — KPIs, risk distribution, Kenya map, activity feed   |
+| `/app/farmers`                   | Farmer search, filters, and profile command center                        |
+| `/app/graph`                     | Force-directed graph workspace — explore entities and paths               |
+| `/app/decisions`                 | Pending queue and officer decision workspace                              |
+| `/app/analytics`                 | BI views — executive, lending, geographic, climate, graph, explainability |
+| `/app/portfolio`, `/app/climate` | Portfolio and climate slices (may merge into analytics)                   |
 
 Public marketing site at `/`.
 
@@ -67,16 +66,16 @@ TanStack Start BFF (createServerFn)
 
 ## Tech stack
 
-| Layer | Choice |
-| ----- | ------ |
-| Framework | [TanStack Start](https://tanstack.com/start) — file-based routes in `src/routes/` |
-| UI | React 19, [shadcn/ui](https://ui.shadcn.com), Tailwind CSS v4 (`src/styles.css`) |
-| Data fetching | TanStack Query + `createServerFn` |
-| Charts | Recharts |
-| Graph canvas | `react-force-graph-2d` |
-| Auth & DB | Supabase (Auth, Postgres, Storage, RLS) |
-| Graph DB | Neo4j Aura (`neo4j-driver`) |
-| Package manager | [Bun](https://bun.sh) |
+| Layer           | Choice                                                                            |
+| --------------- | --------------------------------------------------------------------------------- |
+| Framework       | [TanStack Start](https://tanstack.com/start) — file-based routes in `src/routes/` |
+| UI              | React 19, [shadcn/ui](https://ui.shadcn.com), Tailwind CSS v4 (`src/styles.css`)  |
+| Data fetching   | TanStack Query + `createServerFn`                                                 |
+| Charts          | Recharts                                                                          |
+| Graph canvas    | `react-force-graph-2d`                                                            |
+| Auth & DB       | Supabase (Auth, Postgres, Storage, RLS)                                           |
+| Graph DB        | Neo4j Aura (`neo4j-driver`)                                                       |
+| Package manager | [Bun](https://bun.sh)                                                             |
 
 ---
 
@@ -112,12 +111,12 @@ bun run dev
 
 Dev server: `http://localhost:5173` (hot reload).
 
-| Script | Description |
-| ------ | ----------- |
-| `bun run dev` | Local dev server |
-| `bun run build` | Production build (regenerates `routeTree.gen.ts`) |
-| `bun run lint` | ESLint |
-| `bun run format` | Prettier |
+| Script           | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| `bun run dev`    | Local dev server                                  |
+| `bun run build`  | Production build (regenerates `routeTree.gen.ts`) |
+| `bun run lint`   | ESLint                                            |
+| `bun run format` | Prettier                                          |
 
 Before opening a PR that touches routes or components, run `bun run lint` and `bun run build`.
 
@@ -125,14 +124,14 @@ Before opening a PR that touches routes or components, run `bun run lint` and `b
 
 ## Build status
 
-| Phase | Scope | Status |
-| ----- | ----- | ------ |
-| 1 | Design system, landing page, app route scaffold | **Done** |
-| 2 | Enterprise shell, dashboard, ⌘K search, charts, Kenya map | **Done** |
-| 3 | Farmer intelligence — search, profile tabs, documents | Next |
-| 4 | Graph intelligence workspace | Planned |
-| 5 | Explainability + officer decision workspace | Planned |
-| 6 | Analytics platform (GeoJSON map, rollups, exports) | Planned |
+| Phase | Scope                                                     | Status   |
+| ----- | --------------------------------------------------------- | -------- |
+| 1     | Design system, landing page, app route scaffold           | **Done** |
+| 2     | Enterprise shell, dashboard, ⌘K search, charts, Kenya map | **Done** |
+| 3     | Farmer intelligence — search, profile tabs, documents     | Next     |
+| 4     | Graph intelligence workspace                              | Planned  |
+| 5     | Explainability + officer decision workspace               | Planned  |
+| 6     | Analytics platform (GeoJSON map, rollups, exports)        | Planned  |
 
 Details and checklists: [docs/phase-status.md](docs/phase-status.md). Phased roadmap: [.lovable/plan.md](.lovable/plan.md). Full product vision: [docs/product-spec.md](docs/product-spec.md).
 
@@ -140,13 +139,13 @@ Details and checklists: [docs/phase-status.md](docs/phase-status.md). Phased roa
 
 ## Documentation
 
-| Document | Use when |
-| -------- | -------- |
-| [docs/product-spec.md](docs/product-spec.md) | Product vision, IA, design system, engineering standards |
-| [docs/phase-status.md](docs/phase-status.md) | Picking up work — what's done and what's next |
-| [AGENTS.md](AGENTS.md) | Agent and contributor conventions |
-| [src/routes/README.md](src/routes/README.md) | Routing conventions |
-| [src/components/app/README.md](src/components/app/README.md) | App shell and feature patterns |
+| Document                                                     | Use when                                                 |
+| ------------------------------------------------------------ | -------------------------------------------------------- |
+| [docs/product-spec.md](docs/product-spec.md)                 | Product vision, IA, design system, engineering standards |
+| [docs/phase-status.md](docs/phase-status.md)                 | Picking up work — what's done and what's next            |
+| [AGENTS.md](AGENTS.md)                                       | Agent and contributor conventions                        |
+| [src/routes/README.md](src/routes/README.md)                 | Routing conventions                                      |
+| [src/components/app/README.md](src/components/app/README.md) | App shell and feature patterns                           |
 
 ---
 

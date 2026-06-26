@@ -2,15 +2,21 @@ import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 
+import { useDashboard } from "@/api/hooks/use-dashboard";
+import type { CountyIntel, MapMetric } from "@/api/types";
 import { Button } from "@/components/ui/button";
-import { countyIntel, mapMetricLabels, metricValue, riskColor } from "@/lib/mock/dashboard";
-import type { CountyIntel } from "@/lib/mock/dashboard";
-import type { MapMetric } from "@/lib/mock/types";
+import { riskColor } from "@/lib/risk";
 import { cn } from "@/lib/utils";
 
 const metrics: MapMetric[] = ["risk", "loanVolume", "climate", "approvalRate"];
+const mapMetricLabels: Record<MapMetric, string> = {
+  risk: "Risk level",
+  loanVolume: "Loan volume",
+  climate: "Climate exposure",
+  approvalRate: "Approval rate",
+};
 
-function fillForCounty(county: CountyIntel, metric: MapMetric): string {
+function fillForCounty(countyIntel: CountyIntel[], county: CountyIntel, metric: MapMetric): string {
   if (metric === "risk") return riskColor(county.risk);
 
   const values = countyIntel.map((c) => metricValue(c, metric));
@@ -31,15 +37,17 @@ function fillForCounty(county: CountyIntel, metric: MapMetric): string {
 }
 
 export function KenyaMap() {
+  const { data } = useDashboard();
+  const countyIntel = data?.counties ?? [];
   const [metric, setMetric] = useState<MapMetric>("risk");
-  const [selected, setSelected] = useState<CountyIntel | null>(countyIntel[2]);
-
+  const [selected, setSelected] = useState<CountyIntel | null>(countyIntel[2] ?? null);
   const legend = useMemo(() => {
     if (metric === "risk") {
       return ["Very low", "Low", "Medium", "High", "Critical"];
     }
     return ["Lower", "", "Higher"];
   }, [metric]);
+  if (!countyIntel.length) return null;
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
@@ -92,7 +100,7 @@ export function KenyaMap() {
               <path
                 key={county.id}
                 d={county.path}
-                fill={fillForCounty(county, metric)}
+                fill={fillForCounty(countyIntel, county, metric)}
                 stroke="var(--background)"
                 strokeWidth="1.5"
                 className={cn(
@@ -156,4 +164,17 @@ function Stat({ label, value }: { label: string; value: string }) {
       <dd className="mt-0.5 font-medium">{value}</dd>
     </div>
   );
+}
+
+function metricValue(county: CountyIntel, metric: MapMetric): number {
+  switch (metric) {
+    case "risk":
+      return { "very-low": 1, low: 2, medium: 3, high: 4, critical: 5 }[county.risk] ?? 3;
+    case "loanVolume":
+      return county.loanVolumeM;
+    case "climate":
+      return county.climateExposure;
+    case "approvalRate":
+      return county.approvalRate;
+  }
 }

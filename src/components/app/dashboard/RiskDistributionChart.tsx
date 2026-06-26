@@ -3,9 +3,10 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
 
+import { useDashboard } from "@/api/hooks/use-dashboard";
+import type { RiskBand } from "@/api/types";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { riskBands, riskColor } from "@/lib/mock/dashboard";
-import type { RiskBand } from "@/lib/mock/dashboard";
+import { riskColor } from "@/lib/risk";
 
 const chartConfig = {
   farmers: { label: "Farmers", color: "var(--moss)" },
@@ -17,10 +18,13 @@ function formatKes(n: number) {
 }
 
 export function RiskDistributionChart() {
+  const { data: dashboard } = useDashboard();
+  const riskBands = dashboard?.riskBands ?? [];
   const [active, setActive] = useState<RiskBand | null>(null);
-  const highlighted = active ?? riskBands[2];
+  const highlighted = active ?? riskBands[2] ?? riskBands[0];
+  if (!highlighted) return null;
 
-  const data = riskBands.map((b) => ({
+  const chartData = riskBands.map((b) => ({
     ...b,
     fill: riskColor(b.level),
   }));
@@ -44,7 +48,7 @@ export function RiskDistributionChart() {
 
       <ChartContainer config={chartConfig} className="mt-6 h-[220px] w-full">
         <BarChart
-          data={data}
+          data={chartData}
           layout="vertical"
           margin={{ left: 4, right: 12, top: 4, bottom: 4 }}
           onMouseLeave={() => setActive(null)}
@@ -82,7 +86,7 @@ export function RiskDistributionChart() {
             radius={[0, 4, 4, 0]}
             onMouseEnter={(_d, i) => setActive(riskBands[i])}
           >
-            {data.map((entry) => (
+            {chartData.map((entry) => (
               <Cell key={entry.level} fill={entry.fill} />
             ))}
           </Bar>

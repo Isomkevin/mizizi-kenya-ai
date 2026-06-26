@@ -1,11 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PlaceholderPanel } from "@/components/app/PlaceholderPanel";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/portfolio")({
-  component: () => (
-    <PlaceholderPanel
-      title="Portfolio"
-      description="Lending portfolio composition, risk concentration and cohort performance."
-    />
-  ),
+  beforeLoad: () => {
+    throw redirect({ to: "/app/analytics", search: { tab: "lending" } });
+  },
 });

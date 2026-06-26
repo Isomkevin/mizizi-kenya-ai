@@ -19,7 +19,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { quickActions } from "@/lib/mock/dashboard";
+import { useDashboard } from "@/api/hooks/use-dashboard";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface AppHeaderProps {
   pathname: string;
@@ -28,6 +29,9 @@ interface AppHeaderProps {
 
 export function AppHeader({ pathname, onSearchOpen }: AppHeaderProps) {
   const pageLabel = currentNavLabel(pathname);
+  const { session } = useAuth();
+  const { data: dashboard } = useDashboard();
+  const quickActions = dashboard?.quickActions ?? [];
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
@@ -110,9 +114,9 @@ export function AppHeader({ pathname, onSearchOpen }: AppHeaderProps) {
               <User className="h-3.5 w-3.5" />
             </span>
             <div className="hidden text-left sm:block">
-              <div className="text-xs font-medium leading-none">Kevin M.</div>
+              <div className="text-xs font-medium leading-none">{session?.name ?? "Kevin M."}</div>
               <div className="mt-0.5 font-mono-data text-[10px] text-muted-foreground">
-                Credit officer
+                {session?.role.replace("_", " ") ?? "Credit officer"}
               </div>
             </div>
           </div>

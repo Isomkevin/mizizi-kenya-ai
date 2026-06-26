@@ -1,7 +1,7 @@
 import { CloudSun, Copy, Network, ShieldCheck, Sparkles } from "lucide-react";
 
-import { dashboardInsights } from "@/lib/mock/dashboard";
-import type { DashboardInsight } from "@/lib/mock/dashboard";
+import { useDashboard } from "@/api/hooks/use-dashboard";
+import type { DashboardInsight } from "@/api/types";
 import { RiskBadge } from "@/components/app/RiskBadge";
 
 const iconMap = {
@@ -12,6 +12,9 @@ const iconMap = {
 } as const;
 
 export function AiInsightsPanel() {
+  const { data } = useDashboard();
+  const dashboardInsights = data?.insights ?? [];
+
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
       <div className="flex items-center gap-2">

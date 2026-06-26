@@ -18,6 +18,8 @@ import { Route as AppFarmersRouteImport } from './routes/app.farmers'
 import { Route as AppDecisionsRouteImport } from './routes/app.decisions'
 import { Route as AppClimateRouteImport } from './routes/app.climate'
 import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
+import { Route as AppFarmersFarmerIdRouteImport } from './routes/app.farmers.$farmerId'
+import { Route as AppDecisionsDecisionIdRouteImport } from './routes/app.decisions.$decisionId'
 
 const AppRoute = AppRouteImport.update({
   id: '/app',
@@ -64,27 +66,41 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFarmersFarmerIdRoute = AppFarmersFarmerIdRouteImport.update({
+  id: '/$farmerId',
+  path: '/$farmerId',
+  getParentRoute: () => AppFarmersRoute,
+} as any)
+const AppDecisionsDecisionIdRoute = AppDecisionsDecisionIdRouteImport.update({
+  id: '/$decisionId',
+  path: '/$decisionId',
+  getParentRoute: () => AppDecisionsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/climate': typeof AppClimateRoute
-  '/app/decisions': typeof AppDecisionsRoute
-  '/app/farmers': typeof AppFarmersRoute
+  '/app/decisions': typeof AppDecisionsRouteWithChildren
+  '/app/farmers': typeof AppFarmersRouteWithChildren
   '/app/graph': typeof AppGraphRoute
   '/app/portfolio': typeof AppPortfolioRoute
   '/app/': typeof AppIndexRoute
+  '/app/decisions/$decisionId': typeof AppDecisionsDecisionIdRoute
+  '/app/farmers/$farmerId': typeof AppFarmersFarmerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/climate': typeof AppClimateRoute
-  '/app/decisions': typeof AppDecisionsRoute
-  '/app/farmers': typeof AppFarmersRoute
+  '/app/decisions': typeof AppDecisionsRouteWithChildren
+  '/app/farmers': typeof AppFarmersRouteWithChildren
   '/app/graph': typeof AppGraphRoute
   '/app/portfolio': typeof AppPortfolioRoute
   '/app': typeof AppIndexRoute
+  '/app/decisions/$decisionId': typeof AppDecisionsDecisionIdRoute
+  '/app/farmers/$farmerId': typeof AppFarmersFarmerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -92,11 +108,13 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/climate': typeof AppClimateRoute
-  '/app/decisions': typeof AppDecisionsRoute
-  '/app/farmers': typeof AppFarmersRoute
+  '/app/decisions': typeof AppDecisionsRouteWithChildren
+  '/app/farmers': typeof AppFarmersRouteWithChildren
   '/app/graph': typeof AppGraphRoute
   '/app/portfolio': typeof AppPortfolioRoute
   '/app/': typeof AppIndexRoute
+  '/app/decisions/$decisionId': typeof AppDecisionsDecisionIdRoute
+  '/app/farmers/$farmerId': typeof AppFarmersFarmerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -110,6 +128,8 @@ export interface FileRouteTypes {
     | '/app/graph'
     | '/app/portfolio'
     | '/app/'
+    | '/app/decisions/$decisionId'
+    | '/app/farmers/$farmerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -120,6 +140,8 @@ export interface FileRouteTypes {
     | '/app/graph'
     | '/app/portfolio'
     | '/app'
+    | '/app/decisions/$decisionId'
+    | '/app/farmers/$farmerId'
   id:
     | '__root__'
     | '/'
@@ -131,6 +153,8 @@ export interface FileRouteTypes {
     | '/app/graph'
     | '/app/portfolio'
     | '/app/'
+    | '/app/decisions/$decisionId'
+    | '/app/farmers/$farmerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -203,14 +227,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/farmers/$farmerId': {
+      id: '/app/farmers/$farmerId'
+      path: '/$farmerId'
+      fullPath: '/app/farmers/$farmerId'
+      preLoaderRoute: typeof AppFarmersFarmerIdRouteImport
+      parentRoute: typeof AppFarmersRoute
+    }
+    '/app/decisions/$decisionId': {
+      id: '/app/decisions/$decisionId'
+      path: '/$decisionId'
+      fullPath: '/app/decisions/$decisionId'
+      preLoaderRoute: typeof AppDecisionsDecisionIdRouteImport
+      parentRoute: typeof AppDecisionsRoute
+    }
   }
 }
+
+interface AppDecisionsRouteChildren {
+  AppDecisionsDecisionIdRoute: typeof AppDecisionsDecisionIdRoute
+}
+
+const AppDecisionsRouteChildren: AppDecisionsRouteChildren = {
+  AppDecisionsDecisionIdRoute: AppDecisionsDecisionIdRoute,
+}
+
+const AppDecisionsRouteWithChildren = AppDecisionsRoute._addFileChildren(
+  AppDecisionsRouteChildren,
+)
+
+interface AppFarmersRouteChildren {
+  AppFarmersFarmerIdRoute: typeof AppFarmersFarmerIdRoute
+}
+
+const AppFarmersRouteChildren: AppFarmersRouteChildren = {
+  AppFarmersFarmerIdRoute: AppFarmersFarmerIdRoute,
+}
+
+const AppFarmersRouteWithChildren = AppFarmersRoute._addFileChildren(
+  AppFarmersRouteChildren,
+)
 
 interface AppRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppClimateRoute: typeof AppClimateRoute
-  AppDecisionsRoute: typeof AppDecisionsRoute
-  AppFarmersRoute: typeof AppFarmersRoute
+  AppDecisionsRoute: typeof AppDecisionsRouteWithChildren
+  AppFarmersRoute: typeof AppFarmersRouteWithChildren
   AppGraphRoute: typeof AppGraphRoute
   AppPortfolioRoute: typeof AppPortfolioRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -219,8 +281,8 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAnalyticsRoute: AppAnalyticsRoute,
   AppClimateRoute: AppClimateRoute,
-  AppDecisionsRoute: AppDecisionsRoute,
-  AppFarmersRoute: AppFarmersRoute,
+  AppDecisionsRoute: AppDecisionsRouteWithChildren,
+  AppFarmersRoute: AppFarmersRouteWithChildren,
   AppGraphRoute: AppGraphRoute,
   AppPortfolioRoute: AppPortfolioRoute,
   AppIndexRoute: AppIndexRoute,

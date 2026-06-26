@@ -1,6 +1,6 @@
 import { CloudSun, Sparkles } from "lucide-react";
 
-import { welcomeSnapshot } from "@/lib/mock/dashboard";
+import { useDashboard } from "@/api/hooks/use-dashboard";
 import { cn } from "@/lib/utils";
 
 const healthStyles = {
@@ -10,7 +10,9 @@ const healthStyles = {
 } as const;
 
 export function DashboardWelcome() {
-  const w = welcomeSnapshot;
+  const { data } = useDashboard();
+  const w = data?.welcome;
+  if (!w) return null;
 
   return (
     <section className="space-y-6">

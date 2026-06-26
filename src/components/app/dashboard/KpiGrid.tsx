@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, TrendingDown, TrendingUp, Minus } from "lucide-react";
 
-import { dashboardKpis } from "@/lib/mock/dashboard";
+import { useDashboard } from "@/api/hooks/use-dashboard";
 import { cn } from "@/lib/utils";
 
 const trendIcons = {
@@ -17,6 +17,9 @@ const trendColors = {
 };
 
 export function KpiGrid() {
+  const { data } = useDashboard();
+  const dashboardKpis = data?.kpis ?? [];
+
   return (
     <section className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid-cols-4">
       {dashboardKpis.map((kpi) => {

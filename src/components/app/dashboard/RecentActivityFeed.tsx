@@ -9,9 +9,8 @@ import {
   UserCheck,
 } from "lucide-react";
 
-import { recentActivity } from "@/lib/mock/dashboard";
-import type { ActivityItem } from "@/lib/mock/dashboard";
-import type { ActivityType } from "@/lib/mock/types";
+import { useDashboard } from "@/api/hooks/use-dashboard";
+import type { ActivityItem, ActivityType } from "@/api/types";
 import { RiskBadge } from "@/components/app/RiskBadge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -26,6 +25,9 @@ const typeMeta: Record<ActivityType, { label: string; icon: typeof Activity }> =
 };
 
 export function RecentActivityFeed() {
+  const { data } = useDashboard();
+  const recentActivity = data?.activity ?? [];
+
   return (
     <section className="rounded-2xl border border-border bg-card p-6">
       <div className="flex items-center gap-2">

@@ -1,0 +1,101 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "id": "nakuru", "name": "Nakuru", "score": 0.68 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [35.5, -0.1],
+            [36.2, -0.1],
+            [36.2, -0.7],
+            [35.5, -0.7],
+            [35.5, -0.1]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "nyandarua", "name": "Nyandarua", "score": 0.74 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [36.2, -0.1],
+            [36.8, -0.1],
+            [36.8, -0.7],
+            [36.2, -0.7],
+            [36.2, -0.1]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "kiambu", "name": "Kiambu", "score": 0.46 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [36.6, -0.7],
+            [37.2, -0.7],
+            [37.2, -1.2],
+            [36.6, -1.2],
+            [36.6, -0.7]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "meru", "name": "Meru", "score": 0.38 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [37.2, -0.2],
+            [37.8, -0.2],
+            [37.8, -0.8],
+            [37.2, -0.8],
+            [37.2, -0.2]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "kisumu", "name": "Kisumu", "score": 0.51 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [34.6, -0.1],
+            [35.2, -0.1],
+            [35.2, -0.8],
+            [34.6, -0.8],
+            [34.6, -0.1]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": "mombasa", "name": "Mombasa", "score": 0.57 },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [39.4, -3.8],
+            [39.8, -3.8],
+            [39.8, -4.2],
+            [39.4, -4.2],
+            [39.4, -3.8]
+          ]
+        ]
+      }
+    }
+  ]
+}

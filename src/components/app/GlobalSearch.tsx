@@ -20,8 +20,8 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { searchIndex, searchTypeLabels } from "@/lib/mock/search";
-import type { SearchEntityType } from "@/lib/mock/types";
+import { useGlobalSearch, searchTypeLabels } from "@/api/hooks/use-search";
+import type { SearchEntityType } from "@/api/types";
 import { RiskBadge } from "@/components/app/RiskBadge";
 
 const typeIcons: Record<SearchEntityType, typeof User> = {
@@ -43,18 +43,7 @@ interface GlobalSearchProps {
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return searchIndex;
-    return searchIndex.filter(
-      (item) =>
-        item.title.toLowerCase().includes(q) ||
-        item.subtitle.toLowerCase().includes(q) ||
-        item.location.toLowerCase().includes(q) ||
-        item.status.toLowerCase().includes(q),
-    );
-  }, [query]);
+  const { data: filtered = [] } = useGlobalSearch(query);
 
   const grouped = useMemo(() => {
     const groups = new Map<SearchEntityType, typeof filtered>();

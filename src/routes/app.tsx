@@ -1,11 +1,18 @@
 import { useCallback, useState } from "react";
-import { Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
+import { Outlet, createFileRoute, redirect, useRouterState } from "@tanstack/react-router";
 
 import { AppHeader } from "@/components/app/AppHeader";
 import { AppSidebar } from "@/components/app/AppSidebar";
 import { GlobalSearch, useGlobalSearchShortcut } from "@/components/app/GlobalSearch";
+import { getAuthSessionSnapshot } from "@/providers/AuthProvider";
 
 export const Route = createFileRoute("/app")({
+  beforeLoad: () => {
+    const session = getAuthSessionSnapshot();
+    if (!session) {
+      throw redirect({ to: "/" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Mizizi · Platform" },

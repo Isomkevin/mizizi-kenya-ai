@@ -1,14 +1,6 @@
 import { cn } from "@/lib/utils";
-import type { RiskLevel } from "@/lib/mock/types";
-import { riskColor } from "@/lib/mock/dashboard";
-
-const labels: Record<RiskLevel, string> = {
-  "very-low": "Very low",
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-  critical: "Critical",
-};
+import type { RiskLevel } from "@/api/types";
+import { riskColor, riskLabels } from "@/lib/risk";
 
 export function RiskBadge({ level, className }: { level: RiskLevel; className?: string }) {
   return (
@@ -19,7 +11,7 @@ export function RiskBadge({ level, className }: { level: RiskLevel; className?: 
       )}
     >
       <span className="h-1.5 w-1.5 rounded-full" style={{ background: riskColor(level) }} />
-      {labels[level]}
+      {riskLabels[level]}
     </span>
   );
 }

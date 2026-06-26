@@ -9,7 +9,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 
-import { quickActions } from "@/lib/mock/dashboard";
+import { useDashboard } from "@/api/hooks/use-dashboard";
 
 const actionIcons = {
   "qa-1": UserPlus,
@@ -21,6 +21,9 @@ const actionIcons = {
 } as const;
 
 export function QuickActions() {
+  const { data } = useDashboard();
+  const quickActions = data?.quickActions ?? [];
+
   return (
     <section className="rounded-2xl border border-border bg-card p-6">
       <div className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
