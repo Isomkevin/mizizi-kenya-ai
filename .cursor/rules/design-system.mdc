@@ -1,0 +1,15 @@
+---
+description: Mizizi design system and component styling
+globs: src/styles.css,src/components/**
+alwaysApply: false
+---
+
+# Design system
+
+- Tokens and theme: `src/styles.css` (`@theme inline`, risk semantic colors, `--font-display`, `--font-mono`).
+- Fonts: Instrument Serif (display), Geist Sans (UI), JetBrains Mono (data) — linked in `__root.tsx`.
+- Use existing utility classes: `font-display`, `font-mono-data`, risk tokens from the spec.
+- shadcn primitives in `src/components/ui/` — customize via CSS variables, don't replace with one-off styles.
+- Landing components: `src/components/landing/`. App features: `src/components/app/`.
+- Motion: restrained; prefer `Reveal` patterns on marketing pages. No gratuitous animation.
+- Empty/in-progress app surfaces: `PlaceholderPanel` until the phase ships real UI.

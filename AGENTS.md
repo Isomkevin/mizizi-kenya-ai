@@ -1,3 +1,9 @@
+# Mizizi — Agent Guide
+
+Entry point for AI coding agents continuing work on this repository.
+
+## Lovable connection
+
 <!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
@@ -8,3 +14,70 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Project
+
+**Mizizi** is an enterprise agricultural risk intelligence platform for the Kenya AI Challenge 2026 (AgriFin Finance Challenge). It combines graph intelligence, explainable AI, climate signals, and financial risk analytics.
+
+Quality bar: intentional, editorial, infrastructure-grade UI — not generic SaaS templates. Reference aesthetic: Palantir, Stripe, Linear, Bloomberg.
+
+## Stack
+
+| Layer | Choice |
+| --- | --- |
+| Framework | TanStack Start (file-based routes in `src/routes/`) |
+| UI | React 19, shadcn/ui primitives in `src/components/ui/` |
+| Styling | Tailwind CSS v4 tokens in `src/styles.css` |
+| Charts | Recharts (via shadcn chart components) |
+| Graph (Phase 4) | `react-force-graph-2d` |
+| Data (current) | Typed mock data in `src/lib/mock/` — no backend yet |
+| Package manager | Bun |
+
+## Documentation map
+
+| File | Purpose |
+| --- | --- |
+| [docs/product-spec.md](docs/product-spec.md) | Full PRD (~3,800 lines) — product vision, IA, design system, engineering standards |
+| [docs/phase-status.md](docs/phase-status.md) | What's shipped vs. next — **read this before picking up work** |
+| [.lovable/plan.md](.lovable/plan.md) | Phased build roadmap (Lovable + agents) |
+| [src/routes/README.md](src/routes/README.md) | TanStack Start routing conventions |
+| [src/components/app/README.md](src/components/app/README.md) | App shell and feature component patterns |
+| [src/lib/mock/README.md](src/lib/mock/README.md) | Mock data conventions |
+
+## Current focus
+
+See [docs/phase-status.md](docs/phase-status.md). At a glance:
+
+- **Done:** Phase 1 (design system, landing page, app route scaffold)
+- **In progress / partial:** Phase 2 (basic dashboard shell with inline mock KPIs)
+- **Next:** Complete Phase 2 (enterprise layout, ⌘K search), then Phase 3 (farmer intelligence)
+
+## Conventions
+
+1. **Routes** — Use `src/routes/` only. No `src/pages/`, no Next.js layouts. See `src/routes/README.md`.
+2. **Design tokens** — Extend `src/styles.css`; reskin shadcn primitives. No default purple/indigo palette.
+3. **Mock data** — Add typed modules under `src/lib/mock/`. Structure for later swap to server functions.
+4. **App placeholders** — Use `PlaceholderPanel` only until a phase ships real UI for that route.
+5. **Fonts** — Load via `<link>` in `src/routes/__root.tsx` head (template rule).
+6. **Scope** — Backend, auth, and real ML are out of scope until explicitly requested. The PRD's "no mock data" rule applies to production; phased builds use mocks first per `.lovable/plan.md`.
+
+## Multi-tool handoff
+
+This repo is set up so different AI coding tools can continue the same work. **Always read [docs/phase-status.md](docs/phase-status.md) first** — it is the shared “where we left off” file every agent should update after milestones.
+
+| Tool | Entry file(s) |
+| --- | --- |
+| **Any agent** | `AGENTS.md` (this file) |
+| **Cursor** | `.cursor/rules/`, `.cursor/skills/` |
+| **Claude Code** | `CLAUDE.md`, `.claude/rules/` |
+| **VS Code Copilot** | `.github/copilot-instructions.md`, `.github/instructions/` |
+| **Google Antigravity** | `.agents/CONTEXT.md`, `.agents/agents.md`, `.agents/skills/` |
+| **Lovable** | `.lovable/plan.md` |
+
+Canonical docs: [docs/product-spec.md](docs/product-spec.md) (PRD), [docs/phase-status.md](docs/phase-status.md) (progress).
+
+## Before you ship
+
+- Run `bun run lint` and `bun run build` if you changed routes or components.
+- Update [docs/phase-status.md](docs/phase-status.md) when completing a phase or major milestone.
+- Keep changes focused — match existing patterns in neighboring files.

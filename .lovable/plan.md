@@ -1,8 +1,8 @@
 # Mizizi — Build Plan
 
-The spec is enormous (3,800+ lines covering landing site, full enterprise app, graph intelligence workspace, analytics platform, design system, motion system). Building all of it in one shot would produce shallow work across the board. I'll deliver it in focused phases so each surface meets the Palantir/Stripe/Linear quality bar the spec demands.
+Phased delivery so each surface meets the Palantir/Stripe/Linear quality bar. **Progress:** [docs/phase-status.md](../docs/phase-status.md). **Full spec:** [docs/product-spec.md](../docs/product-spec.md).
 
-## Phase 1 — Foundation + Landing Page (this iteration)
+## Phase 1 — Foundation + Landing Page
 
 **Design system** (`src/styles.css`)
 
@@ -67,8 +67,6 @@ Executive overview, lending, geographic, climate, graph analytics, explainabilit
 - Charts: Recharts (already shadcn-wired). Graph: `react-force-graph-2d` (added Phase 4)
 - Fonts via `<link>` in `__root.tsx` head (per template rules)
 
-## Confirm before I start
+## Agent handoff
 
-1. **Scope of this first iteration** — Phase 1 only (landing + design system + nav shell), or push through Phase 2 (dashboard) as well?
-2. **Backend** — keep fully mocked for now, then enable Lovable Cloud up  later so phases persist data?
-3. **Design direction** — generate 3 rendered HTML directions for the landing hero/sections first, or trust the spec's described aesthetic and build directly? I want t top tier Design do what you have to do
+All AI agents should read [AGENTS.md](../AGENTS.md) at the repo root before starting work.

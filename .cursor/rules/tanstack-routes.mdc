@@ -1,0 +1,23 @@
+---
+description: TanStack Start file-based routing conventions
+globs: src/routes/**
+alwaysApply: false
+---
+
+# TanStack Start routes
+
+- One route per file under `src/routes/`. Landing: `index.tsx` → `/`. App layout: `app.tsx` → `/app` with `<Outlet />`.
+- App child routes use dot notation: `app.farmers.tsx` → `/app/farmers`, `app.index.tsx` → `/app/`.
+- Dynamic segments use bare `$`: `users/$id.tsx`, not `{id}`.
+- Do not create `src/pages/`, `_app/`, or Next.js-style layouts.
+- Do not edit `src/routeTree.gen.ts` — it is auto-generated.
+- Route `head()` for page titles/meta; fonts load in `__root.tsx`.
+
+```tsx
+// ✅ App child route pattern
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/app/farmers")({
+  component: FarmersPage,
+});
+```
