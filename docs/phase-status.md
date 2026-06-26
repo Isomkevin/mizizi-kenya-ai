@@ -1,6 +1,6 @@
 # Build phase status
 
-Last updated: 2026-06-26
+Last updated: 2026-06-27
 
 Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up where the last session left off. Update this file when you complete a milestone.
 
@@ -9,7 +9,7 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Design system, landing page, app route scaffold | **Done** |
-| 2 | Enterprise app shell + dashboard | **Partial** |
+| 2 | Enterprise app shell + dashboard | **Done** |
 | 3 | Farmer intelligence | Not started |
 | 4 | Graph intelligence workspace | Not started |
 | 5 | Explainability workspace | Not started |
@@ -22,23 +22,18 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] App layout with sidebar nav at `/app` (`src/routes/app.tsx`)
 - [x] Placeholder routes: farmers, graph, analytics, portfolio, climate, decisions
 
-## Phase 2 — Partial
-
-**Shipped**
+## Phase 2 — Done
 
 - [x] Sidebar navigation with active states
-- [x] Dashboard route at `/app` with inline KPI cards and insight feed (`src/routes/app.index.tsx`)
+- [x] Dashboard route at `/app` with KPI cards and insight feed (`src/routes/app.index.tsx`)
+- [x] Command bar + global search (⌘K) per spec (`src/components/app/GlobalSearch.tsx`)
+- [x] Full enterprise header layout (`src/components/app/AppHeader.tsx`, `AppSidebar.tsx`)
+- [x] Risk distribution charts on dashboard (`RiskDistributionChart.tsx` + Recharts)
+- [x] Geographic intelligence — schematic Kenya map (`KenyaMap.tsx`)
+- [x] Recent activity feed and quick actions
+- [x] Mock data in `src/lib/mock/dashboard.ts`, `search.ts`, `types.ts`
 
-**Remaining**
-
-- [ ] Command bar + global search (⌘K) per spec
-- [ ] Full enterprise header layout
-- [ ] Risk distribution charts on dashboard
-- [ ] Geographic intelligence (Kenya map)
-- [ ] Recent activity feed and quick actions
-- [ ] Extract dashboard mock data to `src/lib/mock/`
-
-**Next agent task:** Finish Phase 2 dashboard per [product-spec.md § Dashboard](product-spec.md) and [.lovable/plan.md](../.lovable/plan.md).
+**Next agent task:** Start Phase 3 — farmer intelligence per [product-spec.md § Farmer Intelligence](product-spec.md) and [.lovable/plan.md](../.lovable/plan.md).
 
 ## Phase 3 — Not started
 
@@ -64,5 +59,5 @@ Analytics platform with Recharts: executive, lending, geographic, climate, graph
 
 ## Technical debt / notes
 
-- Mock data folder `src/lib/mock/` exists but is empty — inline mocks in route files should migrate here during Phase 2 completion.
+- Kenya map uses schematic SVG counties for Phase 2; replace with GeoJSON drill-down in Phase 6 geographic analytics.
 - `routeTree.gen.ts` is auto-generated; never edit by hand.
