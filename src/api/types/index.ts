@@ -284,6 +284,14 @@ export interface SubmitDecisionInput {
   overrideReason?: string;
 }
 
+export interface SubmitDecisionInput {
+  id: string;
+  status: DecisionDetail["status"];
+  recommendation: DecisionDetail["recommendation"];
+  officerExplanation?: string;
+  overrideReason?: string;
+}
+
 export interface AnalyticsPayload {
   executive: {
     totalFarmers: number;
@@ -310,4 +318,10 @@ export interface AnalyticsPayload {
     topFactors: { factor: string; count: number }[];
     overrideReasons: { reason: string; count: number }[];
   };
+}
+
+export interface RefreshClimateInput {
+  county: string;
+  lat: number;
+  lon: number;
 }

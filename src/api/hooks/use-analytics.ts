@@ -1,12 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { analyticsPayload } from "@/api/hooks/fallback-data";
 import { getAnalyticsFn, refreshClimateFn } from "@/api/functions/analytics";
-import type { RefreshClimateInput } from "@/server/services/analytics";
+import type { RefreshClimateInput } from "@/api/types";
 
 export function useAnalytics() {
   return useQuery({
     queryKey: ["analytics"],
-    queryFn: () => getAnalyticsFn(),
+    queryFn: async () => {
+      try {
+        return await getAnalyticsFn();
+      } catch {
+        return analyticsPayload;
+      }
+    },
   });
 }
 

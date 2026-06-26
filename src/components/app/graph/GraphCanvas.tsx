@@ -1,4 +1,4 @@
-import ForceGraph2D from "react-force-graph-2d";
+import { useEffect, useState } from "react";
 
 import type { GraphNode, GraphPayload } from "@/api/types";
 import { graphNodeColor } from "@/components/app/graph/GraphLegend";
@@ -10,6 +10,27 @@ interface GraphCanvasProps {
 }
 
 export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasProps) {
+  const [ForceGraph2D, setForceGraph2D] =
+    useState<null | (typeof import("react-force-graph-2d"))["default"]>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    void import("react-force-graph-2d").then((module) => {
+      if (mounted) setForceGraph2D(() => module.default);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (!ForceGraph2D) {
+    return (
+      <div className="grid h-[540px] place-items-center rounded-xl border border-border bg-card text-sm text-muted-foreground">
+        Loading graph canvas...
+      </div>
+    );
+  }
+
   return (
     <div className="h-[540px] rounded-xl border border-border bg-card">
       <ForceGraph2D

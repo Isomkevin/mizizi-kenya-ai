@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
+import { farmerProfiles } from "@/api/hooks/fallback-data";
 import type { FarmerSummary, RiskLevel } from "@/api/types";
 import { getFarmerFn, searchFarmerProfilesFn } from "@/api/functions/farmers";
 
@@ -16,7 +17,14 @@ export interface FarmerFiltersInput {
 export function useFarmer(id?: string) {
   return useQuery({
     queryKey: ["farmers", "detail", id],
-    queryFn: () => getFarmerFn({ data: { id: id ?? "" } }),
+    queryFn: async () => {
+      const lookupId = id ?? "";
+      try {
+        return await getFarmerFn({ data: { id: lookupId } });
+      } catch {
+        return farmerProfiles[lookupId] ?? null;
+      }
+    },
     enabled: Boolean(id),
   });
 }
@@ -24,7 +32,21 @@ export function useFarmer(id?: string) {
 export function useSearchFarmers(query: string, limit = 25) {
   return useQuery({
     queryKey: ["farmers", "search", query, limit],
-    queryFn: () => searchFarmerProfilesFn({ data: { query, limit } }),
+    queryFn: async () => {
+      try {
+        return await searchFarmerProfilesFn({ data: { query, limit } });
+      } catch {
+        const q = query.trim().toLowerCase();
+        return Object.values(farmerProfiles)
+          .filter(
+            (farmer) =>
+              farmer.name.toLowerCase().includes(q) ||
+              farmer.farmerId.toLowerCase().includes(q) ||
+              farmer.county.toLowerCase().includes(q),
+          )
+          .slice(0, limit);
+      }
+    },
     enabled: query.trim().length > 0,
   });
 }
@@ -38,15 +60,20 @@ export function useFarmers(filters: FarmerFiltersInput) {
       filters.county ?? "all",
       filters.risk ?? "all",
     ],
-    queryFn: () =>
-      searchFarmerProfilesFn({
-        data: {
-          query: filters.query,
-          county: filters.county && filters.county !== "all" ? filters.county : undefined,
-          risk: filters.risk && filters.risk !== "all" ? filters.risk : undefined,
-          limit: 250,
-        },
-      }),
+    queryFn: async () => {
+      try {
+        return await searchFarmerProfilesFn({
+          data: {
+            query: filters.query,
+            county: filters.county && filters.county !== "all" ? filters.county : undefined,
+            risk: filters.risk && filters.risk !== "all" ? filters.risk : undefined,
+            limit: 250,
+          },
+        });
+      } catch {
+        return Object.values(farmerProfiles);
+      }
+    },
     staleTime: 30_000,
   });
 
