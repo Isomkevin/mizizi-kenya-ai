@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { expandGraphFn, getGraphFn } from "@/server/functions/graph";
+import { expandGraphFn, getGraphFn } from "@/api/functions/graph";
 
 export function useGraph(farmerId?: string) {
   const resolvedFarmerId = farmerId ?? "farmer-001";

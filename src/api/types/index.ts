@@ -276,6 +276,14 @@ export interface DecisionDetail {
   createdAt: string;
 }
 
+export interface SubmitDecisionInput {
+  id: string;
+  status: DecisionDetail["status"];
+  recommendation: DecisionDetail["recommendation"];
+  officerExplanation?: string;
+  overrideReason?: string;
+}
+
 export interface AnalyticsPayload {
   executive: {
     totalFarmers: number;

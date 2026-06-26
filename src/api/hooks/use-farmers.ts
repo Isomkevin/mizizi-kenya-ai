@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { FarmerSummary, RiskLevel } from "@/api/types";
-import { getFarmerFn, searchFarmerProfilesFn } from "@/server/functions/farmers";
+import { getFarmerFn, searchFarmerProfilesFn } from "@/api/functions/farmers";
 
 export interface FarmerFiltersInput {
   query?: string;
@@ -31,7 +31,13 @@ export function useSearchFarmers(query: string, limit = 25) {
 
 export function useFarmers(filters: FarmerFiltersInput) {
   const query = useQuery({
-    queryKey: ["farmers", "profiles", filters.query ?? "", filters.county ?? "all", filters.risk ?? "all"],
+    queryKey: [
+      "farmers",
+      "profiles",
+      filters.query ?? "",
+      filters.county ?? "all",
+      filters.risk ?? "all",
+    ],
     queryFn: () =>
       searchFarmerProfilesFn({
         data: {

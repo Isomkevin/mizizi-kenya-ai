@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getAnalyticsFn, refreshClimateFn } from "@/server/functions/analytics";
+import { getAnalyticsFn, refreshClimateFn } from "@/api/functions/analytics";
 import type { RefreshClimateInput } from "@/server/services/analytics";
 
 export function useAnalytics() {

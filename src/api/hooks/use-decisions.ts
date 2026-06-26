@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getDecisionFn, listDecisionsFn, submitDecisionFn } from "@/server/functions/decisions";
-import type { SubmitDecisionInput } from "@/server/services/decisions";
+import { getDecisionFn, listDecisionsFn, submitDecisionFn } from "@/api/functions/decisions";
+import type { SubmitDecisionInput } from "@/api/types";
 
 export function useDecisions(
   status?: "pending" | "approved" | "declined" | "override",

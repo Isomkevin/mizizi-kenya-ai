@@ -10,10 +10,10 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 | ----- | ----------------------------------------------- | ----------- |
 | 1     | Design system, landing page, app route scaffold | **Done**    |
 | 2     | Enterprise app shell + dashboard                | **Done**    |
-| 3     | Farmer intelligence                             | Not started |
-| 4     | Graph intelligence workspace                    | Not started |
-| 5     | Explainability workspace                        | Not started |
-| 6     | Analytics platform                              | Not started |
+| 3     | Farmer intelligence                             | **Done**    |
+| 4     | Graph intelligence workspace                    | **Done**    |
+| 5     | Explainability workspace                        | **Done**    |
+| 6     | Analytics platform                              | **Done**    |
 
 ## Phase 1 — Done
 
@@ -31,25 +31,38 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] Risk distribution charts on dashboard (`RiskDistributionChart.tsx` + Recharts)
 - [x] Geographic intelligence — schematic Kenya map (`KenyaMap.tsx`)
 - [x] Recent activity feed and quick actions
-- [x] Mock data in `src/lib/mock/dashboard.ts`, `search.ts`, `types.ts`
+- [x] Dashboard migrated to `useDashboard()` hooks
 
-**Next agent task:** Start Phase 3 — farmer intelligence per [product-spec.md § Farmer Intelligence](product-spec.md) and [.lovable/plan.md](../.lovable/plan.md).
+## Phase 3 — Done
 
-## Phase 3 — Not started
+- [x] Farmer search at `/app/farmers` with filters, result cards, `useFarmers`
+- [x] Farmer profile at `/app/farmers/$farmerId` with tabs (overview, financial, climate, applications, decisions, documents, activity)
+- [x] Components in `src/components/app/farmers/`
 
-Farmer search, profile tabs (Overview, Graph, Explainability, Timeline, Documents, Communications). See product spec § Farmer Intelligence.
+## Phase 4 — Done
 
-## Phase 4 — Not started
+- [x] Graph workspace at `/app/graph` with `react-force-graph-2d`, toolbar, sidebar, legend, path viewer
+- [x] `farmerId` query param support via `useGraph`
 
-Force-directed graph canvas. Add `react-force-graph-2d` when starting this phase.
+## Phase 5 — Done
 
-## Phase 5 — Not started
+- [x] Pending decisions queue at `/app/decisions`
+- [x] Decision workspace at `/app/decisions/$decisionId`
+- [x] Components in `src/components/app/decisions/`
 
-Explainability workspace with decision summary, factor waterfall, officer decision UI.
+## Phase 6 — Done
 
-## Phase 6 — Not started
+- [x] Tabbed analytics at `/app/analytics` (executive, lending, geographic, climate, graph, explainability)
+- [x] `/app/portfolio` and `/app/climate` redirect to analytics tabs
+- [x] `src/assets/geo/kenya-counties.json` + `AnalyticsMap` choropleth
 
-Analytics platform with Recharts: executive, lending, geographic, climate, graph, explainability views.
+## Phase 2 migration — Done
+
+- [x] Dashboard components use `useDashboard()`
+- [x] `GlobalSearch` uses `useGlobalSearch()` / server search fn
+- [x] Minimal auth via `AuthProvider` + `/app` route guard (dev bypass)
+
+**Next agent task:** Wire remaining server integrations (Supabase auth, Neo4j live graph) as backend milestones land.
 
 ## Out of scope (until requested)
 
@@ -59,5 +72,6 @@ Analytics platform with Recharts: executive, lending, geographic, climate, graph
 
 ## Technical debt / notes
 
-- Kenya map uses schematic SVG counties for Phase 2; replace with GeoJSON drill-down in Phase 6 geographic analytics.
+- Analytics geographic tab uses simplified GeoJSON choropleth; dashboard map remains schematic SVG.
+- Server RPC entry points live in `src/api/functions/` (TanStack import protection blocks client imports from `src/server/**`).
 - `routeTree.gen.ts` is auto-generated; never edit by hand.

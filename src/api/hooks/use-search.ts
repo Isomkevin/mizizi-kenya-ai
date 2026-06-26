@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import type { SearchEntityType } from "@/api/types";
-import { globalSearchFn as serverGlobalSearchFn, searchFarmersFn } from "@/server/functions/search";
+import { globalSearchFn as serverGlobalSearchFn, searchFarmersFn } from "@/api/functions/search";
 
 export const searchTypeLabels: Record<SearchEntityType, string> = {
   farmer: "Farmers",
