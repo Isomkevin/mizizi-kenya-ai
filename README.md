@@ -58,9 +58,9 @@ TanStack Start BFF (createServerFn)
 └───────────────────┴─────────────────┴──────────────────┘
 ```
 
-**Today:** Phases 1–2 ship a full UI shell and dashboard with typed mock data in `src/lib/mock/` — a temporary bridge while the BFF and data layer land.
+**Today:** Phases 0–6 are implemented with a full-stack path: TanStack Start BFF (`src/api/functions/`), service layer (`src/server/services/`), Supabase schema + RLS migrations, Neo4j constraints, seeded persistence, and live hook-based app surfaces.
 
-**Target:** Server functions in `src/server/functions/`, business logic in `src/server/services/`, Postgres schema in `src/server/db/`, Cypher and graph jobs in `src/server/graph/`. Mocks are retired surface-by-surface as live APIs replace them (see [docs/phase-status.md](docs/phase-status.md)).
+**Runtime model:** local-first persisted data (`.data/mizizi-db.json`) with Supabase/Neo4j adapters when credentials are configured. Hook-level fallbacks remain as resilience guards, not UI data sources.
 
 ---
 
@@ -128,10 +128,11 @@ Before opening a PR that touches routes or components, run `bun run lint` and `b
 | ----- | --------------------------------------------------------- | -------- |
 | 1     | Design system, landing page, app route scaffold           | **Done** |
 | 2     | Enterprise shell, dashboard, ⌘K search, charts, Kenya map | **Done** |
-| 3     | Farmer intelligence — search, profile tabs, documents     | Next     |
-| 4     | Graph intelligence workspace                              | Planned  |
-| 5     | Explainability + officer decision workspace               | Planned  |
-| 6     | Analytics platform (GeoJSON map, rollups, exports)        | Planned  |
+| 0     | Full-stack foundation (auth/schema/seed/BFF)              | **Done** |
+| 3     | Farmer intelligence — search, profile tabs, documents     | **Done** |
+| 4     | Graph intelligence workspace                              | **Done** |
+| 5     | Explainability + officer decision workspace               | **Done** |
+| 6     | Analytics platform (GeoJSON map, rollups, exports)        | **Done** |
 
 Details and checklists: [docs/phase-status.md](docs/phase-status.md). Phased roadmap: [.lovable/plan.md](.lovable/plan.md). Full product vision: [docs/product-spec.md](docs/product-spec.md).
 

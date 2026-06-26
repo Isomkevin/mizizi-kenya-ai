@@ -32,7 +32,7 @@ Quality bar: intentional, editorial, infrastructure-grade UI — not generic Saa
 | Styling         | Tailwind CSS v4 tokens in `src/styles.css`             |
 | Charts          | Recharts (via shadcn chart components)                 |
 | Graph (Phase 4) | `react-force-graph-2d`                                 |
-| Data (current)  | Typed mock data in `src/lib/mock/` — no backend yet    |
+| Data (current)  | Local-first persisted seed + Supabase/Neo4j adapters (`src/server/`) |
 | Package manager | Bun                                                    |
 
 ## Documentation map
@@ -52,9 +52,8 @@ Quality bar: intentional, editorial, infrastructure-grade UI — not generic Saa
 
 See [docs/phase-status.md](docs/phase-status.md). At a glance:
 
-- **Done:** Phase 1 (design system, landing page, app route scaffold)
-- **In progress / partial:** Phase 2 (basic dashboard shell with inline mock KPIs)
-- **Next:** Complete Phase 2 (enterprise layout, ⌘K search), then Phase 3 (farmer intelligence)
+- **Done:** Phases 0–6 (foundation, dashboard, farmers, graph, decisions, analytics)
+- **Current:** Production hardening and deeper integration quality (Supabase auth sessions, Neo4j online/GDS paths, test coverage)
 
 ## Conventions
 
@@ -63,7 +62,7 @@ See [docs/phase-status.md](docs/phase-status.md). At a glance:
 3. **Mock data** — Add typed modules under `src/lib/mock/`. Structure for later swap to server functions.
 4. **App placeholders** — Use `PlaceholderPanel` only until a phase ships real UI for that route.
 5. **Fonts** — Load via `<link>` in `src/routes/__root.tsx` head (template rule).
-6. **Scope** — Backend, auth, and real ML are out of scope until explicitly requested. The PRD's "no mock data" rule applies to production; phased builds use mocks first per `.lovable/plan.md`.
+6. **Scope** — Default runtime is local-first with persisted seed; Supabase/Neo4j are first-class adapters. Keep UI surfaces on hooks/server functions, and use hook-level fallback data only as a resilience path.
 
 ## Agent skills
 

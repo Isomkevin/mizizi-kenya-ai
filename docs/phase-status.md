@@ -8,12 +8,21 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 
 | Phase | Scope                                           | Status      |
 | ----- | ----------------------------------------------- | ----------- |
+| 0     | Full-stack foundation (auth/schema/seed/BFF)    | **Done**    |
 | 1     | Design system, landing page, app route scaffold | **Done**    |
 | 2     | Enterprise app shell + dashboard                | **Done**    |
 | 3     | Farmer intelligence                             | **Done**    |
 | 4     | Graph intelligence workspace                    | **Done**    |
 | 5     | Explainability workspace                        | **Done**    |
 | 6     | Analytics platform                              | **Done**    |
+
+## Phase 0 — Done
+
+- [x] `.env.example` documents Supabase, Neo4j, tenant and AI runtime variables
+- [x] Supabase migration with tenant RLS in `supabase/migrations/001_initial_schema.sql`
+- [x] Neo4j constraints in `scripts/neo4j/001_constraints.cypher`
+- [x] BFF server-function surface in `src/api/functions/*`
+- [x] Seed pipeline resets data, syncs graph entities, and primes climate snapshots
 
 ## Phase 1 — Done
 
@@ -62,16 +71,15 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] `GlobalSearch` uses `useGlobalSearch()` / server search fn
 - [x] Minimal auth via `AuthProvider` + `/app` route guard (dev bypass)
 
-**Next agent task:** Wire remaining server integrations (Supabase auth, Neo4j live graph) as backend milestones land.
+## Next priorities
 
-## Out of scope (until requested)
-
-- Backend / Lovable Cloud persistence
-- Authentication
-- Real ML models (use curated mock explainability payloads)
+- Harden production Supabase auth session flows (replace dev bypass in production runtime)
+- Expand Neo4j online queries and GDS jobs beyond seeded local fallbacks
+- Add decision pipeline tests for risk/explanation grounding and audit transitions
 
 ## Technical debt / notes
 
-- Analytics geographic tab uses simplified GeoJSON choropleth; dashboard map remains schematic SVG.
+- Analytics geographic tab uses GeoJSON county polygons; dashboard map remains a lightweight schematic for at-a-glance status.
+- Fallback payloads remain hook-level only (`src/api/hooks/fallback-data.ts`) and are not consumed directly by UI components.
 - Server RPC entry points live in `src/api/functions/` (TanStack import protection blocks client imports from `src/server/**`).
 - `routeTree.gen.ts` is auto-generated; never edit by hand.

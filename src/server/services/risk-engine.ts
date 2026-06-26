@@ -51,7 +51,10 @@ export function assessFarmerRisk(farmer: FarmerProfile): RiskAssessment {
   const completenessPenalty = Math.max(0, Math.round((100 - farmer.dataCompleteness) / 2.5));
   const graphBonus = Math.min(12, Math.round(farmer.graphConnections / 2));
   const confidenceBonus = Math.round(farmer.confidence * 8);
-  const score = Math.max(0, droughtPenalty + overduePenalty + completenessPenalty - graphBonus - confidenceBonus);
+  const score = Math.max(
+    0,
+    droughtPenalty + overduePenalty + completenessPenalty - graphBonus - confidenceBonus,
+  );
   const risk = SCORE_TO_RISK.find((band) => score <= band.max)?.level ?? "critical";
 
   const factors = normalizeFactors([

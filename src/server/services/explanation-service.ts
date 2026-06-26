@@ -29,9 +29,7 @@ function groundedTemplate(input: ExplanationInput): GeneratedExplanation {
     `Confidence: ${Math.round(input.confidence * 100)}%.`,
     `Top factors: ${topFactors || "No factor data available"}.`,
     input.negativeSignals.length ? `Primary risk alerts: ${input.negativeSignals.join(" ")}` : "",
-    input.positiveSignals.length
-      ? `Primary stabilizers: ${input.positiveSignals.join(" ")}`
-      : "",
+    input.positiveSignals.length ? `Primary stabilizers: ${input.positiveSignals.join(" ")}` : "",
     "Grounding note: this explanation is generated strictly from stored risk factors and profile evidence.",
   ]
     .filter(Boolean)

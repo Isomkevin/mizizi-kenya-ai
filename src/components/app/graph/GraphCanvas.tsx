@@ -10,8 +10,9 @@ interface GraphCanvasProps {
 }
 
 export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasProps) {
-  const [ForceGraph2D, setForceGraph2D] =
-    useState<null | (typeof import("react-force-graph-2d"))["default"]>(null);
+  const [ForceGraph2D, setForceGraph2D] = useState<
+    null | (typeof import("react-force-graph-2d"))["default"]
+  >(null);
 
   useEffect(() => {
     let mounted = true;
