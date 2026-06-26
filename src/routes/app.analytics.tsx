@@ -26,7 +26,7 @@ function AnalyticsPage() {
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="space-y-2">
         <p className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
-          Phase 6 · Analytics platform
+          Analytics platform
         </p>
         <h1 className="font-display text-4xl leading-tight md:text-5xl">Platform Analytics</h1>
       </section>

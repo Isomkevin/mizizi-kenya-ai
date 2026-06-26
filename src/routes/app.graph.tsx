@@ -43,7 +43,7 @@ function GraphWorkspace() {
     <div className="mx-auto max-w-7xl space-y-4 px-4 py-8 sm:px-6 sm:py-10">
       <section className="space-y-2">
         <p className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
-          Phase 4 · Graph workspace
+          Graph workspace
         </p>
         <h1 className="font-display text-4xl leading-tight md:text-5xl">
           Graph Intelligence Workspace

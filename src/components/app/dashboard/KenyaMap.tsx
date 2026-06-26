@@ -142,7 +142,7 @@ export function KenyaMap() {
             </dl>
             <p className="text-xs text-muted-foreground">
               Zooming reveals cooperatives, farmers, and in-flight applications for this county —
-              full drill-down ships in Phase 6 analytics.
+              open geographic analytics for full drill-down.
             </p>
           </div>
         ) : (

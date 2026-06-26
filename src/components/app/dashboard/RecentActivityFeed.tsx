@@ -86,8 +86,7 @@ function ActivityRow({ item }: { item: ActivityItem }) {
       </div>
       {open ? (
         <div className="ml-[4.75rem] mt-2 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
-          Full audit trail and linked entities will open from the farmer or decision workspace in
-          Phase 3.
+          Full audit trail and linked entities open from the farmer or decision workspace.
         </div>
       ) : null}
     </li>
