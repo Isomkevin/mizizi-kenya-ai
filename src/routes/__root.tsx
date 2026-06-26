@@ -81,14 +81,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Mizizi — Connected Intelligence for Agricultural Finance" },
+      { title: "Mizizi" },
       {
         name: "description",
         content:
           "Mizizi is the explainable intelligence layer connecting banks, SACCOs, insurers and cooperatives to the real signals smallholder farmers already generate.",
       },
       { name: "author", content: "LESOM Dynamics" },
-      { property: "og:title", content: "Mizizi — Connected Intelligence for Agricultural Finance" },
+      { property: "og:title", content: "Mizizi" },
       {
         property: "og:description",
         content:
@@ -96,6 +96,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Mizizi" },
+      { name: "description", content: "Mizizi (\"roots\" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend" },
+      { property: "og:description", content: "Mizizi (\"roots\" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend" },
+      { name: "twitter:description", content: "Mizizi (\"roots\" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8d766a00-ef4f-4d46-b18b-666c853b8034" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8d766a00-ef4f-4d46-b18b-666c853b8034" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
