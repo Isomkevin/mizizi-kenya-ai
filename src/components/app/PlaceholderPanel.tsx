@@ -1,4 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { Construction } from "lucide-react";
 
 export function PlaceholderPanel({
@@ -21,7 +20,3 @@ export function PlaceholderPanel({
     </div>
   );
 }
-
-export const Route = createFileRoute("/app/_placeholder")({
-  component: () => null,
-});
