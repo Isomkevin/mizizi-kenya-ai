@@ -1,6 +1,7 @@
 ---
 name: neo4j-graphql-skill
-description: Build and configure a GraphQL API backed by Neo4j using @neo4j/graphql v7 (current) or v5 (LTS).
+description:
+  Build and configure a GraphQL API backed by Neo4j using @neo4j/graphql v7 (current) or v5 (LTS).
   Covers Neo4jGraphQL constructor, getSchema(), assertIndexesAndConstraints(), type definitions with @node,
   @relationship (IN/OUT/UNDIRECTED), @cypher for custom resolvers, @authorization/@authentication for JWT/JWKS
   security, auto-generated queries/mutations, OGM programmatic access, subscriptions via CDC, and Apollo
@@ -30,10 +31,10 @@ allowed-tools: Bash WebFetch
 
 ## Version Matrix
 
-| Version | Status | Notes |
-|---|---|---|
-| v7 | Current | `@node` required; `options` removed; explicit `eq` syntax |
-| v5 | LTS | Older syntax; `options: {limit, offset, sort}` still valid |
+| Version | Status  | Notes                                                      |
+| ------- | ------- | ---------------------------------------------------------- |
+| v7      | Current | `@node` required; `options` removed; explicit `eq` syntax  |
+| v5      | LTS     | Older syntax; `options: {limit, offset, sort}` still valid |
 
 Default to v7 unless codebase is on v5.
 
@@ -46,6 +47,7 @@ npm install @neo4j/graphql neo4j-driver graphql @apollo/server
 ```
 
 For subscriptions (CDC required):
+
 ```bash
 npm install ws graphql-ws express body-parser cors
 ```
@@ -55,10 +57,10 @@ npm install ws graphql-ws express body-parser cors
 ## Step 2 — Minimal Server Setup
 
 ```javascript
-import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
-import { Neo4jGraphQL } from '@neo4j/graphql';
-import neo4j from 'neo4j-driver';
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from "@apollo/server/standalone";
+import { Neo4jGraphQL } from "@neo4j/graphql";
+import neo4j from "neo4j-driver";
 
 const typeDefs = `#graphql
   type Movie @node {
@@ -76,7 +78,7 @@ const typeDefs = `#graphql
 
 const driver = neo4j.driver(
   process.env.NEO4J_URI,
-  neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD)
+  neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD),
 );
 
 const neoSchema = new Neo4jGraphQL({ typeDefs, driver });
@@ -149,8 +151,12 @@ query {
     title
     actorsConnection {
       edges {
-        properties { role }   # maps to @relationshipProperties interface
-        node { name }
+        properties {
+          role
+        } # maps to @relationshipProperties interface
+        node {
+          name
+        }
       }
     }
   }
@@ -173,9 +179,9 @@ type Person @node {
   recommendedMovies: [Movie!]!
     @cypher(
       statement: """
-        MATCH (this)-[:WATCHED]->(m:Movie)<-[:WATCHED]-(o:Person)-[:WATCHED]->(rec:Movie)
-        WHERE NOT (this)-[:WATCHED]->(rec)
-        RETURN rec
+      MATCH (this)-[:WATCHED]->(m:Movie)<-[:WATCHED]-(o:Person)-[:WATCHED]->(rec:Movie)
+      WHERE NOT (this)-[:WATCHED]->(rec)
+      RETURN rec
       """
       columnName: "rec"
     )
@@ -199,7 +205,10 @@ type Query {
 # extend type adds computed fields without modifying the base type definition
 extend type Movie @node {
   avgRating: Float
-    @cypher(statement: "MATCH (this)<-[r:RATED]-(:User) RETURN avg(r.rating) AS result", columnName: "result")
+    @cypher(
+      statement: "MATCH (this)<-[r:RATED]-(:User) RETURN avg(r.rating) AS result"
+      columnName: "result"
+    )
 
   # Field arguments passed as Cypher params; always provide default to avoid null
   recommended(limit: Int = 3): [Movie!]!
@@ -214,7 +223,7 @@ extend type Movie @node {
 
 ```graphql
 type Post @node {
-  id: ID! @id                          # auto-generates UUID; creates UNIQUE constraint
+  id: ID! @id # auto-generates UUID; creates UNIQUE constraint
   createdAt: DateTime! @timestamp(operations: [CREATE])
   updatedAt: DateTime @timestamp(operations: [CREATE, UPDATE])
   title: String!
@@ -226,7 +235,7 @@ type Post @node {
 ```graphql
 type User @node {
   id: ID! @id
-  email: String! @alias(property: "emailAddress")  # GraphQL: email → DB: emailAddress
+  email: String! @alias(property: "emailAddress") # GraphQL: email → DB: emailAddress
 }
 ```
 
@@ -252,7 +261,7 @@ const neoSchema = new Neo4jGraphQL({
   driver,
   features: {
     authorization: {
-      key: { url: 'https://myapp.com/.well-known/jwks.json' },
+      key: { url: "https://myapp.com/.well-known/jwks.json" },
     },
   },
 });
@@ -270,7 +279,8 @@ context: async ({ req }) => ({ jwt: myDecodeJwt(req.headers.authorization) }),
 
 ```graphql
 # Require auth on all operations for a type
-type Post @node
+type Post
+  @node
   @authentication
   @authorization(filter: [{ where: { node: { author: { id: { eq: "$jwt.sub" } } } } }]) {
   title: String!
@@ -278,21 +288,24 @@ type Post @node
 }
 
 # requireAuthentication: false = allow public access without JWT
-type Article @node
-  @authorization(filter: [
-    { requireAuthentication: false, where: { node: { published: { eq: true } } } }
-    { where: { node: { author: { id: { eq: "$jwt.sub" } } } } }
-  ]) {
+type Article
+  @node
+  @authorization(
+    filter: [
+      { requireAuthentication: false, where: { node: { published: { eq: true } } } }
+      { where: { node: { author: { id: { eq: "$jwt.sub" } } } } }
+    ]
+  ) {
   title: String!
   published: Boolean!
 }
 
 # validate (throws error) vs filter (silently hides data)
-type BankAccount @node
-  @authorization(validate: [{
-    when: [BEFORE],
-    where: { node: { owner: { id: { eq: "$jwt.sub" } } } }
-  }]) {
+type BankAccount
+  @node
+  @authorization(
+    validate: [{ when: [BEFORE], where: { node: { owner: { id: { eq: "$jwt.sub" } } } } }]
+  ) {
   balance: Float!
 }
 
@@ -301,8 +314,7 @@ type JWT @jwt {
   roles: [String!]! @jwtClaim(path: "myApp.roles")
 }
 
-type AdminReport @node
-  @authentication(operations: [READ], jwt: { roles: { includes: "admin" } }) {
+type AdminReport @node @authentication(operations: [READ], jwt: { roles: { includes: "admin" } }) {
   data: String!
 }
 ```
@@ -317,13 +329,13 @@ type AdminReport @node
 
 For each `@node` type, the library generates:
 
-| Operation | Generated Name | Example |
-|---|---|---|
-| Query all | `{plural}` | `movies(where, sort, limit, offset)` |
+| Operation         | Generated Name       | Example                                       |
+| ----------------- | -------------------- | --------------------------------------------- |
+| Query all         | `{plural}`           | `movies(where, sort, limit, offset)`          |
 | Cursor pagination | `{plural}Connection` | `moviesConnection(first, after, where, sort)` |
-| Create | `create{Plural}` | `createMovies(input: [MovieCreateInput!]!)` |
-| Update | `update{Plural}` | `updateMovies(where, update)` |
-| Delete | `delete{Plural}` | `deleteMovies(where, delete)` |
+| Create            | `create{Plural}`     | `createMovies(input: [MovieCreateInput!]!)`   |
+| Update            | `update{Plural}`     | `updateMovies(where, update)`                 |
+| Delete            | `delete{Plural}`     | `deleteMovies(where, delete)`                 |
 
 ### v7 Filter Syntax (explicit `eq`)
 
@@ -332,7 +344,9 @@ For each `@node` type, the library generates:
 query {
   movies(where: { title: { eq: "The Matrix" } }) {
     title
-    actors { name }
+    actors {
+      name
+    }
   }
 }
 
@@ -348,14 +362,21 @@ query {
 
 ```graphql
 mutation {
-  createMovies(input: [{
-    title: "Inception"
-    actors: {
-      create: [{ node: { name: "Leonardo DiCaprio" } }]
-      connect: { where: { node: { name: { eq: "Joseph Gordon-Levitt" } } } }
+  createMovies(
+    input: [
+      {
+        title: "Inception"
+        actors: {
+          create: [{ node: { name: "Leonardo DiCaprio" } }]
+          connect: { where: { node: { name: { eq: "Joseph Gordon-Levitt" } } } }
+        }
+      }
+    ]
+  ) {
+    movies {
+      id
+      title
     }
-  }]) {
-    movies { id title }
   }
 }
 ```
@@ -369,28 +390,28 @@ mutation {
 OGM bypasses GraphQL authorization — use only in trusted server-side contexts.
 
 ```javascript
-import { OGM } from '@neo4j/graphql-ogm';
+import { OGM } from "@neo4j/graphql-ogm";
 
 const ogm = new OGM({ typeDefs, driver });
-await ogm.init();  // must await before using models
+await ogm.init(); // must await before using models
 
-const Movie = ogm.model('Movie');
+const Movie = ogm.model("Movie");
 
 // find
 const movies = await Movie.find({
-  where: { title: { eq: 'The Matrix' } },
+  where: { title: { eq: "The Matrix" } },
   selectionSet: `{ id title actors { name } }`,
 });
 
 // create
 const { movies: created } = await Movie.create({
-  input: [{ title: 'Dune', actors: { create: [{ node: { name: 'Timothée Chalamet' } }] } }],
+  input: [{ title: "Dune", actors: { create: [{ node: { name: "Timothée Chalamet" } }] } }],
 });
 
 // update
 await Movie.update({
   where: { id: { eq: movieId } },
-  update: { title: { set: 'Dune: Part One' } },
+  update: { title: { set: "Dune: Part One" } },
 });
 
 // delete
@@ -414,10 +435,13 @@ const neoSchema = new Neo4jGraphQL({
 ```
 
 Subscriptions auto-generate for each type:
+
 ```graphql
 subscription {
   movieCreated(where: { title: { eq: "The Matrix" } }) {
-    createdMovie { title }
+    createdMovie {
+      title
+    }
   }
 }
 # Also: movieUpdated, movieDeleted
@@ -428,47 +452,50 @@ subscription {
 ## Schema Control Directives
 
 ```graphql
-type ReadOnlyData @node @mutation(operations: []) { value: String! }  # disable mutations
-
+type ReadOnlyData @node @mutation(operations: []) {
+  value: String!
+} # disable mutations
 type HeavyDoc @node {
   id: ID! @id
-  content: String! @filterable(byValue: false) @sortable(enabled: false)  # perf guard
+  content: String! @filterable(byValue: false) @sortable(enabled: false) # perf guard
   title: String!
 }
 
-type Series @node @plural(value: "seriesList") { title: String! }  # irregular plural fix
+type Series @node @plural(value: "seriesList") {
+  title: String!
+} # irregular plural fix
 ```
 
 ---
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| `Type 'X' not found` | Missing `@node` on type (v7) | Add `@node` to every node type |
-| `@cypher` field returns null | `columnName` mismatch with RETURN alias | Match `columnName` exactly to RETURN alias |
-| Relationship direction mismatch | Both sides declare same direction | Inverse: if A has `direction: OUT`, B must have `direction: IN` |
-| `assertIndexesAndConstraints` throws | `@id` constraint not in DB | Add `{ options: { create: true } }` or run `CREATE CONSTRAINT` manually |
-| Auth not applied | JWT not in context | Pass `token: req.headers.authorization` in context function |
-| 0 results with valid data | v7 filter missing `eq` | Use `{ field: { eq: value } }` not `{ field: value }` |
-| `connectOrCreate not found` | Removed in v7 | Use `connect` + `create` separately |
-| Memory errors on large mutations | Complex Cypher generation | Batch mutations; increase `server.memory.heap.max_size` |
-| `@subscription` not generating | v7 requires explicit enable | Add `features: { subscriptions: true }` to constructor |
+| Error                                | Cause                                   | Fix                                                                     |
+| ------------------------------------ | --------------------------------------- | ----------------------------------------------------------------------- |
+| `Type 'X' not found`                 | Missing `@node` on type (v7)            | Add `@node` to every node type                                          |
+| `@cypher` field returns null         | `columnName` mismatch with RETURN alias | Match `columnName` exactly to RETURN alias                              |
+| Relationship direction mismatch      | Both sides declare same direction       | Inverse: if A has `direction: OUT`, B must have `direction: IN`         |
+| `assertIndexesAndConstraints` throws | `@id` constraint not in DB              | Add `{ options: { create: true } }` or run `CREATE CONSTRAINT` manually |
+| Auth not applied                     | JWT not in context                      | Pass `token: req.headers.authorization` in context function             |
+| 0 results with valid data            | v7 filter missing `eq`                  | Use `{ field: { eq: value } }` not `{ field: value }`                   |
+| `connectOrCreate not found`          | Removed in v7                           | Use `connect` + `create` separately                                     |
+| Memory errors on large mutations     | Complex Cypher generation               | Batch mutations; increase `server.memory.heap.max_size`                 |
+| `@subscription` not generating       | v7 requires explicit enable             | Add `features: { subscriptions: true }` to constructor                  |
 
 ---
 
 ## v6 → v7 Breaking Changes Summary
 
-| v6 | v7 |
-|---|---|
-| `@node` optional | `@node` required on every node type |
-| `options: { limit, sort }` | `limit`, `sort` as direct args |
-| `{ field: value }` filter | `{ field: { eq: value } }` |
-| `connectOrCreate` nested mutation | Removed — use `connect` + `create` |
-| `directed` arg on queries | `queryDirection` in `@relationship` |
-| Single rel fields `actor: Person` | Must use list `actors: [Person!]!` |
-| `@private` directive | Removed |
-| `@unique` directive | Removed |
+| v6                                | v7                                  |
+| --------------------------------- | ----------------------------------- |
+| `@node` optional                  | `@node` required on every node type |
+| `options: { limit, sort }`        | `limit`, `sort` as direct args      |
+| `{ field: value }` filter         | `{ field: { eq: value } }`          |
+| `connectOrCreate` nested mutation | Removed — use `connect` + `create`  |
+| `directed` arg on queries         | `queryDirection` in `@relationship` |
+| Single rel fields `actor: Person` | Must use list `actors: [Person!]!`  |
+| `@private` directive              | Removed                             |
+| `@unique` directive               | Removed                             |
 
 ---
 

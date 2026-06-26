@@ -112,6 +112,7 @@ Flux<String> getNames(Driver driver) {
 ```
 
 Key rules:
+
 - `Flux.usingWhen` ensures session closes in all paths (success / error / cancel).
 - Never subscribe inside a reactive chain — let the framework subscribe.
 - Reactive is only worth the complexity when the consumer is reactive (e.g. Spring WebFlux). For Spring MVC or synchronous code, use the sync or async API.

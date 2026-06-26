@@ -1,8 +1,8 @@
 # Mizizi documentation
 
-| Document | Description |
-| --- | --- |
-| [product-spec.md](product-spec.md) | Full product requirements document (PRD) |
+| Document                           | Description                                                                 |
+| ---------------------------------- | --------------------------------------------------------------------------- |
+| [product-spec.md](product-spec.md) | Full product requirements document (PRD)                                    |
 | [phase-status.md](phase-status.md) | Build phase progress and next steps — **update this after every milestone** |
 
 ## Cross-tool handoff

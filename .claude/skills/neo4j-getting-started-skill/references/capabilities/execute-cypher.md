@@ -1,7 +1,9 @@
 # Capability — execute-cypher
+
 # Three options for running Cypher statements against Neo4j.
 
 Detect and record `EXEC_METHOD` in the `context` stage — priority order:
+
 1. `mcp` — if neo4j-mcp is running as an MCP server in this session
 2. `cypher-shell` — if `cypher-shell` is on PATH
 3. `query-api` — HTTP fallback, always available when DB is reachable
@@ -15,18 +17,21 @@ Store as `EXEC_METHOD=mcp|cypher-shell|query-api` and use it consistently across
 Use when: neo4j-mcp is configured as an MCP server in this agent session.
 
 **Read query**:
+
 ```
 use tool: read-cypher
 params: { query: "CYPHER 25 MATCH (n) RETURN count(n) AS total", params: {} }
 ```
 
 **Write query**:
+
 ```
 use tool: write-cypher
 params: { query: "CYPHER 25 MERGE (n:Label {id: $id}) SET n.name = $name", params: { "id": "1", "name": "Test" } }
 ```
 
 **Schema inspection**:
+
 ```
 use tool: get-schema
 ```

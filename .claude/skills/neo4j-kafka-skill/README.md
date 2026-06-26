@@ -4,20 +4,20 @@
 
 Configure and operate the **Neo4j Connector for Kafka** (sink and source) and the **native Neo4j CDC API**.
 
-| Component | Covered |
-|---|---|
-| Sink: Cypher strategy | ✅ |
-| Sink: Pattern strategy | ✅ |
-| Sink: CDC strategy (schema + source-id) | ✅ |
-| Sink: CUD strategy | ✅ |
-| Sink: Exactly-once semantics (EOS) | ✅ |
-| Sink: Error handling / DLQ | ✅ |
-| Source: CDC-based (Neo4j 5.13+) | ✅ |
-| Source: Query-based (any edition) | ✅ |
-| Native CDC API (`db.cdc.query`) | ✅ |
-| Confluent Cloud managed connector | ✅ |
-| Schema Registry (Avro / JSON Schema) | ✅ |
-| CDC cursor-loop pattern (Python + Java) | ✅ |
+| Component                               | Covered |
+| --------------------------------------- | ------- |
+| Sink: Cypher strategy                   | ✅      |
+| Sink: Pattern strategy                  | ✅      |
+| Sink: CDC strategy (schema + source-id) | ✅      |
+| Sink: CUD strategy                      | ✅      |
+| Sink: Exactly-once semantics (EOS)      | ✅      |
+| Sink: Error handling / DLQ              | ✅      |
+| Source: CDC-based (Neo4j 5.13+)         | ✅      |
+| Source: Query-based (any edition)       | ✅      |
+| Native CDC API (`db.cdc.query`)         | ✅      |
+| Confluent Cloud managed connector       | ✅      |
+| Schema Registry (Avro / JSON Schema)    | ✅      |
+| CDC cursor-loop pattern (Python + Java) | ✅      |
 
 ## Not covered
 

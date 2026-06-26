@@ -1,4 +1,5 @@
 # Stage 1 — context
+
 # Collect the user's domain, use-case, goals, and preferences.
 
 ## Autonomous mode detection — do this FIRST
@@ -8,12 +9,14 @@ Before asking anything, attempt to extract all 6 context variables from the init
 **The autonomous/HITL decision is based solely on whether all 6 variables are present — never on phrasing like "guide me", "help me", or "walk me through".** Those phrases describe intent, not preference for interactive vs automated execution.
 
 **If all 6 variables can be extracted → AUTONOMOUS MODE.**
+
 - Extract and record them immediately (no questions needed)
 - Record `MODE=autonomous` in progress.md alongside the other variables
 - Never pause for approval at any HITL checkpoint in any stage
 - Proceed through all 8 stages without stopping
 
 **If any variable is missing → HITL MODE.**
+
 - Ask all missing questions in one combined message (see below)
 - Record `MODE=hitl` in progress.md
 
@@ -99,6 +102,7 @@ The provision stage combines both: user's preferred provider, closest available 
 ### REGION_HINT — infer, don't ask
 
 Infer from any available signal — do not ask:
+
 - Explicit mention: "I'm in Brazil", "our servers are in Tokyo", "EU data residency required"
 - Language/locale of the conversation
 - Timezone in system prompt or `date` output (e.g. `CET` → western Europe, `BRT` → Brazil)
@@ -106,21 +110,22 @@ Infer from any available signal — do not ask:
 
 Store the **geographic area** only — the provision stage maps it to the user's chosen provider:
 
-| Signal | REGION_HINT |
-|--------|------------|
-| Western Europe / CET / BST / CEST | `europe-west` |
-| Eastern Europe | `europe-east` |
-| US East Coast / EST / EDT | `us-east` |
-| US West Coast / PST / PDT | `us-west` |
-| Brazil / BRT | `sa-east` |
-| Singapore / SGT | `ap-southeast` |
-| Japan / JST | `ap-northeast` |
-| Australia / AEST / AEDT | `ap-southeast` |
-| No signal | (omit — provision stage uses first available) |
+| Signal                            | REGION_HINT                                   |
+| --------------------------------- | --------------------------------------------- |
+| Western Europe / CET / BST / CEST | `europe-west`                                 |
+| Eastern Europe                    | `europe-east`                                 |
+| US East Coast / EST / EDT         | `us-east`                                     |
+| US West Coast / PST / PDT         | `us-west`                                     |
+| Brazil / BRT                      | `sa-east`                                     |
+| Singapore / SGT                   | `ap-southeast`                                |
+| Japan / JST                       | `ap-northeast`                                |
+| Australia / AEST / AEDT           | `ap-southeast`                                |
+| No signal                         | (omit — provision stage uses first available) |
 
 The provision stage maps `REGION_HINT` + `CLOUD_PROVIDER` to an actual Aura region from the tenant's available configurations.
 
 If `APP_TYPE=graphrag`, also collect:
+
 ```
 EMBEDDING_PROVIDER = openai | cohere | ollama | other
 EMBEDDING_MODEL    = <model name, e.g. text-embedding-3-small>
@@ -132,6 +137,7 @@ EMBEDDING_MODEL    = <model name, e.g. text-embedding-3-small>
 Write to `.env` immediately, skip `provision` stage.
 
 **DATA_SOURCE=demo**: ask which demo dataset:
+
 - Movies — classic graph, great for beginners
 - Northwind — e-commerce (orders, products, customers)
 - StackOverflow — Q&A network
@@ -159,6 +165,7 @@ Store `EXEC_METHOD` alongside the other variables. Reference only the relevant s
 
 ```markdown
 ### 1-context
+
 status: done
 MODE=<autonomous|hitl>
 DOMAIN=<value>
@@ -177,6 +184,7 @@ Include `EMBEDDING_PROVIDER` and `EMBEDDING_MODEL` if `APP_TYPE=graphrag`.
 ## Completion condition
 
 All variables known + `EXEC_METHOD` determined. Summarize before proceeding:
+
 ```
 Got it — here's your plan:
   Domain:    <DOMAIN>

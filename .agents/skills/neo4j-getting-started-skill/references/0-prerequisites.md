@@ -1,9 +1,11 @@
 # Stage 0 — prerequisites
+
 # Verify and install required CLI tools before anything else.
 
 ## neo4j-mcp (official Neo4j MCP server — required)
 
 MCP tool names exposed by this server:
+
 - `get-schema` — introspect node labels, relationship types, property keys
 - `read-cypher` — execute read-only Cypher
 - `write-cypher` — execute write Cypher (disabled in read-only mode)
@@ -15,6 +17,7 @@ which neo4j-mcp 2>/dev/null || ls $HOME/bin/neo4j-mcp 2>/dev/null && echo "FOUND
 ```
 
 If missing, download binary:
+
 ```bash
 PLATFORM=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
@@ -59,6 +62,7 @@ echo "✓ Virtual environment created at .venv"
 ```
 
 All subsequent `pip install`, `python3 script.py`, `jupyter`, `streamlit`, and `uvicorn` commands must use this venv:
+
 - Install: `.venv/bin/pip install ...`
 - Run scripts: `.venv/bin/python3 script.py`
 - Run app: `.venv/bin/jupyter notebook ...` / `.venv/bin/streamlit run ...` / `.venv/bin/uvicorn ...`
@@ -85,6 +89,7 @@ echo "✓ .gitignore updated"
 
 ```markdown
 ### 0-prerequisites
+
 status: done
 PYTHON=<path from `which python3`>
 NEO4J_MCP=<path from `which neo4j-mcp` or local path>

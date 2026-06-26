@@ -14,6 +14,7 @@ ORDER BY elapsedTimeMillis DESC
 ```
 
 Key fields:
+
 - `queryId` — use with `TERMINATE QUERY`
 - `elapsedTimeMillis` — wall time since query started
 - `allocatedBytes` — heap allocated; high = memory pressure
@@ -22,6 +23,7 @@ Key fields:
 - `pageHits` / `pageFaults` — cache hit/miss counts for this query
 
 Kill a single query:
+
 ```cypher
 TERMINATE QUERY "query-id-string"
 YIELD queryId, username, message
@@ -44,6 +46,7 @@ ORDER BY elapsedTime DESC
 ```
 
 Key fields:
+
 - `transactionId` — use with `TERMINATE TRANSACTION`
 - `status` — `Running`, `Blocked`, `Closing`, `Terminated`
 - `activeLockCount` — transactions blocking others will have high counts
@@ -51,12 +54,14 @@ Key fields:
 - `elapsedTime` — duration since transaction opened
 
 Terminate a transaction:
+
 ```cypher
 TERMINATE TRANSACTION "neo4j-transaction-123"
 YIELD transactionId, username, message
 ```
 
 Terminate multiple:
+
 ```cypher
 TERMINATE TRANSACTIONS "tx-1", "tx-2"
 YIELD transactionId, message
@@ -67,6 +72,7 @@ YIELD transactionId, message
 ## Database Statistics
 
 ### Graph Counts
+
 Node/relationship counts by label and type — the data the planner uses for cardinality estimation.
 
 ```cypher
@@ -76,6 +82,7 @@ RETURN section, data
 ```
 
 `data` map includes keys like:
+
 - `nodes` — total node count
 - `relationships` — total rel count
 - `nodesByLabel` — map of `{label: count}`
@@ -83,6 +90,7 @@ RETURN section, data
 - `relsByTypeStartingLabel` / `relsByTypeEndingLabel` — selectivity data
 
 ### Token Stats
+
 ```cypher
 CALL db.stats.retrieve('TOKENS')
 YIELD section, data
@@ -92,11 +100,13 @@ RETURN section, data
 Returns internal token ID mappings for labels, property keys, and relationship types.
 
 ### Retrieve All Stats
+
 ```cypher
 CALL db.stats.retrieveAllAnonymized('GRAPH COUNTS')
 YIELD section, data
 RETURN section, data
 ```
+
 Anonymized version for sharing without exposing property names.
 
 ---
@@ -104,11 +114,13 @@ Anonymized version for sharing without exposing property names.
 ## Statistics and Replanning
 
 ### Config
+
 `dbms.cypher.statistics_divergence_threshold` (default: `0.75`)
 
 Formula: `abs(a - b) / max(a, b)`. At 0.75, plan invalidated when statistics change by 75% (~4× growth/shrink). Lower to replan more aggressively on growing databases.
 
 ### Force Replanning
+
 ```cypher
 // Recalculate all statistics immediately (blocks until complete):
 CALL db.prepareForReplanning()
@@ -121,12 +133,14 @@ CALL db.resampleOutdatedIndexes()
 ```
 
 Force replanning of a single query without changing stats:
+
 ```cypher
 CYPHER replan=force
 MATCH (p:Person {email: $email}) RETURN p.name
 ```
 
 Skip replanning (use cached plan even if stale — useful during high-load bursts):
+
 ```cypher
 CYPHER replan=skip
 MATCH (p:Person {email: $email}) RETURN p.name
@@ -165,6 +179,7 @@ Index types and supported predicates:
 On self-managed Neo4j, slow queries log to `neo4j.log` and `query.log`:
 
 Config options (`neo4j.conf`):
+
 ```
 db.logs.query.enabled=INFO          # Log all queries (verbose) or WARN (slow only)
 db.logs.query.threshold=2s          # Log queries taking longer than this
@@ -189,6 +204,7 @@ RETURN attributes
 ```
 
 Or from SHOW TRANSACTIONS/QUERIES:
+
 - `pageHits` high, `pageFaults` low → cache is sufficient
 - `pageFaults` > 1% of pageHits → increase `server.memory.pagecache.size` in `neo4j.conf`
 

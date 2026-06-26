@@ -18,6 +18,7 @@ make install-skill
 ```
 
 Or manually:
+
 ```bash
 cp -R . ~/.claude/skills/neo4j-getting-started-skill/
 ```
@@ -54,49 +55,49 @@ without stopping. If any are missing, stage 1 asks for them conversationally bef
 
 The skill runs 8 stages in order:
 
-| Stage | What it does |
-|-------|-------------|
-| `0-prerequisites` | Downloads `neo4j-mcp` binary, creates `.venv`, sets up `.gitignore` |
-| `1-context` | Collects domain, use-case, experience, DB target, data source, app type |
-| `2-provision` | Provisions or connects to a Neo4j database; writes `.env` |
-| `3-model` | Designs a graph schema; writes `schema.json` + `schema.cypher` |
-| `4-load` | Applies constraints; loads demo/synthetic/CSV/document data |
-| `5-explore` | Opens Neo4j Browser for visual exploration; runs `neo4j-viz` preview |
-| `6-query` | Generates and validates a Cypher query library (`queries/queries.cypher`) |
-| `7-build` | Generates a runnable app; installs dependencies into `.venv` |
+| Stage             | What it does                                                              |
+| ----------------- | ------------------------------------------------------------------------- |
+| `0-prerequisites` | Downloads `neo4j-mcp` binary, creates `.venv`, sets up `.gitignore`       |
+| `1-context`       | Collects domain, use-case, experience, DB target, data source, app type   |
+| `2-provision`     | Provisions or connects to a Neo4j database; writes `.env`                 |
+| `3-model`         | Designs a graph schema; writes `schema.json` + `schema.cypher`            |
+| `4-load`          | Applies constraints; loads demo/synthetic/CSV/document data               |
+| `5-explore`       | Opens Neo4j Browser for visual exploration; runs `neo4j-viz` preview      |
+| `6-query`         | Generates and validates a Cypher query library (`queries/queries.cypher`) |
+| `7-build`         | Generates a runnable app; installs dependencies into `.venv`              |
 
 ## Database targets (`db_target`)
 
-| Value | What happens |
-|-------|-------------|
-| `aura-free` | Creates a new Aura Free instance via REST API (requires `aura.env`) |
-| `aura-pro` | Creates an Aura Professional instance (requires `aura.env`) |
-| `local-docker` | Runs `neo4j:enterprise` in Docker on `localhost:7687` — Docker must be installed |
-| `local-desktop` | Connects to a running Neo4j Desktop instance on `localhost:7687` |
-| `existing-cloud` | Connects to any existing Neo4j instance — you provide URI + password |
+| Value            | What happens                                                                     |
+| ---------------- | -------------------------------------------------------------------------------- |
+| `aura-free`      | Creates a new Aura Free instance via REST API (requires `aura.env`)              |
+| `aura-pro`       | Creates an Aura Professional instance (requires `aura.env`)                      |
+| `local-docker`   | Runs `neo4j:enterprise` in Docker on `localhost:7687` — Docker must be installed |
+| `local-desktop`  | Connects to a running Neo4j Desktop instance on `localhost:7687`                 |
+| `existing-cloud` | Connects to any existing Neo4j instance — you provide URI + password             |
 
 For `local-docker`, the skill pulls `neo4j:enterprise`, mounts a `./neo4j-data/` volume for
 persistence, and waits up to 90 s for Bolt to be ready. No extra setup needed beyond Docker.
 
 ## Data sources (`data_source`)
 
-| Value | What happens |
-|-------|-------------|
+| Value       | What happens                                                                    |
+| ----------- | ------------------------------------------------------------------------------- |
 | `synthetic` | Generates realistic fake data in Python (`data/generate.py` + `data/import.py`) |
-| `demo` | Loads a Neo4j public demo dataset (Movies, Northwind, etc.) |
-| `csv` | Imports your own CSV files from `data/` |
-| `documents` | Builds a knowledge graph from documents using `neo4j-graphrag` (GraphRAG path) |
+| `demo`      | Loads a Neo4j public demo dataset (Movies, Northwind, etc.)                     |
+| `csv`       | Imports your own CSV files from `data/`                                         |
+| `documents` | Builds a knowledge graph from documents using `neo4j-graphrag` (GraphRAG path)  |
 
 ## App types (`app_type`)
 
-| Value | Output | Run command |
-|-------|--------|-------------|
-| `notebook` | `notebook.ipynb` with schema, viz, and use-case cells | `.venv/bin/jupyter notebook notebook.ipynb` |
-| `streamlit` | `app.py` dashboard with sidebar controls + graph viz | `.venv/bin/streamlit run app.py` |
-| `fastapi` | `main.py` REST API with `/health` + use-case endpoints | `.venv/bin/uvicorn main:app --reload` |
-| `graphrag` | `graphrag_app.py` hybrid vector+graph retrieval pipeline | `.venv/bin/python3 graphrag_app.py` |
-| `mcp` | `.claude/settings.json` MCP server config for Claude Code | restart Claude Code |
-| `explore-only` | `queries/queries.cypher` + `README.md` only — no app | — |
+| Value          | Output                                                    | Run command                                 |
+| -------------- | --------------------------------------------------------- | ------------------------------------------- |
+| `notebook`     | `notebook.ipynb` with schema, viz, and use-case cells     | `.venv/bin/jupyter notebook notebook.ipynb` |
+| `streamlit`    | `app.py` dashboard with sidebar controls + graph viz      | `.venv/bin/streamlit run app.py`            |
+| `fastapi`      | `main.py` REST API with `/health` + use-case endpoints    | `.venv/bin/uvicorn main:app --reload`       |
+| `graphrag`     | `graphrag_app.py` hybrid vector+graph retrieval pipeline  | `.venv/bin/python3 graphrag_app.py`         |
+| `mcp`          | `.claude/settings.json` MCP server config for Claude Code | restart Claude Code                         |
+| `explore-only` | `queries/queries.cypher` + `README.md` only — no app      | —                                           |
 
 ## Modes
 
@@ -144,6 +145,7 @@ graphrag_app.py         ← (app_type=graphrag)
 ```
 
 **Input credential files** (not generated by the skill — you provide these):
+
 ```
 aura.env                ← Aura API credentials (gitignored); see references/2-provision.md
 ```
@@ -178,9 +180,9 @@ Test results land in `neo4j-getting-started-skill-tests/results/`. Each run prod
 
 ## Configuration
 
-| File | Purpose |
-|------|---------|
-| `aura.env` | Aura API `CLIENT_ID` + `CLIENT_SECRET` for provisioning new instances |
-| `.env` | DB connection URI, username, password, database — written by the provision stage |
+| File       | Purpose                                                                          |
+| ---------- | -------------------------------------------------------------------------------- |
+| `aura.env` | Aura API `CLIENT_ID` + `CLIENT_SECRET` for provisioning new instances            |
+| `.env`     | DB connection URI, username, password, database — written by the provision stage |
 
 See `references/2-provision.md` for Aura credential setup.

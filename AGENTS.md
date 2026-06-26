@@ -5,6 +5,7 @@ Entry point for AI coding agents continuing work on this repository.
 ## Lovable connection
 
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -13,6 +14,7 @@ Entry point for AI coding agents continuing work on this repository.
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->
 
 ## Project
@@ -23,28 +25,28 @@ Quality bar: intentional, editorial, infrastructure-grade UI — not generic Saa
 
 ## Stack
 
-| Layer | Choice |
-| --- | --- |
-| Framework | TanStack Start (file-based routes in `src/routes/`) |
-| UI | React 19, shadcn/ui primitives in `src/components/ui/` |
-| Styling | Tailwind CSS v4 tokens in `src/styles.css` |
-| Charts | Recharts (via shadcn chart components) |
-| Graph (Phase 4) | `react-force-graph-2d` |
-| Data (current) | Typed mock data in `src/lib/mock/` — no backend yet |
-| Package manager | Bun |
+| Layer           | Choice                                                 |
+| --------------- | ------------------------------------------------------ |
+| Framework       | TanStack Start (file-based routes in `src/routes/`)    |
+| UI              | React 19, shadcn/ui primitives in `src/components/ui/` |
+| Styling         | Tailwind CSS v4 tokens in `src/styles.css`             |
+| Charts          | Recharts (via shadcn chart components)                 |
+| Graph (Phase 4) | `react-force-graph-2d`                                 |
+| Data (current)  | Typed mock data in `src/lib/mock/` — no backend yet    |
+| Package manager | Bun                                                    |
 
 ## Documentation map
 
-| File | Purpose |
-| --- | --- |
-| [docs/product-spec.md](docs/product-spec.md) | Full PRD (~3,800 lines) — product vision, IA, design system, engineering standards |
-| [docs/phase-status.md](docs/phase-status.md) | What's shipped vs. next — **read this before picking up work** |
-| [.lovable/plan.md](.lovable/plan.md) | Phased build roadmap (Lovable + agents) |
-| [.lovable/skills.md](.lovable/skills.md) | How Lovable uses repo agent skills |
-| [.agents/skills/README.md](.agents/skills/README.md) | Skill index (Neo4j, Masumi, continue-build, …) |
-| [src/routes/README.md](src/routes/README.md) | TanStack Start routing conventions |
-| [src/components/app/README.md](src/components/app/README.md) | App shell and feature component patterns |
-| [src/lib/mock/README.md](src/lib/mock/README.md) | Mock data conventions |
+| File                                                         | Purpose                                                                            |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| [docs/product-spec.md](docs/product-spec.md)                 | Full PRD (~3,800 lines) — product vision, IA, design system, engineering standards |
+| [docs/phase-status.md](docs/phase-status.md)                 | What's shipped vs. next — **read this before picking up work**                     |
+| [.lovable/plan.md](.lovable/plan.md)                         | Phased build roadmap (Lovable + agents)                                            |
+| [.lovable/skills.md](.lovable/skills.md)                     | How Lovable uses repo agent skills                                                 |
+| [.agents/skills/README.md](.agents/skills/README.md)         | Skill index (Neo4j, Masumi, continue-build, …)                                     |
+| [src/routes/README.md](src/routes/README.md)                 | TanStack Start routing conventions                                                 |
+| [src/components/app/README.md](src/components/app/README.md) | App shell and feature component patterns                                           |
+| [src/lib/mock/README.md](src/lib/mock/README.md)             | Mock data conventions                                                              |
 
 ## Current focus
 
@@ -69,11 +71,11 @@ Project skills live in **`.agents/skills/<name>/SKILL.md`** (mirrored under `.cu
 
 **All agents (including Lovable):** read [.agents/skills/README.md](.agents/skills/README.md) when the task may match a skill. Then open the relevant `SKILL.md` before implementing.
 
-| Domain | Key skills |
-| --- | --- |
-| Phased UI build | `continue-build`, `add-app-route` |
+| Domain                   | Key skills                                                                                     |
+| ------------------------ | ---------------------------------------------------------------------------------------------- |
+| Phased UI build          | `continue-build`, `add-app-route`                                                              |
 | Neo4j / graph (Phase 4+) | `neo4j-modeling-skill`, `neo4j-cypher-skill`, `neo4j-gds-skill`, `neo4j-getting-started-skill` |
-| Masumi / payments | `masumi` |
+| Masumi / payments        | `masumi`                                                                                       |
 
 Neo4j bundle: `npx skills add neo4j-contrib/neo4j-skills` (see `skills-lock.json`). **Lovable:** also read [.lovable/skills.md](.lovable/skills.md).
 
@@ -81,14 +83,14 @@ Neo4j bundle: `npx skills add neo4j-contrib/neo4j-skills` (see `skills-lock.json
 
 This repo is set up so different AI coding tools can continue the same work. **Always read [docs/phase-status.md](docs/phase-status.md) first** — it is the shared “where we left off” file every agent should update after milestones.
 
-| Tool | Entry file(s) |
-| --- | --- |
-| **Any agent** | `AGENTS.md` (this file) |
-| **Cursor** | `.cursor/rules/`, `.cursor/skills/` |
-| **Claude Code** | `CLAUDE.md`, `.claude/rules/` |
-| **VS Code Copilot** | `.github/copilot-instructions.md`, `.github/skills/` |
+| Tool                   | Entry file(s)                                                |
+| ---------------------- | ------------------------------------------------------------ |
+| **Any agent**          | `AGENTS.md` (this file)                                      |
+| **Cursor**             | `.cursor/rules/`, `.cursor/skills/`                          |
+| **Claude Code**        | `CLAUDE.md`, `.claude/rules/`                                |
+| **VS Code Copilot**    | `.github/copilot-instructions.md`, `.github/skills/`         |
 | **Google Antigravity** | `.agents/CONTEXT.md`, `.agents/agents.md`, `.agents/skills/` |
-| **Lovable** | `.lovable/plan.md`, `.lovable/skills.md`, `.agents/skills/` |
+| **Lovable**            | `.lovable/plan.md`, `.lovable/skills.md`, `.agents/skills/`  |
 
 Canonical docs: [docs/product-spec.md](docs/product-spec.md) (PRD), [docs/phase-status.md](docs/phase-status.md) (progress).
 

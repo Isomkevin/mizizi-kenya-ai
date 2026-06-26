@@ -9,10 +9,10 @@ Concepts (NFT identity, DIDs, on-chain metadata) → [registry-identity.md](regi
 
 ## Base URLs
 
-| Env | URL |
-|---|---|
-| Managed (mainnet + preprod indexes) | `https://registry.masumi.network/api/v1` |
-| Self-hosted | `http://localhost:3000/api/v1` (or your deployment) |
+| Env                                 | URL                                                 |
+| ----------------------------------- | --------------------------------------------------- |
+| Managed (mainnet + preprod indexes) | `https://registry.masumi.network/api/v1`            |
+| Self-hosted                         | `http://localhost:3000/api/v1` (or your deployment) |
 
 Store as `REGISTRY_SERVICE_URL` in `.env`.
 
@@ -30,22 +30,22 @@ Token via registry's `/api-key` endpoints or admin dashboard. **Scoped to regist
 
 ## Endpoint Index
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/health/` | Liveness + version |
-| GET | `/api-key-status/` | Validate current token |
-| GET \| POST \| PATCH \| DELETE | `/api-key/` | Manage admin keys |
-| GET | `/payment-information/` | Configured payment sources |
-| POST | `/registry-entry/` | Fetch entry by `agentIdentifier` |
-| POST | `/registry-entry-search/` | Search (tags, capability, name, network) |
-| POST | `/registry-entry-refresh/` | Force re-index from chain |
-| GET | `/capability/` | Known capability tags |
-| GET \| POST \| PATCH \| DELETE | `/registry-source/` | Manage indexed on-chain registries |
-| POST | `/registry-diff/` | Diff cached vs on-chain |
-| POST | `/inbox-agent-registration/` | Lookup inbox agents (A2A) |
-| POST | `/inbox-agent-registration-search/` | Search inbox agents |
-| POST | `/inbox-agent-registration-refresh/` | Refresh inbox registration |
-| POST | `/inbox-agent-registration-diff/` | Diff inbox state |
+| Method                         | Path                                 | Purpose                                  |
+| ------------------------------ | ------------------------------------ | ---------------------------------------- |
+| GET                            | `/health/`                           | Liveness + version                       |
+| GET                            | `/api-key-status/`                   | Validate current token                   |
+| GET \| POST \| PATCH \| DELETE | `/api-key/`                          | Manage admin keys                        |
+| GET                            | `/payment-information/`              | Configured payment sources               |
+| POST                           | `/registry-entry/`                   | Fetch entry by `agentIdentifier`         |
+| POST                           | `/registry-entry-search/`            | Search (tags, capability, name, network) |
+| POST                           | `/registry-entry-refresh/`           | Force re-index from chain                |
+| GET                            | `/capability/`                       | Known capability tags                    |
+| GET \| POST \| PATCH \| DELETE | `/registry-source/`                  | Manage indexed on-chain registries       |
+| POST                           | `/registry-diff/`                    | Diff cached vs on-chain                  |
+| POST                           | `/inbox-agent-registration/`         | Lookup inbox agents (A2A)                |
+| POST                           | `/inbox-agent-registration-search/`  | Search inbox agents                      |
+| POST                           | `/inbox-agent-registration-refresh/` | Refresh inbox registration               |
+| POST                           | `/inbox-agent-registration-diff/`    | Diff inbox state                         |
 
 > **All search/lookup = POST** (structured filter bodies). `GET /registry-entry-search/?...` won't work.
 
@@ -54,6 +54,7 @@ Token via registry's `/api-key` endpoints or admin dashboard. **Scoped to regist
 ## Request Bodies (verified from live spec)
 
 ### Search
+
 ```json
 POST /registry-entry-search/
 {
@@ -72,9 +73,11 @@ POST /registry-entry-search/
   "cursorId":"..."                          // optional, pagination
 }
 ```
+
 Filter fields AND-ed. Pagination = `cursorId` (NOT `cursor`).
 
 ### List/lookup by filter
+
 ```json
 POST /registry-entry/
 {
@@ -85,9 +88,11 @@ POST /registry-entry/
   "cursorId":"..."
 }
 ```
+
 Same filter set as search, no fuzzy `query` field. `agentIdentifier` lives under `filter.assetIdentifier`.
 
 ### Refresh from chain
+
 ```json
 POST /registry-entry-refresh/
 {
@@ -95,6 +100,7 @@ POST /registry-entry-refresh/
   "agentIdentifier":"..."                   // required, policyId+assetName concatenated
 }
 ```
+
 Bypasses indexer polling. Use when recent registration not yet visible.
 
 ---
@@ -102,12 +108,18 @@ Bypasses indexer polling. Use when recent registration not yet visible.
 ## Response Envelope
 
 ```json
-{"status":"success","data":{ /* entry or [entries] */ }}
+{
+  "status": "success",
+  "data": {
+    /* entry or [entries] */
+  }
+}
 ```
 
 Error:
+
 ```json
-{"status":"error","error":{"message":"Agent identifier not found","code":"NOT_FOUND"}}
+{ "status": "error", "error": { "message": "Agent identifier not found", "code": "NOT_FOUND" } }
 ```
 
 ---

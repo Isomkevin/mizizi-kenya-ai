@@ -2,18 +2,19 @@
 
 ## Tier Comparison
 
-| Tier | Limits | Cloud | Backups | HA | Use case |
-|---|---|---|---|---|---|
-| **Free** | 200K nodes, 400K rels | GCP us-central1 only | On-demand snapshots only | No | Learning, prototyping |
-| **Professional** | Flexible sizing | AWS/GCP/Azure multi-region | Daily, 7-day retention | No | Production moderate |
-| **Business Critical** | Flexible sizing | AWS/GCP/Azure multi-region | Daily, 7-day retention | 99.95% SLA | Enterprise |
-| **Virtual Dedicated Cloud** | Flexible sizing | Dedicated infrastructure | Hourly, 60-day retention | Yes + CMEK, VPC | Compliance/security |
+| Tier                        | Limits                | Cloud                      | Backups                  | HA              | Use case              |
+| --------------------------- | --------------------- | -------------------------- | ------------------------ | --------------- | --------------------- |
+| **Free**                    | 200K nodes, 400K rels | GCP us-central1 only       | On-demand snapshots only | No              | Learning, prototyping |
+| **Professional**            | Flexible sizing       | AWS/GCP/Azure multi-region | Daily, 7-day retention   | No              | Production moderate   |
+| **Business Critical**       | Flexible sizing       | AWS/GCP/Azure multi-region | Daily, 7-day retention   | 99.95% SLA      | Enterprise            |
+| **Virtual Dedicated Cloud** | Flexible sizing       | Dedicated infrastructure   | Hourly, 60-day retention | Yes + CMEK, VPC | Compliance/security   |
 
 Free auto-pauses after 72h inactivity. Professional/BC/VDC include 7-day free trial (extendable 7 more days).
 
 ## Connection String Format
 
 URI pattern (all tiers):
+
 ```
 NEO4J_URI=neo4j+s://<instance-id>.databases.neo4j.io
 NEO4J_USERNAME=neo4j
@@ -30,24 +31,26 @@ AURA_INSTANCEID=<instance-id>
 ## Fixed vs Changeable Settings
 
 Fixed at creation (new instance required to change):
+
 - Cloud provider (AWS, GCP, Azure)
 - Region/location
 - Instance ID
 
 Changeable later:
+
 - Instance name
 - Memory and storage size (paid tiers)
 - Password
 
 ## User Roles
 
-| Role | Access |
-|---|---|
+| Role               | Access                                                 |
+| ------------------ | ------------------------------------------------------ |
 | Organisation Admin | Full access to all projects, instances, billing, users |
-| Project Admin | Full access within project; manage users + settings |
-| Project Member | Read/write to instances; cannot manage users/settings |
-| Project Viewer | Read-only; no changes |
-| Metrics Reader | View metrics only; no DB changes |
+| Project Admin      | Full access within project; manage users + settings    |
+| Project Member     | Read/write to instances; cannot manage users/settings  |
+| Project Viewer     | Read-only; no changes                                  |
+| Metrics Reader     | View metrics only; no DB changes                       |
 
 Invite users: Project Settings → Users → Invite Users.
 

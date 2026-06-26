@@ -15,14 +15,14 @@ Do not load every skill upfront. One or two relevant skills per task is enough.
 
 ## Mizizi — skills to prioritize
 
-| When the task involves… | Read this skill |
-| --- | --- |
-| Continuing phased UI work, next milestone | [`continue-build`](../.agents/skills/continue-build/SKILL.md) |
-| New TanStack Start app route | [`add-app-route`](../.agents/skills/add-app-route/SKILL.md) |
+| When the task involves…                                   | Read this skill                                                                                                                                                                                                   |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Continuing phased UI work, next milestone                 | [`continue-build`](../.agents/skills/continue-build/SKILL.md)                                                                                                                                                     |
+| New TanStack Start app route                              | [`add-app-route`](../.agents/skills/add-app-route/SKILL.md)                                                                                                                                                       |
 | Farmer graph, Cypher, Neo4j Aura, GDS (Louvain, PageRank) | [`neo4j-modeling-skill`](../.agents/skills/neo4j-modeling-skill/SKILL.md), [`neo4j-cypher-skill`](../.agents/skills/neo4j-cypher-skill/SKILL.md), [`neo4j-gds-skill`](../.agents/skills/neo4j-gds-skill/SKILL.md) |
-| Neo4j setup / first Aura instance | [`neo4j-getting-started-skill`](../.agents/skills/neo4j-getting-started-skill/SKILL.md), [`neo4j-aura-provisioning-skill`](../.agents/skills/neo4j-aura-provisioning-skill/SKILL.md) |
-| Graph UI (NVL) | [`neo4j-nvl-skill`](../.agents/skills/neo4j-nvl-skill/SKILL.md) |
-| Masumi payments, MIP-003, Cardano escrow | [`masumi`](../.agents/skills/masumi/SKILL.md) |
+| Neo4j setup / first Aura instance                         | [`neo4j-getting-started-skill`](../.agents/skills/neo4j-getting-started-skill/SKILL.md), [`neo4j-aura-provisioning-skill`](../.agents/skills/neo4j-aura-provisioning-skill/SKILL.md)                              |
+| Graph UI (NVL)                                            | [`neo4j-nvl-skill`](../.agents/skills/neo4j-nvl-skill/SKILL.md)                                                                                                                                                   |
+| Masumi payments, MIP-003, Cardano escrow                  | [`masumi`](../.agents/skills/masumi/SKILL.md)                                                                                                                                                                     |
 
 Full Neo4j bundle (24 skills): installed from [neo4j-contrib/neo4j-skills](https://github.com/neo4j-contrib/neo4j-skills). See the index for all names.
 

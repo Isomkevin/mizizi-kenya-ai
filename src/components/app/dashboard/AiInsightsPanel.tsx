@@ -1,10 +1,4 @@
-import {
-  CloudSun,
-  Copy,
-  Network,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
+import { CloudSun, Copy, Network, ShieldCheck, Sparkles } from "lucide-react";
 
 import { dashboardInsights } from "@/lib/mock/dashboard";
 import type { DashboardInsight } from "@/lib/mock/dashboard";

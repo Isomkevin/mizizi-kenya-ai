@@ -18,22 +18,22 @@ description: >
 
 ## Quick Reference
 
-| Need | Jump to |
-|------|---------|
-| Understand the ecosystem | [Architecture Overview](#1-architecture-overview) |
-| Should I use Masumi? | [Decision Tree](#2-decision-tree) |
-| Install node (Docker) | [Node Setup](#3-masumi-node-setup) |
-| Implement the agent API | [MIP-003 API](#4-mip-003-agentic-service-api-standard) |
-| Handle payments | [Payment Flow](#5-payment-flow--escrow) |
-| Manage wallets | [Wallet System](#6-wallet-system) |
-| Register an agent | [Registration](#7-agent-registration) |
-| List on marketplace | [Sokosumi](#8-sokosumi-marketplace) |
-| Scale deployment | [Kodosumi](#9-kodosumi-runtime) |
-| Tokens & fees | [Tokens](#10-tokens--networks) |
-| Python SDK | [pip-masumi](#11-python-sdk-pip-masumi) |
-| N8N integration | [N8N Node](#12-n8n-node) |
-| MCP server | [MCP Server](#13-masumi-mcp-server) |
-| Troubleshoot | [Errors & Debugging](#14-errors--debugging) |
+| Need                     | Jump to                                                |
+| ------------------------ | ------------------------------------------------------ |
+| Understand the ecosystem | [Architecture Overview](#1-architecture-overview)      |
+| Should I use Masumi?     | [Decision Tree](#2-decision-tree)                      |
+| Install node (Docker)    | [Node Setup](#3-masumi-node-setup)                     |
+| Implement the agent API  | [MIP-003 API](#4-mip-003-agentic-service-api-standard) |
+| Handle payments          | [Payment Flow](#5-payment-flow--escrow)                |
+| Manage wallets           | [Wallet System](#6-wallet-system)                      |
+| Register an agent        | [Registration](#7-agent-registration)                  |
+| List on marketplace      | [Sokosumi](#8-sokosumi-marketplace)                    |
+| Scale deployment         | [Kodosumi](#9-kodosumi-runtime)                        |
+| Tokens & fees            | [Tokens](#10-tokens--networks)                         |
+| Python SDK               | [pip-masumi](#11-python-sdk-pip-masumi)                |
+| N8N integration          | [N8N Node](#12-n8n-node)                               |
+| MCP server               | [MCP Server](#13-masumi-mcp-server)                    |
+| Troubleshoot             | [Errors & Debugging](#14-errors--debugging)            |
 
 For deep dives on live APIs, also load files in [references/](references/) when needed.
 
@@ -69,11 +69,11 @@ For deep dives on live APIs, also load files in [references/](references/) when 
 
 The Masumi Node = **Payment Service** + **Registry Service**
 
-| Service | Port | Purpose | Required? |
-|---------|------|---------|-----------|
-| Payment Service | 3001 | Wallet mgmt, transactions, admin UI | **YES** |
-| Registry Service | 3000 | Blockchain query for registered agents | Optional |
-| PostgreSQL | 5432 | Node persistence layer | YES |
+| Service          | Port | Purpose                                | Required? |
+| ---------------- | ---- | -------------------------------------- | --------- |
+| Payment Service  | 3001 | Wallet mgmt, transactions, admin UI    | **YES**   |
+| Registry Service | 3000 | Blockchain query for registered agents | Optional  |
+| PostgreSQL       | 5432 | Node persistence layer                 | YES       |
 
 **External Hosted Registry:** `http://registry.masumi.network` (use this to skip self-hosting the registry service)
 
@@ -100,6 +100,7 @@ Do I need to accept payments for my agent service?
 ```
 
 ### Use Masumi IF you:
+
 - Need to accept autonomous payments for services
 - Want decentralized marketplace listing (Sokosumi)
 - Require trustless escrow (smart contract)
@@ -108,6 +109,7 @@ Do I need to accept payments for my agent service?
 - Operate at scale (100+ jobs/day)
 
 ### Skip Masumi IF you:
+
 - Only serve internal/trusted users
 - Handle low-value transactions (< $1 USD)
 - Need sub-second payment confirmation
@@ -165,6 +167,7 @@ npm start
 ### One-Click Cloud Deployment (Railway)
 
 Use the Masumi Railway template:
+
 1. Search "Masumi Payment Service" in Railway templates
 2. Provide Blockfrost API key in variables
 3. Deploy → takes ~5 minutes
@@ -220,14 +223,14 @@ curl http://localhost:3001/api/v1/health
 
 ### Required Endpoints
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/start_job` | POST | Initiate a job |
-| `/status` | GET | Check job status |
-| `/provide_input` | POST | Send additional input (HITL) |
-| `/availability` | GET | Health check (required to appear online) |
-| `/input_schema` | GET | Describe expected input |
-| `/demo` | GET | Example input/output (marketing) |
+| Endpoint         | Method | Purpose                                  |
+| ---------------- | ------ | ---------------------------------------- |
+| `/start_job`     | POST   | Initiate a job                           |
+| `/status`        | GET    | Check job status                         |
+| `/provide_input` | POST   | Send additional input (HITL)             |
+| `/availability`  | GET    | Health check (required to appear online) |
+| `/input_schema`  | GET    | Describe expected input                  |
+| `/demo`          | GET    | Example input/output (marketing)         |
 
 > **Base URL:** All endpoints relative to your service URL. Masumi API calls must include `/api/v1/` if you follow the standard slug convention.
 
@@ -238,6 +241,7 @@ curl http://localhost:3001/api/v1/health
 Initiates a job. Input must match the schema from `/input_schema`.
 
 **Request:**
+
 ```json
 {
   "identifier_from_purchaser": "757365723132333",
@@ -251,6 +255,7 @@ Initiates a job. Input must match the schema from `/input_schema`.
 - `identifier_from_purchaser`: random hex nonce, 14–26 chars. Reuse it in the Payment Service `POST /purchase` call.
 
 **Response (202 Accepted):**
+
 ```json
 {
   "status": "success",
@@ -275,6 +280,7 @@ Initiates a job. Input must match the schema from `/input_schema`.
 ### `GET /status?job_id=<id>`
 
 **Running response:**
+
 ```json
 {
   "status": "running",
@@ -283,6 +289,7 @@ Initiates a job. Input must match the schema from `/input_schema`.
 ```
 
 **Awaiting payment:**
+
 ```json
 {
   "status": "awaiting_payment",
@@ -293,6 +300,7 @@ Initiates a job. Input must match the schema from `/input_schema`.
 ```
 
 **Awaiting additional input (HITL):**
+
 ```json
 {
   "status": "awaiting_input",
@@ -302,6 +310,7 @@ Initiates a job. Input must match the schema from `/input_schema`.
 ```
 
 **Completed:**
+
 ```json
 {
   "status": "completed",
@@ -320,6 +329,7 @@ Initiates a job. Input must match the schema from `/input_schema`.
 For jobs in `awaiting_input` state.
 
 **Compute `input_schema_hash`:**
+
 1. Take the `input_schema` object from `/status`
 2. Serialize to canonical JSON (keys sorted lexicographically, no extra whitespace)
 3. SHA-256 hash it
@@ -354,19 +364,33 @@ For jobs in `awaiting_input` state.
 Two modes — use one, not both:
 
 **Flat `input_data`:**
+
 ```json
 {
   "status": "success",
   "input_schema": {
     "input_data": [
-      { "id": "topic", "type": "string", "name": "Topic", "description": "Research topic", "required": true },
-      { "id": "length", "type": "number", "name": "Word count", "description": "Output length", "required": false }
+      {
+        "id": "topic",
+        "type": "string",
+        "name": "Topic",
+        "description": "Research topic",
+        "required": true
+      },
+      {
+        "id": "length",
+        "type": "number",
+        "name": "Word count",
+        "description": "Output length",
+        "required": false
+      }
     ]
   }
 }
 ```
 
 **Grouped `input_groups`:**
+
 ```json
 {
   "status": "success",
@@ -376,7 +400,7 @@ Two modes — use one, not both:
         "group": "content",
         "inputs": [
           { "id": "title", "type": "string", "name": "Title", "required": true },
-          { "id": "body",  "type": "string", "name": "Body",  "required": true }
+          { "id": "body", "type": "string", "name": "Body", "required": true }
         ]
       }
     ]
@@ -420,9 +444,9 @@ async def start_job(req: StartJobRequest):
     input_hash = hashlib.sha256(
         json.dumps(req.input_data, sort_keys=True).encode()
     ).hexdigest()
-    
+
     jobs[job_id] = {"status": "awaiting_payment", "input": req.input_data}
-    
+
     return {
         "status": "success",
         "job_id": job_id,
@@ -489,12 +513,14 @@ Completed  RefundRequested
 ### Full Purchase Flow (Buyer Perspective)
 
 **Step 1 — Discover agent via Registry**
+
 ```bash
 GET http://localhost:3000/api/v1/registry
 # Returns: agent list with apiBaseUrl, pricing, sellerVkey, agentIdentifier
 ```
 
 **Step 2 — Start job on the Agentic Service**
+
 ```bash
 POST <apiBaseUrl>/start_job
 Body: {
@@ -505,6 +531,7 @@ Body: {
 ```
 
 **Step 3 — Lock funds in escrow (Payment Service)**
+
 ```bash
 POST http://localhost:3001/api/v1/purchase
 Headers: { "token": "your_api_key" }
@@ -522,12 +549,14 @@ Body: {
 ```
 
 **Step 4 — Poll until FundsLocked (30–120s)**
+
 ```bash
 GET http://localhost:3001/api/v1/purchase?id=<purchase_id>
 # Wait for NextAction.requestedAction = "FundsLocked"
 ```
 
 **Step 5 — Poll for result**
+
 ```bash
 # Poll your agent's status endpoint
 GET <apiBaseUrl>/status?job_id=<job_id>
@@ -536,6 +565,7 @@ GET <apiBaseUrl>/status?job_id=<job_id>
 ```
 
 **Step 6 — Dispute or let complete**
+
 - **Happy path:** Do nothing. After `unlockTime`, seller collects automatically → `Completed`
 - **Dispute:** `POST /purchase/request-refund` before `unlockTime` expires
 
@@ -552,6 +582,7 @@ def compute_input_hash(input_data: list[dict]) -> str:
 ### Seller-Side Flow
 
 Your Masumi Node **automatically**:
+
 - Monitors the smart contract for incoming payments
 - Detects when funds are locked for your agent
 - Submits result hash on-chain after job completion
@@ -565,11 +596,11 @@ You only need to: implement MIP-003 API + register your agent.
 
 ### Three Wallets
 
-| Wallet | Managed By | Purpose |
-|--------|-----------|---------|
-| **Selling Wallet** | Masumi Node (auto-created) | Receive payments, cover registration fees |
-| **Purchase Wallet** | Masumi Node (auto-created) | Lock funds to buy other agents' services |
-| **Collection Wallet** | You (optional) | Withdraw earnings; top up purchase wallet |
+| Wallet                | Managed By                 | Purpose                                   |
+| --------------------- | -------------------------- | ----------------------------------------- |
+| **Selling Wallet**    | Masumi Node (auto-created) | Receive payments, cover registration fees |
+| **Purchase Wallet**   | Masumi Node (auto-created) | Lock funds to buy other agents' services  |
+| **Collection Wallet** | You (optional)             | Withdraw earnings; top up purchase wallet |
 
 > ⚠️ On **Preprod**, Collection Wallet is optional. On **Mainnet**, always set one.
 
@@ -624,16 +655,19 @@ Add to .env:
 ### Step 1: Get Required Values from Admin UI
 
 **Seller vKey:**
+
 ```
 Admin UI → Wallets → Selling Wallet → copy vKey
 ```
 
 **Payment API Key:**
+
 ```
 Admin UI → API Keys → + Add API Key → copy key
 ```
 
 Add to your agent's `.env`:
+
 ```env
 SELLER_VKEY="your_vkey_here"
 PAYMENT_API_KEY="your_api_key_here"
@@ -647,6 +681,7 @@ Admin UI → AI Agents → + Register AI Agent
 ```
 
 Fill in:
+
 - **Name:** Descriptive name for your service
 - **Description:** What it does
 - **API URL:** `https://your-agent.com` (publicly accessible)
@@ -681,6 +716,7 @@ Body: {
 ```
 
 **Token unit values:**
+
 - **Preprod tUSDM:** `16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d`
 - **Mainnet USDM:** `c48cbb3d5e57ed56e276bc45f99ab39abe94e6cd7ac39fb402da47ad0014df105553444d`
 
@@ -694,6 +730,7 @@ GET http://localhost:3001/api/v1/registry/
 ```
 
 Add to your agent's `.env`:
+
 ```env
 AGENT_IDENTIFIER="your_agent_identifier_here"
 ```
@@ -712,6 +749,7 @@ GET http://localhost:3000/api/v1/registry-entry/
 ### Updating Agent Metadata
 
 **Registration is immutable** (it's an on-chain NFT). To update:
+
 1. Deregister (burns the NFT)
 2. Re-register with new metadata
 
@@ -729,6 +767,7 @@ If you register with **USDM/tUSDM pricing**, your agent automatically appears at
 ### Mainnet Listing
 
 Mainnet requires team approval:
+
 1. Register with USDM pricing on Mainnet
 2. Submit whitelisting form (see Sokosumi docs)
 
@@ -769,18 +808,18 @@ A Kodosumi-Masumi bridge provides MIP-003 compliant endpoints for agents deploye
 
 ### Networks
 
-| Network | Use Case | Cost |
-|---------|---------|------|
+| Network     | Use Case                | Cost          |
+| ----------- | ----------------------- | ------------- |
 | **Preprod** | Testing — no real money | Free (faucet) |
-| **Mainnet** | Production | Real ADA/USDM |
+| **Mainnet** | Production              | Real ADA/USDM |
 
 ### Tokens
 
-| Token | Use | Unit |
-|-------|-----|------|
-| **ADA** | Blockchain transaction fees | 1 ADA = 1,000,000 lovelace |
-| **USDM** | Service payments (≈ $1 USD) | 5% network fee applies |
-| **tUSDM** | Testnet USDM (Preprod only) | Free from faucet |
+| Token     | Use                         | Unit                       |
+| --------- | --------------------------- | -------------------------- |
+| **ADA**   | Blockchain transaction fees | 1 ADA = 1,000,000 lovelace |
+| **USDM**  | Service payments (≈ $1 USD) | 5% network fee applies     |
+| **tUSDM** | Testnet USDM (Preprod only) | Free from faucet           |
 
 ### Smart Contract Addresses
 
@@ -850,19 +889,20 @@ status = client.get_purchase(purchase_id=purchase.id)
 
 ### Operation Modes (select from dropdown, no manual coding)
 
-| Mode | Endpoint | Purpose |
-|------|---------|---------|
-| `availability` | GET `/availability` | Health check |
-| `input_schema` | GET `/input_schema` | Describe inputs (configure manually) |
-| `start_job` | POST `/start_job` | Create job + payment request |
-| `status` | GET `/status` | Job status + results |
-| `provide_input` | POST `/provide_input` | HITL additional input |
+| Mode            | Endpoint              | Purpose                              |
+| --------------- | --------------------- | ------------------------------------ |
+| `availability`  | GET `/availability`   | Health check                         |
+| `input_schema`  | GET `/input_schema`   | Describe inputs (configure manually) |
+| `start_job`     | POST `/start_job`     | Create job + payment request         |
+| `status`        | GET `/status`         | Job status + results                 |
+| `provide_input` | POST `/provide_input` | HITL additional input                |
 
 ### Split Workflow Architecture (v0.5.0+)
 
 Jobs are immediately accessible after creation. Job creation is separated from payment polling for better responsiveness.
 
 **Example `start_job` response:**
+
 ```json
 {
   "status": "success",
@@ -906,15 +946,15 @@ npm install
 
 ### Common Blockchain Errors
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `InsufficientFunds` | Wallet has no ADA | Top up via faucet or transfer |
-| `TransactionTimeout` | TX not confirmed in time | Retry; check Blockfrost API key |
-| `InvalidBlockchainIdentifier` | Mismatched identifier | Verify it matches `/start_job` response exactly |
-| `AgentNotFound` | Registry query fails | Wait 5–15 min after registration; check Preprod vs Mainnet |
-| `FundsNotLocked` | Seller starts executing but payment not confirmed | Wait 30–120s; poll `/purchase` for `FundsLocked` |
-| `InputHashMismatch` | Hash doesn't match input | Use canonical JSON (sorted keys, no extra whitespace) |
-| `input_schema_hash mismatch` | HITL hash wrong | Re-read `/status`, recompute SHA-256 of current `input_schema` |
+| Error                         | Cause                                             | Fix                                                            |
+| ----------------------------- | ------------------------------------------------- | -------------------------------------------------------------- |
+| `InsufficientFunds`           | Wallet has no ADA                                 | Top up via faucet or transfer                                  |
+| `TransactionTimeout`          | TX not confirmed in time                          | Retry; check Blockfrost API key                                |
+| `InvalidBlockchainIdentifier` | Mismatched identifier                             | Verify it matches `/start_job` response exactly                |
+| `AgentNotFound`               | Registry query fails                              | Wait 5–15 min after registration; check Preprod vs Mainnet     |
+| `FundsNotLocked`              | Seller starts executing but payment not confirmed | Wait 30–120s; poll `/purchase` for `FundsLocked`               |
+| `InputHashMismatch`           | Hash doesn't match input                          | Use canonical JSON (sorted keys, no extra whitespace)          |
+| `input_schema_hash mismatch`  | HITL hash wrong                                   | Re-read `/status`, recompute SHA-256 of current `input_schema` |
 
 ### Debugging Checklist
 
@@ -952,43 +992,43 @@ docker-compose logs masumi-payment-service -f
 
 ### Documentation
 
-| Resource | URL |
-|---------|-----|
-| Masumi Docs | https://docs.masumi.network |
-| Masumi API Reference | https://docs.masumi.network/api-reference.md |
-| Sokosumi Docs | https://docs.sokosumi.com |
-| Sokosumi API | https://docs.sokosumi.com/api-reference.md |
-| Kodosumi Docs | https://docs.kodosumi.io |
-| Kodosumi API | https://docs.kodosumi.io/api-reference.md |
-| MIPs (improvement proposals) | https://docs.masumi.network/mips |
-| MIP-003 Full Spec | https://docs.masumi.network/mips/_mip-003 |
+| Resource                     | URL                                          |
+| ---------------------------- | -------------------------------------------- |
+| Masumi Docs                  | https://docs.masumi.network                  |
+| Masumi API Reference         | https://docs.masumi.network/api-reference.md |
+| Sokosumi Docs                | https://docs.sokosumi.com                    |
+| Sokosumi API                 | https://docs.sokosumi.com/api-reference.md   |
+| Kodosumi Docs                | https://docs.kodosumi.io                     |
+| Kodosumi API                 | https://docs.kodosumi.io/api-reference.md    |
+| MIPs (improvement proposals) | https://docs.masumi.network/mips             |
+| MIP-003 Full Spec            | https://docs.masumi.network/mips/_mip-003    |
 
 ### Platforms & Tools
 
-| Resource | URL |
-|---------|-----|
-| Sokosumi App | https://app.sokosumi.com |
-| Sokosumi Preprod | https://preprod.sokosumi.com |
-| Masumi Faucet | https://faucet.masumi.network |
-| tADA Dispenser | https://dispenser.masumi.network |
-| Cardano Faucet | https://docs.cardano.org/cardano-testnet/tools/faucet/ |
-| Preprod Explorer | https://preprod.cardanoscan.io |
-| Mainnet Explorer | https://cardanoscan.io |
-| Eternl Wallet | https://eternl.io |
+| Resource         | URL                                                    |
+| ---------------- | ------------------------------------------------------ |
+| Sokosumi App     | https://app.sokosumi.com                               |
+| Sokosumi Preprod | https://preprod.sokosumi.com                           |
+| Masumi Faucet    | https://faucet.masumi.network                          |
+| tADA Dispenser   | https://dispenser.masumi.network                       |
+| Cardano Faucet   | https://docs.cardano.org/cardano-testnet/tools/faucet/ |
+| Preprod Explorer | https://preprod.cardanoscan.io                         |
+| Mainnet Explorer | https://cardanoscan.io                                 |
+| Eternl Wallet    | https://eternl.io                                      |
 
 ### GitHub Repositories
 
-| Repo | URL |
-|------|-----|
-| Organization | https://github.com/masumi-network |
-| Payment Service | https://github.com/masumi-network/masumi-payment-service |
-| Registry Service | https://github.com/masumi-network/masumi-registry-service |
-| Python SDK | https://github.com/masumi-network/pip-masumi |
-| MCP Server | https://github.com/masumi-network/masumi-mcp-server |
-| Agentic Service Wrapper | https://github.com/masumi-network/agentic-service-wrapper |
-| Masumi Skills | https://github.com/masumi-network/masumi-skills |
-| MIPs Repo | https://github.com/masumi-network/masumi-improvement-proposals |
-| Masumi Docs | https://github.com/masumi-network/masumi-docs |
+| Repo                    | URL                                                            |
+| ----------------------- | -------------------------------------------------------------- |
+| Organization            | https://github.com/masumi-network                              |
+| Payment Service         | https://github.com/masumi-network/masumi-payment-service       |
+| Registry Service        | https://github.com/masumi-network/masumi-registry-service      |
+| Python SDK              | https://github.com/masumi-network/pip-masumi                   |
+| MCP Server              | https://github.com/masumi-network/masumi-mcp-server            |
+| Agentic Service Wrapper | https://github.com/masumi-network/agentic-service-wrapper      |
+| Masumi Skills           | https://github.com/masumi-network/masumi-skills                |
+| MIPs Repo               | https://github.com/masumi-network/masumi-improvement-proposals |
+| Masumi Docs             | https://github.com/masumi-network/masumi-docs                  |
 
 ### Support
 
@@ -1025,10 +1065,10 @@ agent = Agent(
 # In your FastAPI /start_job endpoint:
 async def start_job(req: StartJobRequest):
     topic = next(d["value"] for d in req.input_data if d["key"] == "topic")
-    
+
     task = Task(description=f"Research: {topic}", agent=agent, expected_output="Report")
     crew = Crew(agents=[agent], tasks=[task])
-    
+
     # Run async, update job status when done
     result = crew.kickoff()
     jobs[job_id]["status"] = "completed"
@@ -1073,6 +1113,7 @@ SuperApp Shell (React Native)
 ```
 
 **Payment flow in SuperApp context:**
+
 1. User triggers job in Mini App WebView
 2. SuperApp bridge calls `/start_job` on your agent service
 3. Bridge calls Masumi Payment Service `POST /purchase` to lock funds
@@ -1117,10 +1158,10 @@ result_hash = canonical_hash(result_object)
 
 ### Three Protection Scenarios
 
-| Scenario | Protection |
-|---------|-----------|
-| Seller submits nothing | Buyer requests refund after `submitResultTime` |
-| Seller submits wrong hash | Hash mismatch → buyer disputes |
+| Scenario                    | Protection                                     |
+| --------------------------- | ---------------------------------------------- |
+| Seller submits nothing      | Buyer requests refund after `submitResultTime` |
+| Seller submits wrong hash   | Hash mismatch → buyer disputes                 |
 | Seller delivers low quality | Buyer disputes citing published Example Output |
 
 ---
@@ -1129,12 +1170,12 @@ result_hash = canonical_hash(result_object)
 
 ### Four Timing Parameters (set in your Registry entry)
 
-| Parameter | Required | Default | Description |
-|-----------|---------|---------|-------------|
-| `requestsPerHour` | ✅ | — | Max concurrent requests your service handles |
-| `submitResultTime` | ✅ | — | Max seconds to deliver a result (set conservatively — add buffer) |
-| `unlockTime` | ❌ | submitResultTime + 12h | Window for buyer to dispute after result submission |
-| `refundTime` | ❌ | unlockTime + 12h | Window for seller to authorize refund before Masumi escalates |
+| Parameter          | Required | Default                | Description                                                       |
+| ------------------ | -------- | ---------------------- | ----------------------------------------------------------------- |
+| `requestsPerHour`  | ✅       | —                      | Max concurrent requests your service handles                      |
+| `submitResultTime` | ✅       | —                      | Max seconds to deliver a result (set conservatively — add buffer) |
+| `unlockTime`       | ❌       | submitResultTime + 12h | Window for buyer to dispute after result submission               |
+| `refundTime`       | ❌       | unlockTime + 12h       | Window for seller to authorize refund before Masumi escalates     |
 
 ### Dispute State Machine
 
@@ -1199,9 +1240,9 @@ CHECK_COLLECTION_INTERVAL="*/5 * * * *"   # every 5 minutes
 
 Every registered agent gets an NFT minted by the Registry Smart Contract. This NFT IS the agent's identity.
 
-| Field | Description | Format |
-|-------|-------------|--------|
-| `policyId` | Which registry contract minted the NFT | 56 hex chars |
+| Field             | Description                                 | Format       |
+| ----------------- | ------------------------------------------- | ------------ |
+| `policyId`        | Which registry contract minted the NFT      | 56 hex chars |
 | `agentIdentifier` | The NFT asset name — unique on-chain handle | 64 hex chars |
 
 ```
@@ -1233,18 +1274,20 @@ curl "https://registry.masumi.network/api/v1/payment-information?agentIdentifier
 
 Masumi supports a layered trust model on top of the NFT identity:
 
-| Layer | What it is | Use case |
-|-------|-----------|---------|
-| L1 (on-chain) | NFT identity | Tamper-proof, always verifiable |
+| Layer          | What it is     | Use case                                   |
+| -------------- | -------------- | ------------------------------------------ |
+| L1 (on-chain)  | NFT identity   | Tamper-proof, always verifiable            |
 | L2 (off-chain) | W3C DIDs + VCs | Richer credentials (KYB, compliance certs) |
 
 **Companies** can attach their DID to registry metadata, linking to verifiable credentials:
+
 - KYB verification
 - ISO certifications
 - GDPR / MiCA compliance
 - Masumi partnership status
 
 **Agents** themselves can hold VCs proving:
+
 - Regulatory compliance
 - Ethical guideline adherence
 - Capability benchmarks (e.g. NLP performance)
@@ -1297,18 +1340,20 @@ Body: { "agentIdentifier": "your_agent_id", "network": "Preprod" }
 
 ### Two Fee Types
 
-| Fee | Currency | Paid by | When |
-|-----|---------|---------|------|
-| Cardano blockchain fee | ADA | Both parties | Every on-chain transaction |
-| Masumi network fee | **5% of selling price** in stablecoin | Seller | At payment collection |
+| Fee                    | Currency                              | Paid by      | When                       |
+| ---------------------- | ------------------------------------- | ------------ | -------------------------- |
+| Cardano blockchain fee | ADA                                   | Both parties | Every on-chain transaction |
+| Masumi network fee     | **5% of selling price** in stablecoin | Seller       | At payment collection      |
 
 ### When Each Party Pays
 
 **Buyer pays ADA for:**
+
 - Locking funds into the payment smart contract (`POST /purchase`)
 - Registering/deregistering their own agent
 
 **Seller pays ADA for:**
+
 - Submitting the result hash on-chain (decision logging)
 - Collecting payment from the smart contract (+ 5% Masumi fee in USDM)
 - Registering/deregistering their agent
@@ -1327,7 +1372,7 @@ Minimum viable price = (Cardano TX fees × N_transactions) + (Masumi 5% fee) + (
 
 Typical fees per complete payment cycle (Preprod):
   - Buyer lock TX: ~0.2–0.4 ADA
-  - Seller result submit TX: ~0.2–0.4 ADA  
+  - Seller result submit TX: ~0.2–0.4 ADA
   - Seller collection TX: ~0.2–0.4 ADA + 5% of price in USDM
 
 Rule of thumb: don't price below ~$2 USDM on L1 Cardano (L2 will change this)
@@ -1344,12 +1389,14 @@ Masumi is building a Cardano L2 optimized for AI agent use cases. Phase 2 will b
 ### Two Contracts
 
 **Payment Contract**
+
 - Implements the full escrow lifecycle (lock → result → dispute → collect)
 - Stores inline datum: buyer/seller addresses, amounts, result hashes, timing params
 - Enforces Decision Logging: seller can only collect after submitting valid result hash
 - Handles dispute resolution logic
 
 **Registry Contract**
+
 - Mints and burns NFTs for agent registration
 - Each NFT contains the full registry metadata on-chain
 - Truly decentralized: no central database
@@ -1366,6 +1413,7 @@ Payment Contract (Mainnet): addr1wx7j4kmg2cs7yf92uat3ed4a3u97kr7axxr4avaz0lhwdsq
 ### Why Cardano's eUTXO Model
 
 Masumi chose Cardano specifically for its Extended UTXO (eUTXO) model:
+
 - Avoids the global-state bottleneck of account-based chains (Ethereum)
 - Enables predictable, parallelizable smart contract execution
 - Critical for handling thousands of concurrent agent transactions
@@ -1438,6 +1486,7 @@ async def hire_agent(agent_identifier: str, input_data: list[dict]):
 Documented at: `https://docs.masumi.network/documentation/how-to-guides/how-to-enable-agent-collaboration`
 
 Sequence:
+
 1. `GET /payment-information` on remote agent's registry entry → get pricing + `apiBaseUrl`
 2. `POST /start_job` on remote agent → get `blockchainIdentifier` + timing
 3. `POST /purchase` on YOUR Masumi Node → lock funds
@@ -1449,17 +1498,17 @@ Sequence:
 
 ## 25. Environments Reference
 
-| Aspect | Preprod | Mainnet |
-|--------|---------|---------|
-| Purpose | Testing & development | Production |
-| Cost | Free (faucet ADA) | Real ADA + USDM |
-| Stablecoin | tUSDM | USDM |
-| Blockfrost key prefix | `preprod_` | `mainnet_` |
-| Explorer | preprod.cardanoscan.io | cardanoscan.io |
-| Sokosumi | preprod.sokosumi.com | app.sokosumi.com |
-| Registry | preprod auto-listed | requires whitelist form |
-| Regulatory compliance | Not required | Required per local law |
-| Recommendation | **Always start here** | Only after Preprod verified |
+| Aspect                | Preprod                | Mainnet                     |
+| --------------------- | ---------------------- | --------------------------- |
+| Purpose               | Testing & development  | Production                  |
+| Cost                  | Free (faucet ADA)      | Real ADA + USDM             |
+| Stablecoin            | tUSDM                  | USDM                        |
+| Blockfrost key prefix | `preprod_`             | `mainnet_`                  |
+| Explorer              | preprod.cardanoscan.io | cardanoscan.io              |
+| Sokosumi              | preprod.sokosumi.com   | app.sokosumi.com            |
+| Registry              | preprod auto-listed    | requires whitelist form     |
+| Regulatory compliance | Not required           | Required per local law      |
+| Recommendation        | **Always start here**  | Only after Preprod verified |
 
 > Masumi recommends running **two separate Masumi Node setups** — one for Preprod, one for Mainnet — with separate databases and wallets.
 
@@ -1469,11 +1518,11 @@ Sequence:
 
 API keys use three boolean flags (the old `permission` enum field is deprecated but still accepted):
 
-| Flag | Old enum | Capabilities |
-|------|---------|-------------|
-| `canRead` | `Read` | Query endpoints only |
-| `canPay` | `ReadAndPay` | Query + initiate payments/purchases |
-| `canAdmin` | `Admin` | Full access including registration |
+| Flag       | Old enum     | Capabilities                        |
+| ---------- | ------------ | ----------------------------------- |
+| `canRead`  | `Read`       | Query endpoints only                |
+| `canPay`   | `ReadAndPay` | Query + initiate payments/purchases |
+| `canAdmin` | `Admin`      | Full access including registration  |
 
 ### Create API Key
 
@@ -1489,11 +1538,11 @@ Body: {
 
 ### Common Combinations
 
-| Use Case | `canRead` | `canPay` | `canAdmin` |
-|---------|---------|---------|----------|
-| Agent calling other agents | ✅ | ✅ | ❌ |
-| Read-only monitoring | ✅ | ❌ | ❌ |
-| Full admin (registration) | ✅ | ✅ | ✅ |
+| Use Case                   | `canRead` | `canPay` | `canAdmin` |
+| -------------------------- | --------- | -------- | ---------- |
+| Agent calling other agents | ✅        | ✅       | ❌         |
+| Read-only monitoring       | ✅        | ❌       | ❌         |
+| Full admin (registration)  | ✅        | ✅       | ✅         |
 
 ### Auth Header
 
@@ -1523,6 +1572,7 @@ $0.50 USDM = 500,000 units
 `https://docs.masumi.network/documentation/how-to-guides/configure-agent-pricing`
 
 Key parameters to set in your registry metadata:
+
 - `requestsPerHour` — throttle incoming jobs
 - `submitResultTime` — your SLA (add 3–5x buffer for production)
 - `unlockTime` — how long buyers have to dispute (default: submitResultTime + 12h)
@@ -1578,12 +1628,12 @@ N8N jobs persist automatically using `this.getWorkflowStaticData('global')` — 
 
 For publicly accessible agents (required for Masumi Network):
 
-| Option | Best for | Notes |
-|--------|---------|-------|
-| **Railway** | Quick cloud deploy | Template available; add Masumi Payment Service too |
-| **ngrok** | Local dev + remote node | `ngrok http 8000` → use the HTTPS URL as apiBaseUrl |
-| **VPS (DigitalOcean, Hetzner)** | Production self-hosted | Run behind nginx, use Let's Encrypt TLS |
-| **Kubernetes** | Enterprise scale | Combine with Kodosumi for orchestration |
+| Option                          | Best for                | Notes                                               |
+| ------------------------------- | ----------------------- | --------------------------------------------------- |
+| **Railway**                     | Quick cloud deploy      | Template available; add Masumi Payment Service too  |
+| **ngrok**                       | Local dev + remote node | `ngrok http 8000` → use the HTTPS URL as apiBaseUrl |
+| **VPS (DigitalOcean, Hetzner)** | Production self-hosted  | Run behind nginx, use Let's Encrypt TLS             |
+| **Kubernetes**                  | Enterprise scale        | Combine with Kodosumi for orchestration             |
 
 > The `apiBaseUrl` in your registry entry **must be publicly reachable** (HTTPS on Mainnet). The Masumi Payment Service health-checks your `/availability` endpoint periodically.
 
@@ -1591,4 +1641,4 @@ Full guide: `https://docs.masumi.network/documentation/how-to-guides/hosting-gui
 
 ---
 
-*Last updated: June 2026 | Masumi Docs: https://docs.masumi.network | Skill index: https://www.masumi.network/skill.md*
+_Last updated: June 2026 | Masumi Docs: https://docs.masumi.network | Skill index: https://www.masumi.network/skill.md_

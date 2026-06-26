@@ -35,14 +35,14 @@ allowed-tools: Bash WebFetch
 
 ## Method Decision Table
 
-| Dataset size | DB state | Source | Method |
-|---|---|---|---|
-| Any size | Online | CSV (Aura or local) | LOAD CSV + CALL IN TRANSACTIONS |
-| < 1M rows | Online | List/API response | UNWIND + CALL IN TRANSACTIONS |
-| > 10M rows | **Offline** (local/self-managed) | CSV / Parquet | `neo4j-admin database import full` |
-| Any size | Online | APOC available | `apoc.periodic.iterate` + `apoc.load.csv` |
-| Any size | Online | JSON/API | `apoc.load.json` or driver batching |
-| Incremental delta | Offline (Enterprise) | CSV | `neo4j-admin database import incremental` |
+| Dataset size      | DB state                         | Source              | Method                                    |
+| ----------------- | -------------------------------- | ------------------- | ----------------------------------------- |
+| Any size          | Online                           | CSV (Aura or local) | LOAD CSV + CALL IN TRANSACTIONS           |
+| < 1M rows         | Online                           | List/API response   | UNWIND + CALL IN TRANSACTIONS             |
+| > 10M rows        | **Offline** (local/self-managed) | CSV / Parquet       | `neo4j-admin database import full`        |
+| Any size          | Online                           | APOC available      | `apoc.periodic.iterate` + `apoc.load.csv` |
+| Any size          | Online                           | JSON/API            | `apoc.load.json` or driver batching       |
+| Incremental delta | Offline (Enterprise)             | CSV                 | `neo4j-admin database import incremental` |
 
 **Aura**: only `https://` URLs — no `file:///`. Use neo4j-admin import only on self-managed.
 
@@ -53,30 +53,38 @@ allowed-tools: Bash WebFetch
 Run in this exact order — skipping causes hard-to-debug duplicates or missed index usage:
 
 **Constraints BEFORE import. Additional indexes AFTER import.**
+
 - Constraints create implicit RANGE indexes used by MERGE during load + enforce uniqueness
 - Additional non-unique indexes (TEXT, RANGE on non-key props, FULLTEXT) created after load — Neo4j populates them async from the committed data; poll `populationPercent` until 100%
 - Creating extra indexes before import slows every write during load with no benefit
 
 1. **Create uniqueness constraints** (enables index used by MERGE):
+
    ```cypher
    CREATE CONSTRAINT IF NOT EXISTS FOR (n:Person) REQUIRE n.id IS UNIQUE;
    CREATE CONSTRAINT IF NOT EXISTS FOR (n:Movie)  REQUIRE n.movieId IS UNIQUE;
    ```
+
    > **Neo4j 2026.02+ (Enterprise/Aura) — PREVIEW:** `ALTER CURRENT GRAPH TYPE SET { … }` can replace all individual constraint statements with a single declarative block. See `neo4j-cypher-skill/references/graph-type.md`. Use individual `CREATE CONSTRAINT` on older versions or Community Edition.
 
-2. **Verify APOC if using apoc.* procedures**:
+2. **Verify APOC if using apoc.\* procedures**:
+
    ```cypher
    RETURN apoc.version();
    ```
+
    If fails → APOC not installed. Use plain LOAD CSV instead.
 
 3. **Confirm target is PRIMARY** (not replica):
+
    ```cypher
    CALL dbms.cluster.role() YIELD role RETURN role;
    ```
+
    If role ≠ `PRIMARY` → stop. Redirect write to PRIMARY endpoint.
 
 4. **Count source file rows** before import (catch encoding issues early):
+
    ```bash
    wc -l data/persons.csv    # Linux/macOS
    ```
@@ -114,6 +122,7 @@ RETURN s.transactionId, s.committed, s.errorMessage
 ```
 
 Null/empty-string rules:
+
 - CSV missing column → `null` (safe)
 - CSV empty string `""` → stored as `""` **not** `null` — use `nullIf(row.x, '')` to convert
 - `toInteger(null)` throws → always use `toIntegerOrNull()`
@@ -153,11 +162,11 @@ LOAD CSV WITH HEADERS FROM 'file:///archive.csv.gz' AS row ...
 
 ### Cloud storage (Enterprise Edition)
 
-| Scheme | Example |
-|---|---|
-| AWS S3 | `s3://my-bucket/data/persons.csv` |
-| Google Cloud Storage | `gs://my-bucket/persons.csv` |
-| Azure Blob | `azb://account/container/persons.csv` |
+| Scheme               | Example                               |
+| -------------------- | ------------------------------------- |
+| AWS S3               | `s3://my-bucket/data/persons.csv`     |
+| Google Cloud Storage | `gs://my-bucket/persons.csv`          |
+| Azure Blob           | `azb://account/container/persons.csv` |
 
 ### Useful built-in functions inside LOAD CSV
 
@@ -183,12 +192,12 @@ CALL (row) {
 
 ### ON ERROR modes
 
-| Mode | Behavior | Use when |
-|---|---|---|
-| `ON ERROR FAIL` | Default. Rolls back entire outer tx on first error | All-or-nothing strict import |
-| `ON ERROR CONTINUE` | Skips failed batch, continues remaining batches | Resilient bulk load — track errors via REPORT STATUS |
-| `ON ERROR BREAK` | Stops after first failed batch; keeps completed work | Semi-strict: stop early, keep successful batches |
-| `ON ERROR RETRY` | Exponential backoff retry (default 30s) + fallback | Concurrent writes with deadlock risk |
+| Mode                | Behavior                                             | Use when                                             |
+| ------------------- | ---------------------------------------------------- | ---------------------------------------------------- |
+| `ON ERROR FAIL`     | Default. Rolls back entire outer tx on first error   | All-or-nothing strict import                         |
+| `ON ERROR CONTINUE` | Skips failed batch, continues remaining batches      | Resilient bulk load — track errors via REPORT STATUS |
+| `ON ERROR BREAK`    | Stops after first failed batch; keeps completed work | Semi-strict: stop early, keep successful batches     |
+| `ON ERROR RETRY`    | Exponential backoff retry (default 30s) + fallback   | Concurrent writes with deadlock risk                 |
 
 `ON ERROR CONTINUE/BREAK` → outer transaction **succeeds** even if inner batches fail.
 `ON ERROR FAIL` → cannot be combined with `REPORT STATUS AS`.
@@ -209,22 +218,22 @@ Use CONCURRENT for read-heavy MERGE on non-overlapping key spaces. Risk: deadloc
 
 ### REPORT STATUS columns
 
-| Column | Type | Meaning |
-|---|---|---|
-| `s.started` | BOOLEAN | Batch transaction started |
-| `s.committed` | BOOLEAN | Batch committed successfully |
-| `s.transactionId` | STRING | Transaction ID |
-| `s.errorMessage` | STRING or null | Error detail if batch failed |
+| Column            | Type           | Meaning                      |
+| ----------------- | -------------- | ---------------------------- |
+| `s.started`       | BOOLEAN        | Batch transaction started    |
+| `s.committed`     | BOOLEAN        | Batch committed successfully |
+| `s.transactionId` | STRING         | Transaction ID               |
+| `s.errorMessage`  | STRING or null | Error detail if batch failed |
 
 ### Batch size guidance
 
-| Row count | Recommended batch size | Notes |
-|---|---|---|
-| < 100k | 10 000 | Default is fine |
-| 100k – 1M | 10 000 – 50 000 | Monitor heap; increase if fast |
-| 1M – 10M | 50 000 – 100 000 | Enable CONCURRENT if CPUs available |
-| > 10M online | 50 000 | Consider neo4j-admin import instead |
-| Relationship import | 5 000 | Lower — each batch does 2x MATCH |
+| Row count           | Recommended batch size | Notes                               |
+| ------------------- | ---------------------- | ----------------------------------- |
+| < 100k              | 10 000                 | Default is fine                     |
+| 100k – 1M           | 10 000 – 50 000        | Monitor heap; increase if fast      |
+| 1M – 10M            | 50 000 – 100 000       | Enable CONCURRENT if CPUs available |
+| > 10M online        | 50 000                 | Consider neo4j-admin import instead |
+| Relationship import | 5 000                  | Lower — each batch does 2x MATCH    |
 
 ---
 
@@ -251,6 +260,7 @@ neo4j-admin database import full \
 For SSDs: always set `--high-parallel-io=on`. For large graphs (>34B nodes/rels): `--format=block`.
 
 **Dry run** (2026.02+) — validate without writing:
+
 ```bash
 neo4j-admin database import full --dry-run ...
 ```
@@ -268,15 +278,15 @@ p001,Alice,1985,9.2,true,Person
 p002,Bob,1990,7.1,false,Person
 ```
 
-| Field | Meaning |
-|---|---|
-| `:ID` | Unique ID for relationship wiring (not stored as property by default) |
-| `:ID(Group)` | Scoped ID space — use when node types share IDs |
-| `:LABEL` | One or more labels; semicolon-separated: `Person;Employee` |
-| `prop:int` | Typed property; types: `int long float double boolean byte short string` |
-| `prop:date` | Temporal: `date localtime time localdatetime datetime duration` |
-| `prop:int[]` | Array — semicolon-separated values in cell: `1;2;3` |
-| `prop:vector` | Float vector (2025.10+) — semicolon-separated coordinates |
+| Field         | Meaning                                                                  |
+| ------------- | ------------------------------------------------------------------------ |
+| `:ID`         | Unique ID for relationship wiring (not stored as property by default)    |
+| `:ID(Group)`  | Scoped ID space — use when node types share IDs                          |
+| `:LABEL`      | One or more labels; semicolon-separated: `Person;Employee`               |
+| `prop:int`    | Typed property; types: `int long float double boolean byte short string` |
+| `prop:date`   | Temporal: `date localtime time localdatetime datetime duration`          |
+| `prop:int[]`  | Array — semicolon-separated values in cell: `1;2;3`                      |
+| `prop:vector` | Float vector (2025.10+) — semicolon-separated coordinates                |
 
 ### Relationship header file format
 
@@ -295,17 +305,17 @@ p002,tt0133093,Morpheus,ACTED_IN
 
 ### Key flags
 
-| Flag | Default | Notes |
-|---|---|---|
-| `--delimiter` | `,` | Single char or `TAB` |
-| `--id-type` | `STRING` | `STRING \| INTEGER \| ACTUAL` |
-| `--bad-tolerance` | `-1` (unlimited, changed 2025.12) | Set `0` for strict prod imports |
-| `--threads` | CPU count | Set explicitly on shared hosts |
-| `--max-off-heap-memory` | 90% RAM | Reduce if other services share host |
-| `--high-parallel-io` | `off` | Set `on` for SSD/NVMe |
-| `--format` | `standard` | `block` for >34B nodes/rels |
-| `--overwrite-destination` | false | Required if DB already exists |
-| `--dry-run` | false | 2026.02+ — validate without writing |
+| Flag                      | Default                           | Notes                               |
+| ------------------------- | --------------------------------- | ----------------------------------- |
+| `--delimiter`             | `,`                               | Single char or `TAB`                |
+| `--id-type`               | `STRING`                          | `STRING \| INTEGER \| ACTUAL`       |
+| `--bad-tolerance`         | `-1` (unlimited, changed 2025.12) | Set `0` for strict prod imports     |
+| `--threads`               | CPU count                         | Set explicitly on shared hosts      |
+| `--max-off-heap-memory`   | 90% RAM                           | Reduce if other services share host |
+| `--high-parallel-io`      | `off`                             | Set `on` for SSD/NVMe               |
+| `--format`                | `standard`                        | `block` for >34B nodes/rels         |
+| `--overwrite-destination` | false                             | Required if DB already exists       |
+| `--dry-run`               | false                             | 2026.02+ — validate without writing |
 
 ### Schema file (--schema) [Enterprise, block format]
 
@@ -366,11 +376,11 @@ CALL apoc.periodic.iterate(
 RETURN batches, total, errorMessages
 ```
 
-| Config key | Default | Notes |
-|---|---|---|
-| `batchSize` | 10000 | Rows per inner transaction |
-| `parallel` | false | Enable for non-overlapping writes; risk: deadlocks |
-| `retries` | 0 | Retry failed batches N times with 100ms delay |
+| Config key  | Default | Notes                                              |
+| ----------- | ------- | -------------------------------------------------- |
+| `batchSize` | 10000   | Rows per inner transaction                         |
+| `parallel`  | false   | Enable for non-overlapping writes; risk: deadlocks |
+| `retries`   | 0       | Retry failed batches N times with 100ms delay      |
 
 Prefer `CALL IN TRANSACTIONS` (native Cypher) over `apoc.periodic.iterate` for new code — it has `REPORT STATUS`, `CONCURRENT`, and `RETRY` built in without APOC dependency.
 
@@ -407,15 +417,16 @@ Use when source is not a file (API responses, DB migrations). Collect into `BATC
 
 ## MCP Tool Usage
 
-| Operation | MCP tool | Notes |
-|---|---|---|
-| `SHOW CONSTRAINTS`, `SHOW INDEXES` | `read-cypher` | Always inspect before import |
-| `CREATE CONSTRAINT`, `CREATE INDEX` | `write-cypher` | Gate: show planned constraint, confirm |
-| LOAD CSV / CALL IN TRANSACTIONS | `write-cypher` | Gate: show row count + Cypher, confirm |
-| Verify counts | `read-cypher` | Post-import: `MATCH (n:Label) RETURN count(n)` |
-| Poll index state | `read-cypher` | Poll until all `state = 'ONLINE'` |
+| Operation                           | MCP tool       | Notes                                          |
+| ----------------------------------- | -------------- | ---------------------------------------------- |
+| `SHOW CONSTRAINTS`, `SHOW INDEXES`  | `read-cypher`  | Always inspect before import                   |
+| `CREATE CONSTRAINT`, `CREATE INDEX` | `write-cypher` | Gate: show planned constraint, confirm         |
+| LOAD CSV / CALL IN TRANSACTIONS     | `write-cypher` | Gate: show row count + Cypher, confirm         |
+| Verify counts                       | `read-cypher`  | Post-import: `MATCH (n:Label) RETURN count(n)` |
+| Poll index state                    | `read-cypher`  | Poll until all `state = 'ONLINE'`              |
 
 Write gate — before any bulk write via MCP, show:
+
 1. Query + affected labels
 2. Estimated row count from source
 3. `EXPLAIN` plan
@@ -428,18 +439,18 @@ Always pass `database` param if not default: `{"code": "...", "database": "neo4j
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| `Couldn't load the external resource` | `file:///` path not in Neo4j import dir | Move file to `$NEO4J_HOME/import/`; check `dbms.security.allow_csv_import_from_file_urls=true` |
-| `Cannot merge node using null property value` | MERGE key resolved to null | Validate `row.id IS NOT NULL` before MERGE; add `WHERE row.id IS NOT NULL` |
-| `toInteger() called on null` | Null column fed to non-null-safe fn | Replace `toInteger()` → `toIntegerOrNull()`, `toFloat()` → `toFloatOrNull()` |
-| `Node N already exists` / constraint violation mid-import | Duplicate source IDs | Dedup source CSV; use `MERGE` not `CREATE`; add `IF NOT EXISTS` to constraint |
-| Heap overflow / OutOfMemoryError | Batch too large or file too large | Reduce batch size; switch to `CALL IN TRANSACTIONS`; neo4j-admin for offline |
-| `Invalid input 'IN': expected...'` | `PERIODIC COMMIT` used | Replace `USING PERIODIC COMMIT` → `CALL IN TRANSACTIONS` — PERIODIC COMMIT removed in Cypher 25 |
-| neo4j-admin: `Bad input data` | Wrong header format or type mismatch | Check `:ID`, `:START_ID`, `:END_ID` present; check typed columns parse correctly |
-| neo4j-admin: import fails silently | `--bad-tolerance` default was unlimited pre-2025.12 | Set `--bad-tolerance=0` to surface all errors |
-| Index not used during MERGE | Constraint not created before import | Drop data, create constraint, re-import |
-| Relationship import missing nodes | Relationships imported before nodes | Always import ALL node files before ANY relationship files |
+| Error                                                     | Cause                                               | Fix                                                                                             |
+| --------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `Couldn't load the external resource`                     | `file:///` path not in Neo4j import dir             | Move file to `$NEO4J_HOME/import/`; check `dbms.security.allow_csv_import_from_file_urls=true`  |
+| `Cannot merge node using null property value`             | MERGE key resolved to null                          | Validate `row.id IS NOT NULL` before MERGE; add `WHERE row.id IS NOT NULL`                      |
+| `toInteger() called on null`                              | Null column fed to non-null-safe fn                 | Replace `toInteger()` → `toIntegerOrNull()`, `toFloat()` → `toFloatOrNull()`                    |
+| `Node N already exists` / constraint violation mid-import | Duplicate source IDs                                | Dedup source CSV; use `MERGE` not `CREATE`; add `IF NOT EXISTS` to constraint                   |
+| Heap overflow / OutOfMemoryError                          | Batch too large or file too large                   | Reduce batch size; switch to `CALL IN TRANSACTIONS`; neo4j-admin for offline                    |
+| `Invalid input 'IN': expected...'`                        | `PERIODIC COMMIT` used                              | Replace `USING PERIODIC COMMIT` → `CALL IN TRANSACTIONS` — PERIODIC COMMIT removed in Cypher 25 |
+| neo4j-admin: `Bad input data`                             | Wrong header format or type mismatch                | Check `:ID`, `:START_ID`, `:END_ID` present; check typed columns parse correctly                |
+| neo4j-admin: import fails silently                        | `--bad-tolerance` default was unlimited pre-2025.12 | Set `--bad-tolerance=0` to surface all errors                                                   |
+| Index not used during MERGE                               | Constraint not created before import                | Drop data, create constraint, re-import                                                         |
+| Relationship import missing nodes                         | Relationships imported before nodes                 | Always import ALL node files before ANY relationship files                                      |
 
 ---
 

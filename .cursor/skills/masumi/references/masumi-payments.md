@@ -11,6 +11,7 @@ Registry **discovery** API (separate service) → [masumi-registry-api.md](masum
 ## What It Does
 
 Self-hosted node = enables:
+
 - A2A payments (autonomous agent-to-agent)
 - Smart-contract escrow (trustless lock + release)
 - Decision logging (sha256 input+output on-chain)
@@ -42,11 +43,13 @@ Payment Service (you run this)
 ## Install + Setup
 
 ### Prereqs
+
 - Node.js ≥ 18
 - PostgreSQL ≥ 14
 - Git
 
 ### Steps
+
 ```bash
 git clone https://github.com/masumi-network/masumi-payment-service
 cd masumi-payment-service
@@ -56,6 +59,7 @@ npm run db:generate
 ```
 
 ### `.env`
+
 ```env
 NETWORK=Preprod                              # or Mainnet
 BLOCKFROST_API_KEY_PREPROD=preprod...
@@ -76,6 +80,7 @@ BLOCK_CONFIRMATIONS_THRESHOLD=20
 > **Never commit `.env`.** Hardware wallet for Collection Wallet on mainnet.
 
 ### Start
+
 ```bash
 npm run dev                       # dev mode, hot reload
 # or
@@ -89,11 +94,11 @@ Swagger: http://localhost:3001/docs.
 
 ## Base URLs
 
-| Env | URL |
-|---|---|
-| Local self-host | `http://localhost:3001/api/v1` |
+| Env               | URL                                     |
+| ----------------- | --------------------------------------- |
+| Local self-host   | `http://localhost:3001/api/v1`          |
 | Managed (mainnet) | `https://payment.masumi.network/api/v1` |
-| Your hosted | e.g. Railway URL |
+| Your hosted       | e.g. Railway URL                        |
 
 Store as `PAYMENT_SERVICE_URL` in `.env`. There's **no** `preprod.payment.masumi.network` host — for preprod, self-host and pass `network:"Preprod"` in bodies.
 
@@ -115,16 +120,19 @@ Store as `PAYMENT_API_KEY` in `.env`. Generate via admin dashboard.
 ## Complete Endpoint Index
 
 **Health + keys**
+
 - `GET /health`
 - `GET /api-key-status`
 - `GET | POST | PATCH | DELETE /api-key`
 
 **Wallets**
+
 - `GET | POST | PATCH /wallet`
 - `GET | POST | PATCH | DELETE /wallet/low-balance`
 - `GET /utxos`, `GET /rpc-api-keys`
 
 **Payments (seller)**
+
 - `GET | POST /payment`
 - `GET /payment/diff`, `/payment/diff/next-action`, `/payment/diff/onchain-state-or-result`
 - `GET /payment/count`
@@ -133,9 +141,10 @@ Store as `PAYMENT_API_KEY` in `.env`. Generate via admin dashboard.
 - `POST /payment/error-state-recovery`
 - `POST /payment/resolve-blockchain-identifier`
 - `POST /payment/income`
-- `POST /payment/x402` *(HTTP 402 / x402)*
+- `POST /payment/x402` _(HTTP 402 / x402)_
 
 **Purchases (buyer)**
+
 - `GET | POST /purchase`
 - `GET /purchase/diff`, `/purchase/diff/next-action`, `/purchase/diff/onchain-state-or-result`
 - `GET /purchase/count`
@@ -146,36 +155,44 @@ Store as `PAYMENT_API_KEY` in `.env`. Generate via admin dashboard.
 - `POST /purchase/spending`
 
 **Registry (NFT mint on-chain)**
+
 - `GET | POST | DELETE /registry`
 - `GET /registry/wallet`, `/registry/agent-identifier`
 - `GET /registry/diff`, `/registry/count`
 - `POST /registry/deregister`
 
 **Inbox agents (A2A)**
+
 - `GET | POST | DELETE /inbox-agents`
 - `GET /inbox-agents/wallet`, `/agent-identifier`, `/diff`, `/count`
 - `POST /inbox-agents/deregister`
 
 **Payment sources**
+
 - `GET /payment-source`
 - `GET | POST | PATCH | DELETE /payment-source-extended`
 
 **Swaps (ADA ↔ USDM)**
+
 - `POST /swap`, `GET /swap/confirm`, `/swap/transactions`, `/swap/estimate`
 - `POST /swap/cancel`, `/swap/acknowledge-timeout`
 
 **Webhooks**
+
 - `GET | POST | PATCH | DELETE /webhooks`, `POST /webhooks/test`
 
 **Invoicing**
+
 - `GET | POST /invoice/monthly`, `POST /invoice/monthly/internal`, `GET /invoice/monthly/missing`
 - `POST /signature/sign/create-invoice/monthly`
 
 **Signature**
+
 - `POST /signature/verify/reveal-data`
 - `POST /signature/sign/verifyAndPublishAgent`
 
 **Monitoring**
+
 - `GET /monitoring`
 - `POST /monitoring/trigger-cycle`, `/monitoring/start`, `/monitoring/stop`
 
@@ -186,83 +203,99 @@ For **registry search/discovery** (separate service): [masumi-registry-api.md](m
 ## Verified Request Bodies (live spec)
 
 ### `POST /payment` — create payment request (seller)
+
 ```json
 {
-  "network":"Preprod",                  // required
-  "agentIdentifier":"<min 57 chars>",   // required
-  "inputHash":"<sha256 hex>",           // required
-  "RequestedFunds":[                    // optional; null for fixed, array for dynamic
-    {"unit":"","amount":"10000000"}     // unit="" = ADA/lovelace
+  "network": "Preprod", // required
+  "agentIdentifier": "<min 57 chars>", // required
+  "inputHash": "<sha256 hex>", // required
+  "RequestedFunds": [
+    // optional; null for fixed, array for dynamic
+    { "unit": "", "amount": "10000000" } // unit="" = ADA/lovelace
   ],
-  "payByTime":"<ISO date-time>",        // optional; when payment must hit contract
-  "submitResultTime":"<ISO date-time>", // optional; when seller must submit hash
-  "identifierFromPurchaser":"buyer-id"  // required
+  "payByTime": "<ISO date-time>", // optional; when payment must hit contract
+  "submitResultTime": "<ISO date-time>", // optional; when seller must submit hash
+  "identifierFromPurchaser": "buyer-id" // required
 }
 ```
+
 `unit:""` = ADA/lovelace. For USDM: full policyId+assetName concatenated.
 
 ### `GET /payment` — check status
+
 Query: `network` (req), optional `filterSmartContractAddress`, `filterOnChainState`, `searchQuery`, `includeHistory`, plus `cursorId | limit` (1..100).
 On-chain state filter values: `FundsLocked`, `FundsOrDatumInvalid`, `ResultSubmitted`, `RefundRequested`, `Disputed`, `Withdrawn`, `RefundWithdrawn`, `DisputedWithdrawn`.
 
 For exact lookup by blockchain identifier → `POST /payment/resolve-blockchain-identifier`.
 
 ### `POST /payment/submit-result` — seller submits decision hash
+
 ```json
 {
-  "network":"Preprod",                  // required
-  "blockchainIdentifier":"<id>",        // required, ≤8000 chars
-  "submitResultHash":"<sha256 hex>"     // required, ≤250 chars
+  "network": "Preprod", // required
+  "blockchainIdentifier": "<id>", // required, ≤8000 chars
+  "submitResultHash": "<sha256 hex>" // required, ≤250 chars
 }
 ```
+
 > Migration: old docs said `{identifier, decisionHash}`. Live shape = `{network, blockchainIdentifier, submitResultHash}`.
 
 ### `POST /payment/authorize-refund` — seller approves refund
+
 ```json
 {
-  "network":"Preprod",                  // required
-  "blockchainIdentifier":"<id>"         // required, ≤8000 chars
+  "network": "Preprod", // required
+  "blockchainIdentifier": "<id>" // required, ≤8000 chars
 }
 ```
 
 ### `POST /purchase/request-refund` — buyer requests
+
 ```json
 {
-  "network":"Preprod",
-  "blockchainIdentifier":"<id>"
+  "network": "Preprod",
+  "blockchainIdentifier": "<id>"
 }
 ```
 
 ### `POST /registry` — mint agent NFT
+
 Required: `network`, `sellingWalletVkey`, `name`, `description`, `apiBaseUrl`, `Tags[]`, `ExampleOutputs[]`, `Capability`, `AgentPricing`, `Author`.
 
 ```json
 {
-  "network":"Preprod",
-  "sellingWalletVkey":"<vkey from GET /wallet>",
-  "name":"My Agent",
-  "description":"Short description (≤250)",
-  "apiBaseUrl":"https://my-agent.example.com",
-  "Tags":["data-analysis"],                      // 1-15 items, each ≤63 chars
-  "ExampleOutputs":[                             // 1-25 items
-    {"name":"sample","url":"https://my-agent.example.com/sample.json","mimeType":"application/json"}
+  "network": "Preprod",
+  "sellingWalletVkey": "<vkey from GET /wallet>",
+  "name": "My Agent",
+  "description": "Short description (≤250)",
+  "apiBaseUrl": "https://my-agent.example.com",
+  "Tags": ["data-analysis"], // 1-15 items, each ≤63 chars
+  "ExampleOutputs": [
+    // 1-25 items
+    {
+      "name": "sample",
+      "url": "https://my-agent.example.com/sample.json",
+      "mimeType": "application/json"
+    }
   ],
-  "Capability":{"name":"gpt-4","version":"2024-08"},
-  "AgentPricing":{
-    "pricingType":"Fixed",                       // Fixed | Free | Dynamic
-    "Pricing":[{"unit":"","amount":"10000000"}]  // 1 ADA = 1000000 lovelace
+  "Capability": { "name": "gpt-4", "version": "2024-08" },
+  "AgentPricing": {
+    "pricingType": "Fixed", // Fixed | Free | Dynamic
+    "Pricing": [{ "unit": "", "amount": "10000000" }] // 1 ADA = 1000000 lovelace
   },
-  "Author":{"name":"You","contactEmail":"you@example.com"},
-  "Legal":{"terms":"https://...","privacyPolicy":"https://...","other":""},
-  "recipientWalletAddress":"<optional managed hot wallet>",
-  "sendFundingLovelace":"7500000"
+  "Author": { "name": "You", "contactEmail": "you@example.com" },
+  "Legal": { "terms": "https://...", "privacyPolicy": "https://...", "other": "" },
+  "recipientWalletAddress": "<optional managed hot wallet>",
+  "sendFundingLovelace": "7500000"
 }
 ```
+
 > Field names are **case-sensitive**: `Tags`, `ExampleOutputs`, `Capability`, `AgentPricing`, `Author`, `Legal` (capitalized); `name`, `description`, `apiBaseUrl`, `sellingWalletVkey` (camelCase). Old snake_case (`api_endpoint`, `tags`, `pricing`) does not work.
 
 ### `DELETE /registry` — burn NFT
+
 ```json
-{"id":"<cuid of agent registration row>"}
+{ "id": "<cuid of agent registration row>" }
 ```
 
 ---
@@ -288,54 +321,68 @@ Required: `network`, `sellingWalletVkey`, `name`, `description`, `apiBaseUrl`, `
 ## Buyer Flow (TypeScript)
 
 ```typescript
-import 'dotenv/config';
-import axios from 'axios';
-import crypto from 'crypto';
-import canonicalize from 'canonicalize';     // RFC 8785
+import "dotenv/config";
+import axios from "axios";
+import crypto from "crypto";
+import canonicalize from "canonicalize"; // RFC 8785
 
-const REG  = process.env.REGISTRY_SERVICE_URL!;
-const PAY  = process.env.PAYMENT_SERVICE_URL!;
-const KEY  = process.env.PAYMENT_API_KEY!;
+const REG = process.env.REGISTRY_SERVICE_URL!;
+const PAY = process.env.PAYMENT_SERVICE_URL!;
+const KEY = process.env.PAYMENT_API_KEY!;
 const RKEY = process.env.REGISTRY_API_KEY!;
-const NET  = process.env.NETWORK ?? 'Preprod';
-const H    = (k: string) => ({ headers: { token: k, 'Content-Type': 'application/json' } });
+const NET = process.env.NETWORK ?? "Preprod";
+const H = (k: string) => ({ headers: { token: k, "Content-Type": "application/json" } });
 
 // 1. Discover
-const search = await axios.post(`${REG}/registry-entry-search/`,
-  { network: NET, query: 'data analysis', limit: 20 }, H(RKEY));
+const search = await axios.post(
+  `${REG}/registry-entry-search/`,
+  { network: NET, query: "data analysis", limit: 20 },
+  H(RKEY),
+);
 const agent = search.data.data[0];
 
 // 2. Start job on seller (MIP-003 endpoint advertised in registry as apiBaseUrl)
-const buyerId = 'buyer-' + crypto.randomUUID();
+const buyerId = "buyer-" + crypto.randomUUID();
 const job = await axios.post(`${agent.apiBaseUrl}/start_job`, {
-  input_data: { query: 'Analyze Q4 sales' },
+  input_data: { query: "Analyze Q4 sales" },
   identifier_from_purchaser: buyerId,
 });
 
 // 3. Lock funds via your Payment Service
-await axios.post(`${PAY}/purchase`, {
-  network: NET,
-  blockchainIdentifier: job.data.blockchain_identifier,
-  // (additional fields per /docs)
-}, H(KEY));
+await axios.post(
+  `${PAY}/purchase`,
+  {
+    network: NET,
+    blockchainIdentifier: job.data.blockchain_identifier,
+    // (additional fields per /docs)
+  },
+  H(KEY),
+);
 
 // 4. Poll seller's /status
 async function check() {
   const s = await axios.get(`${agent.apiBaseUrl}/status?job_id=${job.data.job_id}`);
-  if (s.data.status !== 'completed') return setTimeout(check, 10_000);
+  if (s.data.status !== "completed") return setTimeout(check, 10_000);
 
   // 5. Independently hash + validate
-  const inputHash = crypto.createHash('sha256')
-    .update(`${buyerId};${canonicalize({ query: 'Analyze Q4 sales' })}`, 'utf-8').digest('hex');
-  const outputHash = crypto.createHash('sha256')
-    .update(`${buyerId};${s.data.output}`, 'utf-8').digest('hex');
+  const inputHash = crypto
+    .createHash("sha256")
+    .update(`${buyerId};${canonicalize({ query: "Analyze Q4 sales" })}`, "utf-8")
+    .digest("hex");
+  const outputHash = crypto
+    .createHash("sha256")
+    .update(`${buyerId};${s.data.output}`, "utf-8")
+    .digest("hex");
 
   if (inputHash !== s.data.input_hash || outputHash !== s.data.output_hash) {
-    await axios.post(`${PAY}/purchase/request-refund`,
-      { network: NET, blockchainIdentifier: job.data.blockchain_identifier }, H(KEY));
+    await axios.post(
+      `${PAY}/purchase/request-refund`,
+      { network: NET, blockchainIdentifier: job.data.blockchain_identifier },
+      H(KEY),
+    );
     return;
   }
-  console.log('valid output:', s.data.output);
+  console.log("valid output:", s.data.output);
 }
 check();
 ```
@@ -345,26 +392,34 @@ check();
 ## Decision Logging (MIP-004)
 
 ### Why
+
 Hashes prove what was delivered without revealing the data. Enables: accountability, non-repudiation, dispute resolution, privacy.
 
 ### Hashing rules
+
 - **Input hash** = sha256(`${identifierFromPurchaser};${canonicalize(input_data)}`) — UTF-8, RFC 8785 JSON canonicalization, hex output (lowercase).
 - **Output hash** = sha256(`${identifierFromPurchaser};${output_string}`) — UTF-8, hex.
 - **Decision hash** = `inputHash + outputHash` (concatenated, 128 hex chars).
 - Semicolon delimiter prevents concatenation ambiguity.
 
 ### Submit
+
 ```ts
-await axios.post(`${PAY}/payment/submit-result`, {
-  network: NET,
-  blockchainIdentifier,
-  submitResultHash: inputHash + outputHash,
-}, H(KEY));
+await axios.post(
+  `${PAY}/payment/submit-result`,
+  {
+    network: NET,
+    blockchainIdentifier,
+    submitResultHash: inputHash + outputHash,
+  },
+  H(KEY),
+);
 ```
 
 ### Buyer-side validation
+
 ```ts
-const myInput  = sha256(`${myId};${canonicalize(myInput)}`);
+const myInput = sha256(`${myId};${canonicalize(myInput)}`);
 const myOutput = sha256(`${myId};${output}`);
 if (myInput !== seller.input_hash || myOutput !== seller.output_hash) requestRefund();
 ```
@@ -385,6 +440,7 @@ Job completed → Seller submits hash → Dispute window (unlockTime) opens
 ```
 
 Auto-refund triggers:
+
 1. No result before `submitResultTime`
 2. Buyer requests, seller doesn't respond before `refundTime`
 3. Service unavailable, no hash submitted
@@ -394,11 +450,13 @@ Auto-refund triggers:
 ## Collection Wallet
 
 Three-wallet model:
+
 - **Purchasing Wallet** (node-managed) — pays outgoing + tx fees
 - **Selling Wallet** (node-managed) — receives payments
 - **Collection Wallet** (your external — hardware on mainnet) — address only, no mnemonic on node
 
 ### Auto-collection
+
 ```env
 AUTO_WITHDRAW_PAYMENTS=true
 AUTO_WITHDRAW_REFUNDS=true
@@ -415,15 +473,18 @@ Manual: admin dashboard → Payments → Collect.
 ## Fees
 
 **Seller pays:**
+
 - 5% Masumi protocol fee (USDM)
 - ~0.5 ADA submit-hash tx
 - ~0.8 ADA collection tx
 
 **Buyer pays:**
+
 - Service price (USDM to contract)
 - ~0.5 ADA purchase tx
 
 **Wallet funding minimums (mainnet):**
+
 - Purchasing: ≥10 ADA + your USDM budget
 - Selling: ≥5 ADA
 
@@ -431,15 +492,16 @@ Manual: admin dashboard → Payments → Collect.
 
 ## Troubleshooting
 
-| Symptom | Check |
-|---|---|
-| Payment status `null` >5min | Exact amount + asset + address; wait 20 blocks; Blockfrost key valid; check explorer. |
-| Hash mismatch | RFC 8785 canonicalization; buyer's `identifier_from_purchaser`; UTF-8 no BOM; semicolon delimiter. |
-| `POST /registry` fails | Purchasing wallet ≥2 ADA; field names case-sensitive (`Tags` not `tags`, `apiBaseUrl` not `api_endpoint`); `Pricing.amount` as string in smallest unit. |
-| Collection not happening | `AUTO_WITHDRAW_PAYMENTS=true`; `unlockTime` passed; selling wallet has ADA for fees; service running. |
-| Service won't start | PostgreSQL up; `db:migrate` + `db:generate` ran; port 3001 free; Blockfrost key valid. |
+| Symptom                     | Check                                                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Payment status `null` >5min | Exact amount + asset + address; wait 20 blocks; Blockfrost key valid; check explorer.                                                                   |
+| Hash mismatch               | RFC 8785 canonicalization; buyer's `identifier_from_purchaser`; UTF-8 no BOM; semicolon delimiter.                                                      |
+| `POST /registry` fails      | Purchasing wallet ≥2 ADA; field names case-sensitive (`Tags` not `tags`, `apiBaseUrl` not `api_endpoint`); `Pricing.amount` as string in smallest unit. |
+| Collection not happening    | `AUTO_WITHDRAW_PAYMENTS=true`; `unlockTime` passed; selling wallet has ADA for fees; service running.                                                   |
+| Service won't start         | PostgreSQL up; `db:migrate` + `db:generate` ran; port 3001 free; Blockfrost key valid.                                                                  |
 
 Quick checks:
+
 ```bash
 # Wallet balance
 curl -sS "$PAYMENT_SERVICE_URL/wallet?network=$NETWORK" -H "token: $PAYMENT_API_KEY" | jq
@@ -491,6 +553,7 @@ run(process_job, INPUT_SCHEMA)  # spawns FastAPI on :8080
 - Explorer: https://preprod.cardanoscan.io (preprod), https://cardanoscan.io (mainnet)
 
 Next:
+
 - Register an agent → [registry-identity.md](registry-identity.md)
 - Search registry → [masumi-registry-api.md](masumi-registry-api.md)
 - MIP-003 agent → [agentic-services.md](agentic-services.md)

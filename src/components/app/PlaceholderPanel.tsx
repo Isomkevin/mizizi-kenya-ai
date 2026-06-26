@@ -1,12 +1,6 @@
 import { Construction } from "lucide-react";
 
-export function PlaceholderPanel({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
+export function PlaceholderPanel({ title, description }: { title: string; description: string }) {
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
       <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">

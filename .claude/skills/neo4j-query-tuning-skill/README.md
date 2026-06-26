@@ -15,6 +15,7 @@ Diagnoses and fixes slow Neo4j Cypher queries by interpreting execution plans, i
 ## Availability
 
 Works with any Neo4j 2025.x / 2026.x instance (self-managed or Aura). Some features require Enterprise edition:
+
 - `SHOW QUERIES` for other users' queries — Enterprise
 - `runtime=parallel` — Enterprise or Aura Pro 2025+
 
@@ -28,4 +29,4 @@ Works with any Neo4j 2025.x / 2026.x instance (self-managed or Aura). Some featu
 ## Reference Files
 
 - [`references/plan-operators.md`](references/plan-operators.md) — complete operator table with all variants
-- [`references/stats-and-monitoring.md`](references/stats-and-monitoring.md) — SHOW QUERIES, SHOW TRANSACTIONS, db.stats.*, index health, page cache
+- [`references/stats-and-monitoring.md`](references/stats-and-monitoring.md) — SHOW QUERIES, SHOW TRANSACTIONS, db.stats.\*, index health, page cache

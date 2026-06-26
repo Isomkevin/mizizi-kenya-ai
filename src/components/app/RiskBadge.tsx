@@ -10,13 +10,7 @@ const labels: Record<RiskLevel, string> = {
   critical: "Critical",
 };
 
-export function RiskBadge({
-  level,
-  className,
-}: {
-  level: RiskLevel;
-  className?: string;
-}) {
+export function RiskBadge({ level, className }: { level: RiskLevel; className?: string }) {
   return (
     <span
       className={cn(
@@ -24,10 +18,7 @@ export function RiskBadge({
         className,
       )}
     >
-      <span
-        className="h-1.5 w-1.5 rounded-full"
-        style={{ background: riskColor(level) }}
-      />
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: riskColor(level) }} />
       {labels[level]}
     </span>
   );

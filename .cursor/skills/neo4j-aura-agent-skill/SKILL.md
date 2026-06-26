@@ -8,10 +8,11 @@ description: Manages Neo4j Aura Agents via the v2beta1 REST API — create, list
   Does NOT cover AuraDB instance provisioning — use neo4j-aura-provisioning-skill.
   Does NOT cover vector index creation — use neo4j-vector-index-skill.
 version: 1.0.1
-allowed-tools: Bash WebFetch  
+allowed-tools: Bash WebFetch
 ---
 
 ## When to Use
+
 - Creating or configuring an Aura Agent on an existing AuraDB instance
 - Adding/updating tools (CypherTemplate, SimilaritySearch, Text2Cypher) to an agent
 - Deploying an agent for external access (REST API endpoint or MCP server)
@@ -19,6 +20,7 @@ allowed-tools: Bash WebFetch
 - Listing, reading, or deleting existing agents in a project
 
 ## When NOT to Use
+
 - **Creating/managing AuraDB instances** → `neo4j-aura-provisioning-skill`
 - **Creating vector indexes** → `neo4j-vector-index-skill`
 - **Running Cypher directly** → `neo4j-cypher-skill`
@@ -39,6 +41,7 @@ Expose your graph via natural language to users or apps without application code
 ---
 
 ## Prerequisites
+
 - Running AuraDB instance with knowledge graph loaded
 - "Generative AI assistance" enabled in Organization settings
 - "Aura Agent" toggled on in the project
@@ -75,6 +78,7 @@ Token TTL: 3600 s. Re-run on 401/403.
 `/organizations/{AURA_ORG_ID}/projects/{AURA_PROJECT_ID}`
 
 **Programmatic fallback**:
+
 ```bash
 curl -s https://api.neo4j.io/v1/tenants \
   -H "Authorization: Bearer $TOKEN" | jq '.data[] | {id, name}'
@@ -82,6 +86,7 @@ curl -s https://api.neo4j.io/v1/tenants \
 ```
 
 Set in `.env`:
+
 ```
 AURA_ORG_ID=<organization-id>
 AURA_PROJECT_ID=<project-id>
@@ -134,6 +139,7 @@ uv run python scripts\fetch_schema.py    # Windows
 Saves `schema.json`. Output: node/rel-type counts, node labels + typed properties (with Aura `data_type`), relationship patterns, VECTOR indexes.
 
 **Data gate** — script exits with error and does NOT write `schema.json` if:
+
 - fewer than 2 nodes, OR
 - zero relationship types
 
@@ -161,21 +167,21 @@ Before designing tools, read [references/authoring-guide.md](references/authorin
 
 Tool selection:
 
-| Use Case | Tool |
-|---|---|
-| Lookup by specific property value | `cypherTemplate` |
-| Semantic text search | `similaritySearch` |
-| Aggregation, counting, open-ended | `text2cypher` |
+| Use Case                          | Tool               |
+| --------------------------------- | ------------------ |
+| Lookup by specific property value | `cypherTemplate`   |
+| Semantic text search              | `similaritySearch` |
+| Aggregation, counting, open-ended | `text2cypher`      |
 
 **CypherTemplate parameters**: for each parameter, read `aura_data_type` from `schema.json → node_props` or `rel_props` and use it as `data_type`. If the property has `low_cardinality: true`, the parameter `description` MUST list the valid values — copy them from the `values` array in `schema.json`. Example: `"description": "Agreement type to filter by. Valid values: \"Distributor Agreement\", \"License Agreement\", \"NDA\""`. Properties with `has_fulltext_index: true` are especially likely to be filter targets and must include valid values when low cardinality.
 
 **SimilaritySearch configuration** — ask the user for all three before drafting the tool config:
 
-| Field | What to ask | Source |
-|---|---|---|
-| `provider` | "openai" or "vertexai"? | User confirms |
-| `model` | Which model? | User picks from `references/REFERENCE.md → Embedding Provider Options` |
-| `dimension` | What output dimension? | Required if model is configurable (see table); fixed models use the table value |
+| Field       | What to ask             | Source                                                                          |
+| ----------- | ----------------------- | ------------------------------------------------------------------------------- |
+| `provider`  | "openai" or "vertexai"? | User confirms                                                                   |
+| `model`     | Which model?            | User picks from `references/REFERENCE.md → Embedding Provider Options`          |
+| `dimension` | What output dimension?  | Required if model is configurable (see table); fixed models use the table value |
 
 `index`: use `name` from `schema.json → metadata → vector_index` where `state = ONLINE`. `dimension` must match `vector.dimensions` in the same index entry.
 
@@ -188,6 +194,7 @@ Draft config JSON → show to user for review → confirm → proceed to Step 6.
 ## Step 6 — Create Agent
 
 Minimum required config:
+
 ```json
 {
   "name": "My Agent",
@@ -205,6 +212,7 @@ Minimum required config:
 ```
 
 **Show config to user and confirm before running:**
+
 ```bash
 uv run python3 scripts/manage_agent.py create --config agent-config.json
 ```
@@ -222,6 +230,7 @@ uv run python3 scripts/invoke_agent.py --agent-id "$AURA_AGENT_ID" "What can you
 `--raw` prints full JSON including reasoning chain and token usage.
 
 Direct curl (uses token from Step 1):
+
 ```bash
 curl -s -X POST \
   "https://api.neo4j.io/v2beta1/organizations/${AURA_ORG_ID}/projects/${AURA_PROJECT_ID}/agents/${AURA_AGENT_ID}/invoke" \
@@ -234,11 +243,13 @@ curl -s -X POST \
 ## Step 8 — Update Agent (Partial PATCH)
 
 Create patch JSON with only the fields to change:
+
 ```json
 { "system_prompt": "Updated instructions.", "is_mcp_enabled": true }
 ```
 
 **Show to user and confirm before running:**
+
 ```bash
 uv run python3 scripts/manage_agent.py update --agent-id "$AURA_AGENT_ID" --config patch.json
 ```
@@ -250,6 +261,7 @@ uv run python3 scripts/manage_agent.py update --agent-id "$AURA_AGENT_ID" --conf
 IRREVERSIBLE. Configuration permanently removed.
 
 **Show to user and wait for explicit confirmation before running:**
+
 ```bash
 uv run python3 scripts/manage_agent.py delete --agent-id "$AURA_AGENT_ID"
 ```
@@ -261,6 +273,7 @@ Returns 202 Accepted.
 ## Tool Configuration
 
 ### CypherTemplate
+
 Pre-defined parameterized queries for repeated, predictable lookups.
 
 ```json
@@ -285,6 +298,7 @@ Pre-defined parameterized queries for repeated, predictable lookups.
 Low-cardinality rule: if `schema.json → node_props[Label][prop].low_cardinality` is `true`, the `description` field must end with the exact values from `schema.json → node_props[Label][prop].values`. This applies to relationship properties in `rel_props` too.
 
 ### SimilaritySearch
+
 Requires a VECTOR index (`state = ONLINE`). Get index name from `schema.json → metadata → vector_index`.
 
 ```json
@@ -307,6 +321,7 @@ Requires a VECTOR index (`state = ONLINE`). Get index name from `schema.json →
 `provider`/`model` combinations: see [references/REFERENCE.md](references/REFERENCE.md).
 
 ### Text2Cypher
+
 Natural language → Cypher. Use as fallback for aggregation and discovery.
 
 ```json
@@ -322,14 +337,14 @@ Natural language → Cypher. Use as fallback for aggregation and discovery.
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| `401 Unauthorized` | Token expired | Re-run Step 1 |
-| `403 Forbidden` on create | Not a project admin | Request admin access |
-| `400 Bad Request` | Invalid tool config or missing required field | Check `type` spelling: `cypherTemplate`, `similaritySearch`, `text2cypher` |
-| `404 Not Found` | Wrong org/project/agent ID | Re-run `list` to verify IDs |
-| `400` on create with SimilaritySearch | Vector index missing | Create index first — use `neo4j-vector-index-skill` |
-| Agent returns no results | `top_k` too low or index empty | Increase `top_k`; verify index is populated |
+| Error                                 | Cause                                         | Fix                                                                        |
+| ------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------- |
+| `401 Unauthorized`                    | Token expired                                 | Re-run Step 1                                                              |
+| `403 Forbidden` on create             | Not a project admin                           | Request admin access                                                       |
+| `400 Bad Request`                     | Invalid tool config or missing required field | Check `type` spelling: `cypherTemplate`, `similaritySearch`, `text2cypher` |
+| `404 Not Found`                       | Wrong org/project/agent ID                    | Re-run `list` to verify IDs                                                |
+| `400` on create with SimilaritySearch | Vector index missing                          | Create index first — use `neo4j-vector-index-skill`                        |
+| Agent returns no results              | `top_k` too low or index empty                | Increase `top_k`; verify index is populated                                |
 
 ---
 
@@ -337,47 +352,48 @@ Natural language → Cypher. Use as fallback for aggregation and discovery.
 
 All scripts load credentials from `.env` automatically. Run with `uv run python3 <script>`.
 
-| Script | Purpose |
-|---|---|
+| Script                    | Purpose                                               |
+| ------------------------- | ----------------------------------------------------- |
 | `scripts/fetch_schema.py` | Fetch graph schema from AuraDB; save to `schema.json` |
-| `scripts/manage_agent.py` | CRUD: list, create, get, update, delete agents |
-| `scripts/invoke_agent.py` | Send a natural language query to an agent |
+| `scripts/manage_agent.py` | CRUD: list, create, get, update, delete agents        |
+| `scripts/invoke_agent.py` | Send a natural language query to an agent             |
 
 **fetch_schema.py parameters:**
 
-| Parameter | Type | Required | Default |
-|---|---|---|---|
-| `NEO4J_URI` | env | Yes | — |
-| `NEO4J_USERNAME` | env | No | `neo4j` |
-| `NEO4J_PASSWORD` | env | Yes | — |
-| `NEO4J_DATABASE` | env | No | `neo4j` |
+| Parameter        | Type | Required | Default |
+| ---------------- | ---- | -------- | ------- |
+| `NEO4J_URI`      | env  | Yes      | —       |
+| `NEO4J_USERNAME` | env  | No       | `neo4j` |
+| `NEO4J_PASSWORD` | env  | Yes      | —       |
+| `NEO4J_DATABASE` | env  | No       | `neo4j` |
 
 **manage_agent.py parameters:**
 
-| Parameter | Type | Required | Env fallback |
-|---|---|---|---|
-| `AURA_CLIENT_ID` | env | Yes | — |
-| `AURA_CLIENT_SECRET` | env | Yes | — |
-| `--org-id` | arg | No | `AURA_ORG_ID` |
-| `--project-id` | arg | No | `AURA_PROJECT_ID` |
-| `--agent-id` | arg | get/update/delete | `AURA_AGENT_ID` |
-| `--config` | arg | create/update | — |
+| Parameter            | Type | Required          | Env fallback      |
+| -------------------- | ---- | ----------------- | ----------------- |
+| `AURA_CLIENT_ID`     | env  | Yes               | —                 |
+| `AURA_CLIENT_SECRET` | env  | Yes               | —                 |
+| `--org-id`           | arg  | No                | `AURA_ORG_ID`     |
+| `--project-id`       | arg  | No                | `AURA_PROJECT_ID` |
+| `--agent-id`         | arg  | get/update/delete | `AURA_AGENT_ID`   |
+| `--config`           | arg  | create/update     | —                 |
 
 **invoke_agent.py parameters:**
 
-| Parameter | Type | Required | Env fallback |
-|---|---|---|---|
-| `AURA_CLIENT_ID` | env | Yes | — |
-| `AURA_CLIENT_SECRET` | env | Yes | — |
-| `--org-id` | arg | No | `AURA_ORG_ID` |
-| `--project-id` | arg | No | `AURA_PROJECT_ID` |
-| `--agent-id` | arg | Yes | `AURA_AGENT_ID` |
-| `query` | positional | Yes | — |
-| `--raw` | flag | No | — |
+| Parameter            | Type       | Required | Env fallback      |
+| -------------------- | ---------- | -------- | ----------------- |
+| `AURA_CLIENT_ID`     | env        | Yes      | —                 |
+| `AURA_CLIENT_SECRET` | env        | Yes      | —                 |
+| `--org-id`           | arg        | No       | `AURA_ORG_ID`     |
+| `--project-id`       | arg        | No       | `AURA_PROJECT_ID` |
+| `--agent-id`         | arg        | Yes      | `AURA_AGENT_ID`   |
+| `query`              | positional | Yes      | —                 |
+| `--raw`              | flag       | No       | —                 |
 
 ---
 
 ## Checklist
+
 - [ ] AuraDB instance `running`, knowledge graph loaded
 - [ ] "Generative AI assistance" + "Aura Agent" enabled in org/project settings
 - [ ] `.env` populated: `AURA_CLIENT_ID`, `AURA_CLIENT_SECRET`, `AURA_ORG_ID`, `AURA_PROJECT_ID`, `AURA_INSTANCE_ID`, `NEO4J_URI`, `NEO4J_PASSWORD`

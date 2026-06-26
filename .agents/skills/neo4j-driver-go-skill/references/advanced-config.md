@@ -54,9 +54,9 @@ neo4j.NoAuth()                                 // unauthenticated (dev only)
 
 ## URI Schemes
 
-| Scheme | When to use |
-|--------|-------------|
-| `neo4j://` | Unencrypted, cluster-routing |
+| Scheme       | When to use                                     |
+| ------------ | ----------------------------------------------- |
+| `neo4j://`   | Unencrypted, cluster-routing                    |
 | `neo4j+s://` | Encrypted (TLS), cluster-routing — use for Aura |
-| `bolt://` | Unencrypted, single instance |
-| `bolt+s://` | Encrypted, single instance |
+| `bolt://`    | Unencrypted, single instance                    |
+| `bolt+s://`  | Encrypted, single instance                      |

@@ -27,9 +27,11 @@ For escrow this means: no shared mutable state to race against; deterministic va
 ## Payment Smart Contract
 
 ### What it does
+
 Holds buyer's USDM in escrow. Releases to seller (or refunds to buyer) only when conditions met.
 
 ### Architecture
+
 ```
 Buyer pays  →  Contract UTXO (locked)
                 ├─ Datum: state (parties, amount, hash, timing)
@@ -39,6 +41,7 @@ Buyer pays  →  Contract UTXO (locked)
 ```
 
 ### Datum (state in contract UTXO)
+
 ```aiken
 type PaymentDatum {
   buyer: Address,
@@ -66,14 +69,14 @@ type PaymentDatum {
 
 ### Redeemers
 
-| Redeemer | Actor | When | Effect |
-|---|---|---|---|
-| `SubmitResult{hash}` | Seller | After work, before `submit_result_time` | Sets `decision_hash`; starts dispute window |
-| `WithdrawPayment` | Seller | After `unlock_time`; no refund pending | 95% to seller, 5% protocol fee, consume UTXO |
-| `RequestRefund` | Buyer | Within `unlock_time` (or before submit if no hash) | Sets `refund_requested` |
-| `AuthorizeRefund` | Seller | Anytime after refund requested | Sets `refund_authorized` |
-| `WithdrawRefund` | Buyer | Refund authorized OR `refund_time` elapsed OR admin approves | Full refund to buyer |
-| `AdminResolve{approve}` | Admin | Disputed jobs | Forces resolution |
+| Redeemer                | Actor  | When                                                         | Effect                                       |
+| ----------------------- | ------ | ------------------------------------------------------------ | -------------------------------------------- |
+| `SubmitResult{hash}`    | Seller | After work, before `submit_result_time`                      | Sets `decision_hash`; starts dispute window  |
+| `WithdrawPayment`       | Seller | After `unlock_time`; no refund pending                       | 95% to seller, 5% protocol fee, consume UTXO |
+| `RequestRefund`         | Buyer  | Within `unlock_time` (or before submit if no hash)           | Sets `refund_requested`                      |
+| `AuthorizeRefund`       | Seller | Anytime after refund requested                               | Sets `refund_authorized`                     |
+| `WithdrawRefund`        | Buyer  | Refund authorized OR `refund_time` elapsed OR admin approves | Full refund to buyer                         |
+| `AdminResolve{approve}` | Admin  | Disputed jobs                                                | Forces resolution                            |
 
 ### Validator logic (simplified)
 
@@ -128,6 +131,7 @@ fn validate_withdraw_refund(d: PaymentDatum) -> Bool {
 ```
 
 ### Payment lifecycle
+
 ```
 Buyer locks USDM  →  state = {refund_requested:false, decision_hash:null}
    │
@@ -144,6 +148,7 @@ Dispute window (unlock_time)
 ```
 
 ### Contract addresses
+
 Resolve at runtime via Payment Service: `GET /payment-source`. Don't hard-code in your code — addresses can rotate between service versions and per network.
 
 ---
@@ -151,9 +156,11 @@ Resolve at runtime via Payment Service: `GET /payment-source`. Don't hard-code i
 ## Registry Smart Contract
 
 ### What it does
+
 Mints unique NFT per agent. Embeds metadata in CIP-25/CIP-68 on-chain metadata. Burning deregisters.
 
 ### Architecture
+
 ```
 Mint policy:    validates agent metadata + signature, mints 1 NFT, sends to seller wallet
 Burn policy:    validates NFT owner signed, burns NFT (qty -1), removes from registry indexer
@@ -172,23 +179,23 @@ Stored under standard `721` metadata key, keyed by registry policy ID:
         "description": "AI-powered data analysis service",
         "image": "ipfs://Qm...",
         "apiBaseUrl": "https://my-agent.example.com",
-        "Tags": ["data","analysis","ai"],
-        "Capability": {"name":"data-analysis","version":"2.0.0"},
+        "Tags": ["data", "analysis", "ai"],
+        "Capability": { "name": "data-analysis", "version": "2.0.0" },
         "AgentPricing": {
           "pricingType": "Fixed",
-          "Pricing": [{"unit":"","amount":"10000000"}]
+          "Pricing": [{ "unit": "", "amount": "10000000" }]
         },
         "Author": {
-          "name":"AI Corp",
-          "contactEmail":"hi@aicorp.com",
-          "organization":"AI Corp"
+          "name": "AI Corp",
+          "contactEmail": "hi@aicorp.com",
+          "organization": "AI Corp"
         },
         "Legal": {
-          "privacyPolicy":"https://...",
-          "terms":"https://..."
+          "privacyPolicy": "https://...",
+          "terms": "https://..."
         },
         "ExampleOutputs": [
-          {"name":"sample","url":"https://...","mimeType":"application/json"}
+          { "name": "sample", "url": "https://...", "mimeType": "application/json" }
         ],
         "averageExecutionTime": 60,
         "submitResultTime": 120,
@@ -204,11 +211,13 @@ Stored under standard `721` metadata key, keyed by registry policy ID:
 > Field names match the current Payment Service `POST /registry` body: capitalized `Tags`, `Capability`, `AgentPricing`, `Author`, `Legal`, `ExampleOutputs`; camelCase `apiBaseUrl`. Old snake_case (`api_endpoint`, `tags`, `pricing`) is deprecated.
 
 Cardano string limit = 63 chars. Longer values split into arrays:
+
 ```json
-{"description":["First chunk up to 63 chars... ","next chunk"]}
+{ "description": ["First chunk up to 63 chars... ", "next chunk"] }
 ```
 
 ### Minting policy (simplified)
+
 ```aiken
 fn validate_mint(r: MintRedeemer, ctx: ScriptContext) -> Bool {
   let tx = ctx.transaction
@@ -223,6 +232,7 @@ fn validate_mint(r: MintRedeemer, ctx: ScriptContext) -> Bool {
 ```
 
 ### Burning policy (simplified)
+
 ```aiken
 fn validate_burn(r: BurnRedeemer, ctx: ScriptContext) -> Bool {
   let tx = ctx.transaction
@@ -240,48 +250,54 @@ fn validate_burn(r: BurnRedeemer, ctx: ScriptContext) -> Bool {
 
 ### Payment contract
 
-| Risk | Mitigation |
-|---|---|
-| Time manipulation | Use slot ranges (`validity_range`), not raw POSIX. Cardano blocks ≈ 20s. |
-| Hash forgery | Buyer **must** verify off-chain. Dispute mechanism + reputation penalize repeat offenders. |
-| Refund griefing | Seller can deny refund → arbitration. Auto-approve only after `refund_time`. |
-| Double-spend | Prevented by eUTXO model; same UTXO can be input once per chain. |
-| Reentrancy | Impossible (no shared mutable state during validation). |
+| Risk              | Mitigation                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| Time manipulation | Use slot ranges (`validity_range`), not raw POSIX. Cardano blocks ≈ 20s.                   |
+| Hash forgery      | Buyer **must** verify off-chain. Dispute mechanism + reputation penalize repeat offenders. |
+| Refund griefing   | Seller can deny refund → arbitration. Auto-approve only after `refund_time`.               |
+| Double-spend      | Prevented by eUTXO model; same UTXO can be input once per chain.                           |
+| Reentrancy        | Impossible (no shared mutable state during validation).                                    |
 
 ### Registry contract
 
-| Risk | Mitigation |
-|---|---|
-| Metadata injection | Validators enforce: HTTPS-only URLs, length caps, no script tags. |
-| NFT theft | Hold registry NFT in **hardware wallet** on mainnet. Backup seed offline. |
-| Policy spoofing | Pin official policy IDs in client code; Registry Service validates. |
+| Risk               | Mitigation                                                                |
+| ------------------ | ------------------------------------------------------------------------- |
+| Metadata injection | Validators enforce: HTTPS-only URLs, length caps, no script tags.         |
+| NFT theft          | Hold registry NFT in **hardware wallet** on mainnet. Backup seed offline. |
+| Policy spoofing    | Pin official policy IDs in client code; Registry Service validates.       |
 
 ---
 
 ## Interacting with the Contracts
 
 ### Via Payment Service (recommended)
+
 99% of the time: don't talk to contracts directly. Use Payment Service endpoints.
 
 ```ts
-import 'dotenv/config';
-import axios from 'axios';
+import "dotenv/config";
+import axios from "axios";
 
 const PAY = process.env.PAYMENT_SERVICE_URL!;
 const KEY = process.env.PAYMENT_API_KEY!;
-const H   = { headers: { token: KEY, 'Content-Type': 'application/json' } };
+const H = { headers: { token: KEY, "Content-Type": "application/json" } };
 
 // SubmitResult redeemer (Aiken) ⇄ /payment/submit-result API call
-await axios.post(`${PAY}/payment/submit-result`, {
-  network: 'Preprod',
-  blockchainIdentifier: '<from /payment>',
-  submitResultHash: inputHash + outputHash,
-}, H);
+await axios.post(
+  `${PAY}/payment/submit-result`,
+  {
+    network: "Preprod",
+    blockchainIdentifier: "<from /payment>",
+    submitResultHash: inputHash + outputHash,
+  },
+  H,
+);
 ```
 
 > The API body fields are `network`, `blockchainIdentifier`, `submitResultHash`. Older docs showed `identifier` and `decisionHash` — those are gone.
 
 ### Direct interaction (advanced)
+
 Use `pycardano` (Python) or `lucid-cardano` (TS) to build transactions yourself.
 
 ```python
@@ -337,6 +353,7 @@ validator {
 ```
 
 ### Aiken essentials
+
 - **Immutable** by default — every `let` is final.
 - **Pattern matching** with `when ... is { ... }`.
 - **Type safety** — compile-time only; no runtime type tags.
@@ -344,6 +361,7 @@ validator {
 - **Off-chain** types separate (transaction builder side).
 
 ### Testing Aiken
+
 ```bash
 aiken build         # compile
 aiken check         # type-check + run unit tests
@@ -352,6 +370,7 @@ aiken docs          # generate docs
 ```
 
 Validators are pure functions → write `test` blocks like:
+
 ```aiken
 test withdraw_after_deadline() {
   let datum = Datum { owner: ..., amount: 100, deadline: 100 }
@@ -396,18 +415,19 @@ test withdraw_after_deadline() {
 
 ## Troubleshooting
 
-| Symptom | Likely cause | Fix |
-|---|---|---|
-| Tx failed: "validator rejected" | Datum decode error, wrong redeemer, signer mismatch, time bounds | Inspect via cardano-cli or Lucid: check datum, signer hash, slot range. |
-| NFT not minted | Metadata missing required fields, wrong asset name format | Confirm body to `POST /registry` has all required capitalized fields. |
-| Payment not detected | Wrong asset (sent ADA when USDM expected, or vice versa); wrong addr; <20 block confirmations | Confirm `currency` matches policy ID + asset name; check Blockfrost; wait for confirmations. |
-| "InsufficientCollateral" | Plutus tx needs collateral UTXO with pure ADA | Send ~5 ADA to a separate wallet UTXO; mark as collateral when building. |
+| Symptom                         | Likely cause                                                                                  | Fix                                                                                          |
+| ------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Tx failed: "validator rejected" | Datum decode error, wrong redeemer, signer mismatch, time bounds                              | Inspect via cardano-cli or Lucid: check datum, signer hash, slot range.                      |
+| NFT not minted                  | Metadata missing required fields, wrong asset name format                                     | Confirm body to `POST /registry` has all required capitalized fields.                        |
+| Payment not detected            | Wrong asset (sent ADA when USDM expected, or vice versa); wrong addr; <20 block confirmations | Confirm `currency` matches policy ID + asset name; check Blockfrost; wait for confirmations. |
+| "InsufficientCollateral"        | Plutus tx needs collateral UTXO with pure ADA                                                 | Send ~5 ADA to a separate wallet UTXO; mark as collateral when building.                     |
 
 ---
 
 ## Best Practices
 
 ### Contract developers
+
 - Use **slot ranges** (`validity_range`), not raw POSIX timestamps.
 - Validate **all** inputs in the validator — don't trust the builder.
 - **Test edge cases**: exact deadline, double-redeemer, missing signer, wrong asset.
@@ -415,6 +435,7 @@ test withdraw_after_deadline() {
 - Keep validator logic minimal — every additional op costs script execution units (= ADA fees).
 
 ### Users
+
 - **Verify policy ID** before trusting a contract address. Pin in code.
 - **Hardware wallet** for any wallet holding registry NFTs on mainnet.
 - **Backup seed phrases** offline before depositing real funds.
@@ -433,6 +454,7 @@ test withdraw_after_deadline() {
 - lucid-cardano: https://github.com/spacebudz/lucid
 
 Next:
+
 - Payment Service flows + endpoints → [masumi-payments.md](masumi-payments.md)
 - Registry + DIDs → [registry-identity.md](registry-identity.md)
 - Cardano basics → [cardano-blockchain.md](cardano-blockchain.md)

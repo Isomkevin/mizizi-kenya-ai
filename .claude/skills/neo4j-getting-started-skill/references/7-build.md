@@ -1,5 +1,7 @@
 # Stage 7 — build
+
 # Generate a runnable application, dashboard, or agent integration.
+
 # v1: Python only. JavaScript in phase 2.
 
 ## Virtual environment (required — always use .venv)
@@ -142,12 +144,14 @@ df.plot(kind='barh', x='recommendation', y='mutual', title='Recommendations')
 Validate: `python3 -m json.tool notebook.ipynb > /dev/null && echo "✓ Valid notebook"`
 
 Install and run:
+
 ```bash
 .venv/bin/pip install -r requirements.txt
 .venv/bin/jupyter notebook notebook.ipynb
 ```
 
 Add to `requirements.txt`:
+
 ```
 jupyter>=1.0.0
 ipykernel>=6.0.0
@@ -215,6 +219,7 @@ assert not df2.empty, "Query returned no results"
 ```
 
 Add to `requirements.txt`:
+
 ```
 streamlit>=1.30.0
 pandas>=2.0.0
@@ -222,10 +227,12 @@ neo4j-viz>=1.0.0
 ```
 
 Install and run:
+
 ```bash
 .venv/bin/pip install -r requirements.txt
 .venv/bin/streamlit run app.py
 ```
+
 Validate: `.venv/bin/python3 -m py_compile app.py && echo "✓ Syntax OK"`
 
 ## Path C — FastAPI Backend
@@ -330,23 +337,28 @@ RETURN COUNT { (c)-[:PLACED]->(:Order) } AS orders,
 ### Step C2 — Validate and run
 
 Add to `requirements.txt`:
+
 ```
 fastapi>=0.110.0
 uvicorn>=0.29.0
 ```
 
 Install, validate, and run:
+
 ```bash
 .venv/bin/pip install -r requirements.txt
 .venv/bin/python3 -m py_compile main.py && echo "✓ Syntax OK"
 .venv/bin/uvicorn main:app --reload
 ```
+
 Docs: `http://localhost:8000/docs`
 
 Smoke-test the running app:
+
 ```bash
 curl -s http://localhost:8000/health | python3 -m json.tool
 ```
+
 Assert `total_nodes > 0` in the response.
 
 ## Path D — GraphRAG Pipeline
@@ -397,6 +409,7 @@ if __name__ == "__main__":
 ```
 
 Add to `requirements.txt`:
+
 ```
 neo4j-graphrag[openai]>=1.13.0
 ```
@@ -407,6 +420,7 @@ Install `neo4j-mcp` binary (done in prerequisites). Write config files:
 
 **For Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS,
 `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
+
 ```json
 {
   "mcpServers": {
@@ -424,6 +438,7 @@ Install `neo4j-mcp` binary (done in prerequisites). Write config files:
 ```
 
 **For Claude Code** (`.claude/settings.json` in project root):
+
 ```json
 {
   "mcpServers": {
@@ -445,6 +460,7 @@ Available MCP tools after restart: `read-cypher`, `write-cypher`, `get-schema`, 
 Tell user: "Restart Claude Desktop or Claude Code — the `neo4j` server will appear as available tools."
 
 For read-only mode (recommended for production/shared DBs), add:
+
 ```json
 "NEO4J_READ_ONLY": "true"
 ```
@@ -453,6 +469,7 @@ For read-only mode (recommended for production/shared DBs), add:
 
 ```markdown
 ### 7-build
+
 status: done
 artifact=<filename, e.g. notebook.ipynb or app.py>
 app_type=<notebook|streamlit|fastapi|graphrag|mcp>

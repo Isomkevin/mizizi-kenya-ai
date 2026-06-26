@@ -22,9 +22,7 @@ const nodes: Node[] = [
   { id: "peers", label: "Peers", x: 50, y: 96, group: "signal" },
 ];
 
-const edges: Edge[] = nodes
-  .filter((n) => n.id !== "f")
-  .map((n) => ({ from: "f", to: n.id }));
+const edges: Edge[] = nodes.filter((n) => n.id !== "f").map((n) => ({ from: "f", to: n.id }));
 
 // add lateral peer edges
 edges.push(
@@ -45,7 +43,7 @@ export function GraphBackdrop({ animated = true }: { animated?: boolean }) {
   useEffect(() => {
     if (!animated) return;
     let raf: number;
-    let start = performance.now();
+    const start = performance.now();
     const tick = (now: number) => {
       setT((now - start) / 1000);
       raf = requestAnimationFrame(tick);
@@ -103,23 +101,16 @@ export function GraphBackdrop({ animated = true }: { animated?: boolean }) {
 
       {nodes.map((n) => {
         const p = pos(n);
-        const r =
-          n.group === "farmer" ? 1.6 : n.group === "system" ? 0.9 : 0.7;
+        const r = n.group === "farmer" ? 1.6 : n.group === "system" ? 0.9 : 0.7;
         const fill =
           n.group === "farmer"
             ? "var(--moss-deep)"
             : n.group === "signal"
-            ? "var(--amber)"
-            : "var(--moss)";
+              ? "var(--amber)"
+              : "var(--moss)";
         return (
           <g key={n.id}>
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={r * 2.2}
-              fill={fill}
-              opacity={0.12}
-            />
+            <circle cx={p.x} cy={p.y} r={r * 2.2} fill={fill} opacity={0.12} />
             <circle cx={p.x} cy={p.y} r={r} fill={fill} />
           </g>
         );

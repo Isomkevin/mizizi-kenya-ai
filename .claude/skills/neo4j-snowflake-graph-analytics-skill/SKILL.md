@@ -20,12 +20,14 @@ Snowflake Native App — graph algorithm power inside Snowflake. Data stays in S
 ---
 
 ## When to Use
+
 - Running graph algorithms / GDS in Snowflake
 - Data already lives in Snowflake tables
 - On-demand / pipeline workloads — ephemeral sessions, pay per session-minute
 - Full isolation from the live database during analytics
 
 ## When NOT to Use
+
 - **Aura Pro with embedded GDS plugin** → `neo4j-gds-skill`
 - **Aura Graph Analytics** → `neo4j-aura-graph-analytics-skill`
 - **Self-managed Neo4j with embedded GDS plugin** → `neo4j-gds-skill`
@@ -83,16 +85,16 @@ SELECT ... FROM MY_DATABASE.MY_SCHEMA.MY_TABLE;
 
 Apply these when projecting columns from your tables (keep the original column name unless renaming):
 
-| Source type | Action |
-|---|---|
-| Whole-number numerics (`INT`, `INTEGER`, `BIGINT`, `SMALLINT`, `TINYINT`, `BYTEINT`, `NUMBER(p,0)`) | `CAST(col AS BIGINT) AS col` |
-| Fractional numerics (`FLOAT`, `DOUBLE`, `REAL`, `DECIMAL(p,s>0)`, `NUMBER(p,s>0)`) | `CAST(col AS DOUBLE) AS col` |
-| `ARRAY` of numbers | keep as `ARRAY` (except GraphSAGE — see below). Not allowed on relationship views. |
-| `VECTOR(FLOAT, n)` | keep as-is. Not allowed on relationship views. |
-| `BOOLEAN` | **drop by default**. Opt-in only: `IFF(col, 1, 0)::BIGINT AS col` |
-| `DATE`, `TIME`, `TIMESTAMP*` | **drop by default**. Opt-in only: `DATE_PART('EPOCH_SECOND', col)::BIGINT AS col` (tell the user the unit) |
-| `VARCHAR`, `CHAR`, `TEXT`, `STRING` | **drop** — can't be a graph property. To read results by name, join output back to the source table on the key (see Step 4) |
-| `VARIANT`, `OBJECT`, `GEOGRAPHY`, `GEOMETRY`, `BINARY` | **drop** — not supported as graph properties |
+| Source type                                                                                         | Action                                                                                                                      |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Whole-number numerics (`INT`, `INTEGER`, `BIGINT`, `SMALLINT`, `TINYINT`, `BYTEINT`, `NUMBER(p,0)`) | `CAST(col AS BIGINT) AS col`                                                                                                |
+| Fractional numerics (`FLOAT`, `DOUBLE`, `REAL`, `DECIMAL(p,s>0)`, `NUMBER(p,s>0)`)                  | `CAST(col AS DOUBLE) AS col`                                                                                                |
+| `ARRAY` of numbers                                                                                  | keep as `ARRAY` (except GraphSAGE — see below). Not allowed on relationship views.                                          |
+| `VECTOR(FLOAT, n)`                                                                                  | keep as-is. Not allowed on relationship views.                                                                              |
+| `BOOLEAN`                                                                                           | **drop by default**. Opt-in only: `IFF(col, 1, 0)::BIGINT AS col`                                                           |
+| `DATE`, `TIME`, `TIMESTAMP*`                                                                        | **drop by default**. Opt-in only: `DATE_PART('EPOCH_SECOND', col)::BIGINT AS col` (tell the user the unit)                  |
+| `VARCHAR`, `CHAR`, `TEXT`, `STRING`                                                                 | **drop** — can't be a graph property. To read results by name, join output back to the source table on the key (see Step 4) |
+| `VARIANT`, `OBJECT`, `GEOGRAPHY`, `GEOMETRY`, `BINARY`                                              | **drop** — not supported as graph properties                                                                                |
 
 **Lowest-common-denominator policy:** by default include only safe columns (numeric → BIGINT/DOUBLE, ARRAY, VECTOR). Booleans and time-like columns require explicit opt-in. When you drop columns, briefly tell the user which and why, so they can ask for them back.
 
@@ -127,7 +129,7 @@ FROM MY_DATABASE.MY_SCHEMA.TRANSFERS;
 
 Every run is a single `CALL` whose first argument is the compute pool and second is a JSON config with three parts. Note JSON uses **single quotes** in Snowflake SQL.
 
-> **App name:** `Neo4j_Graph_Analytics` is only the *default* installation name. If the app was installed under a different name, replace it everywhere — in the procedure call (`<APP>.graph.<algo>`), the `USE DATABASE <APP>` statement, and the privilege grants below. Check with `SHOW APPLICATIONS;`.
+> **App name:** `Neo4j_Graph_Analytics` is only the _default_ installation name. If the app was installed under a different name, replace it everywhere — in the procedure call (`<APP>.graph.<algo>`), the `USE DATABASE <APP>` statement, and the privilege grants below. Check with `SHOW APPLICATIONS;`.
 
 ```sql
 USE ROLE MY_CONSUMER_ROLE;
@@ -170,17 +172,18 @@ Set `orientation` per relationship table in `relationshipTables`:
 - `REVERSE` — direction flipped, target → source.
 
 Choose based on the algorithm:
+
 - **`UNDIRECTED`** — community detection that treats edges symmetrically: WCC, Louvain, Leiden, Label Propagation. **Triangle Count requires `UNDIRECTED`.**
-- **`NATURAL`** — directed-flow and ranking: PageRank, Article Rank, Dijkstra and the other pathfinding algorithms, Max Flow. **Node Similarity** expects a *bipartite* graph (two disjoint node sets) projected `NATURAL`; use `REVERSE` to compare the other node set instead.
+- **`NATURAL`** — directed-flow and ranking: PageRank, Article Rank, Dijkstra and the other pathfinding algorithms, Max Flow. **Node Similarity** expects a _bipartite_ graph (two disjoint node sets) projected `NATURAL`; use `REVERSE` to compare the other node set instead.
 - **KNN ignores relationships entirely** — similarity comes from node properties, so orientation has no effect on it (and K-Means likewise uses only node properties).
 
 ### Compute pools (first `CALL` argument)
 
-| Pool | Use |
-|---|---|
-| `CPU_X64_XS` | Default — dev / small graphs |
-| `CPU_X64_S/M/L` | Progressively larger |
-| `HIGHMEM_X64_S/M/L` | Large graphs, lower CPU need |
+| Pool                                           | Use                                                  |
+| ---------------------------------------------- | ---------------------------------------------------- |
+| `CPU_X64_XS`                                   | Default — dev / small graphs                         |
+| `CPU_X64_S/M/L`                                | Progressively larger                                 |
+| `HIGHMEM_X64_S/M/L`                            | Large graphs, lower CPU need                         |
 | `GPU_NV_XS`, `GPU_NV_S`, `GPU_GCP_NV_L4_1_24G` | GraphSAGE / GPU work (availability varies by region) |
 
 Prefer `CPU_X64_XS` unless the user asks otherwise or GraphSAGE makes a GPU pool appropriate. See [Estimating Jobs](https://neo4j.com/docs/snowflake-graph-analytics/current/jobs/estimation/).
@@ -213,7 +216,7 @@ LIMIT 10;
 For relationship results, join the source table twice — once on `SOURCENODEID` and once on `TARGETNODEID`.
 
 ---
- 
+
 ## Available Algorithms
 
 Procedure = `Neo4j_Graph_Analytics.graph.<name>`. Names below are exact.
@@ -221,59 +224,66 @@ Procedure = `Neo4j_Graph_Analytics.graph.<name>`. Names below are exact.
 For complete algorithm compute/write parameter reference, see [references/algorithms.md](references/algorithms.md).
 
 ### Community Detection
-| Algorithm | Procedure | Use case |
-|---|---|---|
-| Weakly Connected Components | `wcc` | Find disconnected subgraphs |
-| Louvain | `louvain` | Community detection (modularity) |
-| Leiden | `leiden` | Community detection, more stable than Louvain |
-| Label Propagation | `label_propagation` | Fast community detection by label spreading |
-| K-Means | `kmeans` | Cluster nodes by node properties |
-| Triangle Count | `triangle_count` | Local clustering / dense subgraphs |
+
+| Algorithm                   | Procedure           | Use case                                      |
+| --------------------------- | ------------------- | --------------------------------------------- |
+| Weakly Connected Components | `wcc`               | Find disconnected subgraphs                   |
+| Louvain                     | `louvain`           | Community detection (modularity)              |
+| Leiden                      | `leiden`            | Community detection, more stable than Louvain |
+| Label Propagation           | `label_propagation` | Fast community detection by label spreading   |
+| K-Means                     | `kmeans`            | Cluster nodes by node properties              |
+| Triangle Count              | `triangle_count`    | Local clustering / dense subgraphs            |
 
 ### Centrality
-| Algorithm | Procedure | Use case |
-|---|---|---|
-| PageRank | `page_rank` | Rank nodes by influence |
+
+| Algorithm    | Procedure      | Use case                                           |
+| ------------ | -------------- | -------------------------------------------------- |
+| PageRank     | `page_rank`    | Rank nodes by influence                            |
 | Article Rank | `article_rank` | PageRank variant, discounts high-degree neighbours |
-| Betweenness | `betweenness` | Find bridge nodes |
-| Degree | `degree` | Count direct connections |
+| Betweenness  | `betweenness`  | Find bridge nodes                                  |
+| Degree       | `degree`       | Count direct connections                           |
 
 ### Pathfinding
-| Algorithm | Procedure | Use case |
-|---|---|---|
-| Dijkstra Source-Target | `dijkstra` | Shortest path(s) from source to target(s) or pairs |
-| Dijkstra Single-Source | `dijkstra_single_source` | Shortest paths from one node to all others |
-| Delta-Stepping SSSP | `delta_stepping` | Parallel single-source shortest paths |
-| Breadth First Search | `bfs` | BFS traversal from a source |
-| Yen's K-Shortest Paths | `yens` | Top-K shortest loopless paths |
-| Max Flow | `max_flow` | Maximum flow with capacities |
-| Min-Cost Max Flow | `max_flow_min_cost` | Max flow minimising total cost |
-| FastPath | `fastpath` | Fast approximate shortest paths |
+
+| Algorithm              | Procedure                | Use case                                           |
+| ---------------------- | ------------------------ | -------------------------------------------------- |
+| Dijkstra Source-Target | `dijkstra`               | Shortest path(s) from source to target(s) or pairs |
+| Dijkstra Single-Source | `dijkstra_single_source` | Shortest paths from one node to all others         |
+| Delta-Stepping SSSP    | `delta_stepping`         | Parallel single-source shortest paths              |
+| Breadth First Search   | `bfs`                    | BFS traversal from a source                        |
+| Yen's K-Shortest Paths | `yens`                   | Top-K shortest loopless paths                      |
+| Max Flow               | `max_flow`               | Maximum flow with capacities                       |
+| Min-Cost Max Flow      | `max_flow_min_cost`      | Max flow minimising total cost                     |
+| FastPath               | `fastpath`               | Fast approximate shortest paths                    |
 
 ### Similarity
-| Algorithm | Procedure | Use case |
-|---|---|---|
-| Node Similarity | `node_similarity` | Similar nodes by shared neighbours |
+
+| Algorithm                | Procedure                  | Use case                                   |
+| ------------------------ | -------------------------- | ------------------------------------------ |
+| Node Similarity          | `node_similarity`          | Similar nodes by shared neighbours         |
 | Filtered Node Similarity | `node_similarity_filtered` | Node similarity with source/target filters |
-| KNN | `knn` | K most similar nodes |
-| Filtered KNN | `knn_filtered` | KNN with source/target filters |
+| KNN                      | `knn`                      | K most similar nodes                       |
+| Filtered KNN             | `knn_filtered`             | KNN with source/target filters             |
 
 ### Node Embeddings
-| Algorithm | Procedure | Use case |
-|---|---|---|
-| FastRP | `fast_rp` | Fast node embeddings |
-| Node2Vec | `node2vec` | Random-walk node embeddings |
-| HashGNN | `hashgnn` | GNN-inspired embeddings without training |
+
+| Algorithm | Procedure  | Use case                                 |
+| --------- | ---------- | ---------------------------------------- |
+| FastRP    | `fast_rp`  | Fast node embeddings                     |
+| Node2Vec  | `node2vec` | Random-walk node embeddings              |
+| HashGNN   | `hashgnn`  | GNN-inspired embeddings without training |
 
 ### GraphSAGE (Graph ML)
-| Algorithm | Procedure | Use case |
-|---|---|---|
-| Node Classification — train | `gs_nc_train` | Train supervised node-label model |
-| Node Classification — predict | `gs_nc_predict` | Predict labels with a trained model |
-| Unsupervised embeddings — train | `gs_unsup_train` | Train unsupervised embedding model |
+
+| Algorithm                         | Procedure          | Use case                              |
+| --------------------------------- | ------------------ | ------------------------------------- |
+| Node Classification — train       | `gs_nc_train`      | Train supervised node-label model     |
+| Node Classification — predict     | `gs_nc_predict`    | Predict labels with a trained model   |
+| Unsupervised embeddings — train   | `gs_unsup_train`   | Train unsupervised embedding model    |
 | Unsupervised embeddings — predict | `gs_unsup_predict` | Infer embeddings with a trained model |
 
 ### Model catalog (GraphSAGE)
+
 `show_models`, `model_exists`, `drop_model`.
 
 ---
@@ -281,18 +291,22 @@ For complete algorithm compute/write parameter reference, see [references/algori
 ## Algorithm-Specific Notes
 
 ### GraphSAGE
+
 - Projected node tables used by GraphSAGE must **not** contain `ARRAY` property columns — use `VECTOR(FLOAT, n)` for multi-valued numeric features. (`ARRAY` is fine for non-GraphSAGE algorithms.)
 - Feature columns must be **non-NULL and finite** — filter, impute, or exclude nullable feature columns in the view. For `gs_nc_train`, the `targetProperty` is a label (not a feature) and may be NULL.
 - Before running, list the node properties GraphSAGE will use per node table: all non-`NODEID` columns; for `gs_nc_train` exclude the `targetProperty`.
 - Training (`gs_nc_train`, `gs_unsup_train`) can be slow and may use a GPU pool (`GPU_NV_S`). Show the exact `CALL` and get explicit confirmation before running training.
 
 ### Dijkstra Source-Target (`dijkstra`)
+
 Provide one of:
+
 - single pair: `sourceNode` + `sourceNodeTable`, `targetNode` + `targetNodeTable`;
 - one source, many targets: `sourceNode` + `sourceNodeTable`, `targetNodes` (list) + `targetNodesTable`;
 - many pairs: `sourceTargetNodePairsTable` (table with `SOURCENODEID`/`TARGETNODEID` columns) + `sourceNodeTable` + `targetNodeTable`.
 
 ### General
+
 - Never use `NODEID` itself as an algorithm property.
 - Omit any config parameter whose value is null.
 
@@ -345,6 +359,7 @@ USE ROLE MY_CONSUMER_ROLE;   -- run algorithms as the consumer role
 ## Common Patterns
 
 ### Chaining algorithms
+
 Because results write to tables (and the `FUTURE TABLES` grant lets the app read what it creates), feed one algorithm's output into the next:
 
 ```sql
@@ -355,20 +370,21 @@ CALL Neo4j_Graph_Analytics.graph.knn('CPU_X64_XS', { ... });
 ```
 
 ### Convert categorical data to numeric
+
 The graph engine can't use VARCHAR as a property. Map categories to numbers in the view (e.g. `CASE` / a lookup join). To read results by their original label, join the output table back to the source table on the key.
 
 ---
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---|---|
-| `Insufficient privileges` | App needs `SELECT` on your tables/views and `CREATE TABLE` on the schema (see Privilege Setup) |
-| `Column nodeId not found` | View is missing/mis-cast the key — expose `NODEID` (and `SOURCENODEID`/`TARGETNODEID`) with explicit casts |
+| Problem                               | Solution                                                                                                                        |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `Insufficient privileges`             | App needs `SELECT` on your tables/views and `CREATE TABLE` on the schema (see Privilege Setup)                                  |
+| `Column nodeId not found`             | View is missing/mis-cast the key — expose `NODEID` (and `SOURCENODEID`/`TARGETNODEID`) with explicit casts                      |
 | Type / projection error on a property | A property column wasn't cast to a supported type — apply the casting rules; relationship props must be `BIGINT`/`DOUBLE`/`INT` |
-| GraphSAGE fails on features | Remove `ARRAY` feature columns (use `VECTOR`), and ensure features are non-NULL/finite |
-| `Compute pool not available` | Pool may still be starting; wait a minute and retry |
-| Algorithm returns no results | Check node/relationship views aren't empty and that every `SOURCENODEID`/`TARGETNODEID` matches a `NODEID` |
+| GraphSAGE fails on features           | Remove `ARRAY` feature columns (use `VECTOR`), and ensure features are non-NULL/finite                                          |
+| `Compute pool not available`          | Pool may still be starting; wait a minute and retry                                                                             |
+| Algorithm returns no results          | Check node/relationship views aren't empty and that every `SOURCENODEID`/`TARGETNODEID` matches a `NODEID`                      |
 
 Full guide: https://neo4j.com/docs/snowflake-graph-analytics/current/troubleshooting/
 

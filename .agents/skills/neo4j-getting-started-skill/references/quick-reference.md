@@ -11,6 +11,7 @@ Fastest path to a populated graph. Load via `:play movies` in Neo4j Browser or t
 ```
 
 Alternatively, load programmatically:
+
 ```cypher
 // Load sample movie data directly
 LOAD CSV WITH HEADERS FROM 'https://data.neo4j.com/importing-cypher/movies.csv' AS row
@@ -21,6 +22,7 @@ SET m.title = row.title, m.year = toInteger(row.year)
 Movie graph schema: `(Person)-[:ACTED_IN {roles}]->(Movie)`, `(Person)-[:DIRECTED]->(Movie)`
 
 Starter queries:
+
 ```cypher
 // Find all Tom Hanks movies
 MATCH (p:Person {name: 'Tom Hanks'})-[:ACTED_IN]->(m:Movie)
@@ -38,14 +40,14 @@ RETURN rec.title, count(a) AS score ORDER BY score DESC LIMIT 5
 
 ## Neo4j Browser / Aura Query Tool Commands
 
-| Command | Effect |
-|---|---|
-| `:play movies` | Load movie graph walkthrough (Browser only) |
-| `:server connect` | Connect to a different database |
-| `:clear` | Clear result pane |
-| `:schema` | Show labels, relationship types, property keys |
-| `:help` | Show available commands |
-| `Ctrl+Enter` / `Cmd+Enter` | Execute query |
+| Command                    | Effect                                         |
+| -------------------------- | ---------------------------------------------- |
+| `:play movies`             | Load movie graph walkthrough (Browser only)    |
+| `:server connect`          | Connect to a different database                |
+| `:clear`                   | Clear result pane                              |
+| `:schema`                  | Show labels, relationship types, property keys |
+| `:help`                    | Show available commands                        |
+| `Ctrl+Enter` / `Cmd+Enter` | Execute query                                  |
 
 ## Cypher Quick Reference
 
@@ -83,17 +85,17 @@ DETACH DELETE p
 
 ## Common First-Day Mistakes
 
-| Mistake | Symptom | Fix |
-|---|---|---|
-| Querying without index | Slow queries; full node scan | Add `CREATE INDEX` on frequently filtered property before loading data |
-| Using `CREATE` instead of `MERGE` on re-import | Duplicate nodes | Use `MERGE (n:Label {id: row.id})` for idempotent imports |
-| Keeping FK columns as node properties | Graph has no traversable connections | Map FK columns to relationships |
-| Storing NULL as empty string `""` | Properties pollute queries | Use `CASE WHEN ... IS NOT NULL` to omit; Neo4j silently skips actual nulls |
-| No constraint before bulk import | Duplicates on load, constraint creation then fails | `CREATE CONSTRAINT ... REQUIRE x IS UNIQUE` before first LOAD CSV |
-| `neo4j://` URI for Aura | TLS error / connection refused | Use `neo4j+s://` for all Aura connections |
-| Global `pip install` on Python 3.12+ | "externally-managed-environment" error | Always use `.venv`: `python3 -m venv .venv && .venv/bin/pip install ...` |
-| Forgetting to save credentials file | Can't retrieve password later | Download credentials file at instance creation — no password reset available |
-| Running large queries without LIMIT | Browser/Query tool hangs | Always add `LIMIT 25` when exploring unknown graph |
+| Mistake                                        | Symptom                                            | Fix                                                                          |
+| ---------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Querying without index                         | Slow queries; full node scan                       | Add `CREATE INDEX` on frequently filtered property before loading data       |
+| Using `CREATE` instead of `MERGE` on re-import | Duplicate nodes                                    | Use `MERGE (n:Label {id: row.id})` for idempotent imports                    |
+| Keeping FK columns as node properties          | Graph has no traversable connections               | Map FK columns to relationships                                              |
+| Storing NULL as empty string `""`              | Properties pollute queries                         | Use `CASE WHEN ... IS NOT NULL` to omit; Neo4j silently skips actual nulls   |
+| No constraint before bulk import               | Duplicates on load, constraint creation then fails | `CREATE CONSTRAINT ... REQUIRE x IS UNIQUE` before first LOAD CSV            |
+| `neo4j://` URI for Aura                        | TLS error / connection refused                     | Use `neo4j+s://` for all Aura connections                                    |
+| Global `pip install` on Python 3.12+           | "externally-managed-environment" error             | Always use `.venv`: `python3 -m venv .venv && .venv/bin/pip install ...`     |
+| Forgetting to save credentials file            | Can't retrieve password later                      | Download credentials file at instance creation — no password reset available |
+| Running large queries without LIMIT            | Browser/Query tool hangs                           | Always add `LIMIT 25` when exploring unknown graph                           |
 
 ## Aura Quick-Start Checklist (First-Time)
 

@@ -3,11 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
 
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { riskBands, riskColor } from "@/lib/mock/dashboard";
 import type { RiskBand } from "@/lib/mock/dashboard";
 
@@ -97,10 +93,7 @@ export function RiskDistributionChart() {
         <Detail label="Farmers" value={highlighted.farmers.toLocaleString()} />
         <Detail label="Avg. loan" value={formatKes(highlighted.avgLoanKes)} />
         <Detail label="Approval %" value={`${highlighted.approvalRate}%`} />
-        <Detail
-          label="Climate exposure"
-          value={`${highlighted.climateExposure}%`}
-        />
+        <Detail label="Climate exposure" value={`${highlighted.climateExposure}%`} />
       </div>
 
       <div className="mt-4 flex h-2 w-full overflow-hidden rounded-full">

@@ -28,19 +28,19 @@ Authoritative reference for the `neo4j-agent-memory` Python package — a Neo4j 
 
 ## Project at a Glance
 
-| Field | Value |
-|-------|-------|
-| Package | `neo4j-agent-memory` |
-| PyPI | https://pypi.org/project/neo4j-agent-memory/ |
-| GitHub | https://github.com/neo4j-labs/agent-memory |
-| Canonical docs | https://neo4j.com/labs/agent-memory/ |
-| Hosted service | https://memory.neo4jlabs.com (NAMS — early-access, not yet documented on official project pages) |
-| Hosted MCP endpoint | https://memory.neo4jlabs.com/mcp (SSE, bearer auth) |
-| License | Apache-2.0 |
-| Python | 3.10+ |
-| Neo4j | 5.20+ (required for vector indexes) |
-| Status | Experimental (Neo4j Labs, community-supported) |
-| Current version (at time of writing) | **0.1.1** — **always verify PyPI before citing** |
+| Field                                | Value                                                                                            |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Package                              | `neo4j-agent-memory`                                                                             |
+| PyPI                                 | https://pypi.org/project/neo4j-agent-memory/                                                     |
+| GitHub                               | https://github.com/neo4j-labs/agent-memory                                                       |
+| Canonical docs                       | https://neo4j.com/labs/agent-memory/                                                             |
+| Hosted service                       | https://memory.neo4jlabs.com (NAMS — early-access, not yet documented on official project pages) |
+| Hosted MCP endpoint                  | https://memory.neo4jlabs.com/mcp (SSE, bearer auth)                                              |
+| License                              | Apache-2.0                                                                                       |
+| Python                               | 3.10+                                                                                            |
+| Neo4j                                | 5.20+ (required for vector indexes)                                                              |
+| Status                               | Experimental (Neo4j Labs, community-supported)                                                   |
+| Current version (at time of writing) | **0.1.1** — **always verify PyPI before citing**                                                 |
 
 ## What It Is (One Sentence)
 
@@ -50,10 +50,10 @@ A graph-native memory system for AI agents that stores conversations, builds kno
 
 `neo4j-agent-memory` ships in two consumption models. They are the same underlying project — the differences are how you run it, how you authenticate, and what's managed for you.
 
-| Option | What It Is | When to Choose |
-|--------|------------|----------------|
-| **Self-hosted library** | `pip install neo4j-agent-memory` + your own Neo4j (local / Docker / Aura). Full Python API, local MCP server, and framework integrations run in your process. | Dev, on-prem data, custom extraction pipelines, full control, bringing your own embeddings / LLMs. |
-| **Hosted (NAMS)** | Managed service at `https://memory.neo4jlabs.com`. Per-workspace isolated Neo4j Aura database, REST API, remote MCP endpoint, web console. | Zero-infra trials, sharing memory across agents / machines, demos, teams that don't want to run Neo4j. |
+| Option                  | What It Is                                                                                                                                                    | When to Choose                                                                                         |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Self-hosted library** | `pip install neo4j-agent-memory` + your own Neo4j (local / Docker / Aura). Full Python API, local MCP server, and framework integrations run in your process. | Dev, on-prem data, custom extraction pipelines, full control, bringing your own embeddings / LLMs.     |
+| **Hosted (NAMS)**       | Managed service at `https://memory.neo4jlabs.com`. Per-workspace isolated Neo4j Aura database, REST API, remote MCP endpoint, web console.                    | Zero-infra trials, sharing memory across agents / machines, demos, teams that don't want to run Neo4j. |
 
 > ⚠️ **NAMS is reachable but not yet referenced in the GitHub README or `neo4j.com/labs/agent-memory/`.** Treat it as early-access / soft-launched. Do not assert SLAs, pricing, or GA status in published content. See the **Hosted Service (NAMS)** section below for details.
 
@@ -61,11 +61,11 @@ A graph-native memory system for AI agents that stores conversations, builds kno
 
 The defining architectural feature. Every piece of content describing the project should lead with this trinity.
 
-| Memory Type | Stores | Color Convention |
-|-------------|--------|------------------|
-| **Short-Term** | Conversation messages, session history, sequential message chains, metadata-filtered search, LLM-powered summaries | Green (`#B2F2BB` / `#2F9E44`) |
-| **Long-Term** | Entities (people, places, orgs), preferences, facts, and the relationships between them — built automatically from conversations via the POLE+O model | Orange/Yellow (`#FFEC99` / `#F08C00`) |
-| **Reasoning** | Decision traces, tool call provenance, thought-action-outcome chains — so the agent can learn from its own past reasoning patterns | Purple (`#D0BFFF` / `#9C36B5`) |
+| Memory Type    | Stores                                                                                                                                                | Color Convention                      |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| **Short-Term** | Conversation messages, session history, sequential message chains, metadata-filtered search, LLM-powered summaries                                    | Green (`#B2F2BB` / `#2F9E44`)         |
+| **Long-Term**  | Entities (people, places, orgs), preferences, facts, and the relationships between them — built automatically from conversations via the POLE+O model | Orange/Yellow (`#FFEC99` / `#F08C00`) |
+| **Reasoning**  | Decision traces, tool call provenance, thought-action-outcome chains — so the agent can learn from its own past reasoning patterns                    | Purple (`#D0BFFF` / `#9C36B5`)        |
 
 **Reasoning memory is the primary competitive differentiator.** Most competing systems cover short-term and long-term but treat reasoning as an afterthought or omit it entirely. Lead with this when positioning.
 
@@ -174,10 +174,10 @@ neo4j-agent-memory mcp serve \
 
 ### Tool Profiles
 
-| Profile | Tools | Contents |
-|---------|-------|----------|
-| **core** | 6 | `memory_search`, `memory_get_context`, `memory_store_message`, `memory_add_entity`, `memory_add_preference`, `memory_add_fact` |
-| **extended** (default) | 16 | Core + conversation history, entity details, graph export, relationship creation, reasoning traces, observations, read-only Cypher |
+| Profile                | Tools | Contents                                                                                                                           |
+| ---------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **core**               | 6     | `memory_search`, `memory_get_context`, `memory_store_message`, `memory_add_entity`, `memory_add_preference`, `memory_add_fact`     |
+| **extended** (default) | 16    | Core + conversation history, entity details, graph export, relationship creation, reasoning traces, observations, read-only Cypher |
 
 As of v0.1.1, `memory_add_fact` accepts a `metadata` parameter, bringing it to parity with `memory_add_entity`.
 
@@ -262,15 +262,15 @@ claude mcp add --transport sse neo4j-agent-memory-hosted \
 
 All integrations live under `neo4j_agent_memory.integrations.<framework>`. Install the matching extra.
 
-| Framework | Install Extra | Import |
-|-----------|---------------|--------|
-| LangChain | `[langchain]` | `from neo4j_agent_memory.integrations.langchain import Neo4jAgentMemory` |
-| Pydantic AI | `[pydantic-ai]` | `from neo4j_agent_memory.integrations.pydantic_ai import MemoryDependency` |
-| Google ADK | `[google-adk]` | `from neo4j_agent_memory.integrations.google_adk import Neo4jMemoryService` |
-| AWS Strands | `[strands]` | `from neo4j_agent_memory.integrations.strands import context_graph_tools` |
-| CrewAI | `[crewai]` | `from neo4j_agent_memory.integrations.crewai import Neo4jCrewMemory` |
-| LlamaIndex | `[llamaindex]` | `from neo4j_agent_memory.integrations.llamaindex import Neo4jLlamaIndexMemory` |
-| OpenAI Agents | `[openai-agents]` | `from neo4j_agent_memory.integrations.openai_agents import ...` |
+| Framework                 | Install Extra       | Import                                                                             |
+| ------------------------- | ------------------- | ---------------------------------------------------------------------------------- |
+| LangChain                 | `[langchain]`       | `from neo4j_agent_memory.integrations.langchain import Neo4jAgentMemory`           |
+| Pydantic AI               | `[pydantic-ai]`     | `from neo4j_agent_memory.integrations.pydantic_ai import MemoryDependency`         |
+| Google ADK                | `[google-adk]`      | `from neo4j_agent_memory.integrations.google_adk import Neo4jMemoryService`        |
+| AWS Strands               | `[strands]`         | `from neo4j_agent_memory.integrations.strands import context_graph_tools`          |
+| CrewAI                    | `[crewai]`          | `from neo4j_agent_memory.integrations.crewai import Neo4jCrewMemory`               |
+| LlamaIndex                | `[llamaindex]`      | `from neo4j_agent_memory.integrations.llamaindex import Neo4jLlamaIndexMemory`     |
+| OpenAI Agents             | `[openai-agents]`   | `from neo4j_agent_memory.integrations.openai_agents import ...`                    |
 | Microsoft Agent Framework | `[microsoft-agent]` | `from neo4j_agent_memory.integrations.microsoft_agent import Neo4jMicrosoftMemory` |
 
 ## Entity Extraction Pipeline
@@ -335,13 +335,13 @@ When editing or reviewing content about this project, check for:
 
 Mentions of these are frequent; recognize them and use the correct names.
 
-| Project | What It Is |
-|---------|------------|
-| **create-context-graph** | CLI scaffolder (`uvx create-context-graph`) that generates full-stack context graph apps pre-wired with neo4j-agent-memory. Canonical docs: `create-context-graph.dev`. |
-| **Lenny's Podcast Memory Explorer** | Flagship demo — 299 podcast episodes, knowledge graph, geospatial maps, Wikipedia enrichment. PydanticAI-based. Lives at `examples/lennys-memory/` in the repo. |
-| **neo4j-agent-integrations** | Broader umbrella of framework integrations, many of which are packaged back into `neo4j-agent-memory` under `[<framework>]` extras. |
-| **agent-memory-tck** | Technology Compliance Kit — behavioral specifications for multi-language/multi-framework interoperability (polyglot). |
-| **Microsoft Learn integration** | Official Microsoft Agent Framework docs reference `neo4j-agent-memory` as the Neo4j Memory Provider. |
+| Project                             | What It Is                                                                                                                                                              |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **create-context-graph**            | CLI scaffolder (`uvx create-context-graph`) that generates full-stack context graph apps pre-wired with neo4j-agent-memory. Canonical docs: `create-context-graph.dev`. |
+| **Lenny's Podcast Memory Explorer** | Flagship demo — 299 podcast episodes, knowledge graph, geospatial maps, Wikipedia enrichment. PydanticAI-based. Lives at `examples/lennys-memory/` in the repo.         |
+| **neo4j-agent-integrations**        | Broader umbrella of framework integrations, many of which are packaged back into `neo4j-agent-memory` under `[<framework>]` extras.                                     |
+| **agent-memory-tck**                | Technology Compliance Kit — behavioral specifications for multi-language/multi-framework interoperability (polyglot).                                                   |
+| **Microsoft Learn integration**     | Official Microsoft Agent Framework docs reference `neo4j-agent-memory` as the Neo4j Memory Provider.                                                                    |
 
 ## Canonical Examples (from the Repo)
 

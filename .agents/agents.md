@@ -8,11 +8,11 @@ Read `docs/phase-status.md` and follow the next unchecked items. Do not restart 
 
 ## Personas (use as needed)
 
-| Role | Focus |
-| --- | --- |
+| Role            | Focus                                                                                |
+| --------------- | ------------------------------------------------------------------------------------ |
 | **Implementer** | Ship UI per `docs/product-spec.md`; match existing code style; minimal focused diffs |
-| **Reviewer** | Run `bun run lint` and `bun run build`; verify against phase checklist |
-| **Documenter** | Update `docs/phase-status.md` after milestones |
+| **Reviewer**    | Run `bun run lint` and `bun run build`; verify against phase checklist               |
+| **Documenter**  | Update `docs/phase-status.md` after milestones                                       |
 
 ## References
 

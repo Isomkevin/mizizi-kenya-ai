@@ -14,12 +14,14 @@ allowed-tools: Bash WebFetch
 ---
 
 ## When to Use
+
 - Writing Python code that connects to Neo4j
 - Setting up driver, sessions, transactions, or async patterns
 - Debugging result handling, serialization, or UNWIND batching
 - Reviewing Neo4j driver usage in Python code
 
 ## When NOT to Use
+
 - **Writing/optimizing Cypher** → `neo4j-cypher-skill`
 - **Driver version upgrades** → `neo4j-migration-skill`
 - **GraphRAG pipelines** (`neo4j-graphrag` package) → `neo4j-graphrag-skill`
@@ -54,6 +56,7 @@ DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
 ```
 
 `.env` file format:
+
 ```
 NEO4J_URI=neo4j+s://xxx.databases.neo4j.io
 NEO4J_USERNAME=neo4j
@@ -89,12 +92,12 @@ driver.close()
 
 URI schemes:
 
-| Scheme | Use |
-|---|---|
+| Scheme       | Use                                      |
+| ------------ | ---------------------------------------- |
 | `neo4j+s://` | TLS + cluster routing — **Aura default** |
-| `neo4j://` | Unencrypted + cluster routing |
-| `bolt+s://` | TLS, single instance |
-| `bolt://` | Unencrypted, single instance |
+| `neo4j://`   | Unencrypted + cluster routing            |
+| `bolt+s://`  | TLS, single instance                     |
+| `bolt://`    | Unencrypted, single instance             |
 
 Auth options: `("user", "pass")` tuple, `basic_auth()`, `bearer_auth("jwt")`, `kerberos_auth("b64")`.
 
@@ -102,12 +105,12 @@ Auth options: `("user", "pass")` tuple, `basic_auth()`, `bearer_auth("jwt")`, `k
 
 ## Choosing the Right API
 
-| API | Use when | Auto-retry | Streaming |
-|---|---|---|---|
-| `driver.execute_query()` | Most queries — simple, safe default | ✅ | ❌ eager |
-| `session.execute_read/write()` | Large results / multiple queries in one tx | ✅ | ✅ |
-| `session.run()` | `LOAD CSV`, `CALL {} IN TRANSACTIONS`, scripts | ⚠️ one-shot [6.2+] | ✅ |
-| `AsyncGraphDatabase` | asyncio applications | ✅ | ✅ |
+| API                            | Use when                                       | Auto-retry         | Streaming |
+| ------------------------------ | ---------------------------------------------- | ------------------ | --------- |
+| `driver.execute_query()`       | Most queries — simple, safe default            | ✅                 | ❌ eager  |
+| `session.execute_read/write()` | Large results / multiple queries in one tx     | ✅                 | ✅        |
+| `session.run()`                | `LOAD CSV`, `CALL {} IN TRANSACTIONS`, scripts | ⚠️ one-shot [6.2+] | ✅        |
+| `AsyncGraphDatabase`           | asyncio applications                           | ✅                 | ✅        |
 
 `session.run()` retry [6.2+]: single immediate retry on DBMS-marked idempotent errors only (currently admission control). Disable with `disable_auto_commit_retries=True` at driver or session level.
 
@@ -143,6 +146,7 @@ print(summary.counters.nodes_created)
 **Never f-string or format Cypher.** Always `$param` — prevents injection and enables plan caching.
 
 `result_transformer_` — reshape before return:
+
 ```python
 import neo4j
 df      = driver.execute_query("MATCH (p:Person) RETURN p.name, p.age", database_="neo4j",
@@ -180,6 +184,7 @@ with driver.session(database="neo4j") as session:
 **Callback may retry** on transient failures — keep callbacks idempotent; move side effects (HTTP calls, emails) outside the callback.
 
 Timeout/metadata via `@unit_of_work` (named functions only — cannot decorate lambdas):
+
 ```python
 from neo4j import unit_of_work
 
@@ -233,6 +238,7 @@ asyncio.run(main())
 ```
 
 FastAPI lifespan pattern:
+
 ```python
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -251,6 +257,7 @@ app = FastAPI(lifespan=lifespan)
 ```
 
 Parallel queries with `asyncio.gather`:
+
 ```python
 results = await asyncio.gather(
     driver.execute_query("MATCH (a:Artist) RETURN a.name AS name", database_="neo4j"),
@@ -317,6 +324,7 @@ json.dumps(records[0].data())   # safe
 ```
 
 Node/Relationship/temporal access:
+
 ```python
 node = record["p"]           # neo4j.graph.Node
 node.element_id              # stable within this transaction only
@@ -359,6 +367,7 @@ Custom objects and dataclasses must be converted to `dict` before passing as par
 - Large results: stream lazily inside `execute_read` callback; `execute_query` is always eager.
 
 Connection pool tuning:
+
 ```python
 driver = GraphDatabase.driver(URI, auth=AUTH,
     max_connection_pool_size=50,        # default 100
@@ -377,44 +386,47 @@ Full performance patterns → [references/performance.md](references/performance
 
 ## Common Errors
 
-| Mistake | Fix |
-|---|---|
-| f-string / `.format()` Cypher params | Use `$param` placeholders always |
-| Param name ending with `_` | Pass via `parameters_={"key_": val}` |
-| Omitting `database_` | Always set — saves a round-trip every call |
-| Returning `Result` from tx callback | Consume to `list` inside callback |
-| Side effects in `execute_read/write` callback | Move outside — callback may retry |
-| Passing dataclass/Pydantic as param | Convert to `dict` first |
-| `UNWIND` with list of objects | `list[dict]` only |
-| `record.get()` for absent-key detection | `"key" in record.keys()` for absent; `.get()` returns `None` for both absent and graph null |
-| No `.consume()` after `session.run()` | Commit timing undefined; call `.consume()` |
-| Sync driver inside asyncio | Use `AsyncGraphDatabase` — sync blocks event loop |
-| Async driver created per request | Singleton — create once at startup |
-| Leaked sessions | `with driver.session(...) as session` always |
-| `json.dumps(record.data())` with node/temporal | Project scalars in Cypher or convert explicitly |
-| `result["name"]` on `EagerResult` | Index `result.records[0]["name"]` or unpack `records, _, _ = ...` |
-| `Result.single()` returns None for 0 results | It raises — use `single(strict=False)` |
-| `@unit_of_work` on lambda | Use named function |
-| `Neo4jError` caught before `ConstraintError` | Catch `ConstraintError` first — it's a subclass |
-| `neo4j-driver` package name | Package is `neo4j` since v6; `neo4j-driver` deprecated |
+| Mistake                                        | Fix                                                                                         |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| f-string / `.format()` Cypher params           | Use `$param` placeholders always                                                            |
+| Param name ending with `_`                     | Pass via `parameters_={"key_": val}`                                                        |
+| Omitting `database_`                           | Always set — saves a round-trip every call                                                  |
+| Returning `Result` from tx callback            | Consume to `list` inside callback                                                           |
+| Side effects in `execute_read/write` callback  | Move outside — callback may retry                                                           |
+| Passing dataclass/Pydantic as param            | Convert to `dict` first                                                                     |
+| `UNWIND` with list of objects                  | `list[dict]` only                                                                           |
+| `record.get()` for absent-key detection        | `"key" in record.keys()` for absent; `.get()` returns `None` for both absent and graph null |
+| No `.consume()` after `session.run()`          | Commit timing undefined; call `.consume()`                                                  |
+| Sync driver inside asyncio                     | Use `AsyncGraphDatabase` — sync blocks event loop                                           |
+| Async driver created per request               | Singleton — create once at startup                                                          |
+| Leaked sessions                                | `with driver.session(...) as session` always                                                |
+| `json.dumps(record.data())` with node/temporal | Project scalars in Cypher or convert explicitly                                             |
+| `result["name"]` on `EagerResult`              | Index `result.records[0]["name"]` or unpack `records, _, _ = ...`                           |
+| `Result.single()` returns None for 0 results   | It raises — use `single(strict=False)`                                                      |
+| `@unit_of_work` on lambda                      | Use named function                                                                          |
+| `Neo4jError` caught before `ConstraintError`   | Catch `ConstraintError` first — it's a subclass                                             |
+| `neo4j-driver` package name                    | Package is `neo4j` since v6; `neo4j-driver` deprecated                                      |
 
 ---
 
 ## References
 
 Load on demand:
+
 - [references/async.md](references/async.md) — full async patterns: managed transactions, result methods, concurrency
 - [references/data-types.md](references/data-types.md) — complete Python↔Cypher type mapping, temporal conversion, graph object API, spatial types (CartesianPoint/WGS84Point)
 - [references/performance.md](references/performance.md) — connection pool, lazy streaming, threading vs asyncio, bookmarks/causal consistency
 - [references/transactions.md](references/transactions.md) — explicit transactions, rollback, commit uncertainty, `unit_of_work` details
 
 Docs:
+
 - https://neo4j.com/docs/python-manual/current/
 - https://neo4j.com/docs/api/python-driver/current/
 
 ---
 
 ## Checklist
+
 - [ ] Package installed as `neo4j` (not `neo4j-driver`)
 - [ ] One Driver instance created at startup; shared everywhere
 - [ ] `verify_connectivity()` called at startup

@@ -17,6 +17,7 @@ allowed-tools: Bash WebFetch
 ---
 
 ## When to Use
+
 - Generating embeddings inside Cypher without external Python (`ai.text.embed()`)
 - Batch-embedding nodes/chunks during ingestion (`ai.text.embedBatch()`)
 - Calling LLMs directly in Cypher for completions or GraphRAG (`ai.text.completion()`)
@@ -26,6 +27,7 @@ allowed-tools: Bash WebFetch
 - Counting tokens or chunking text by token limit (`ai.text.tokenCount()`, `ai.text.chunkByTokenLimit()`)
 
 ## When NOT to Use
+
 - **Python-based GraphRAG pipelines** (VectorCypherRetriever, HybridCypherRetriever) → `neo4j-graphrag-skill`
 - **Vector index CREATE / kNN search / SEARCH clause** → `neo4j-vector-index-skill`
 - **GDS embeddings** (FastRP, Node2Vec) → `neo4j-gds-skill`
@@ -46,6 +48,7 @@ ALTER DATABASE neo4j SET DEFAULT LANGUAGE CYPHER 25
 ```
 
 **Installation:**
+
 - **Aura**: GenAI plugin enabled by default — no action needed
 - **Self-managed JAR**: copy plugin JAR to `plugins/` directory
 - **Docker**: `--env NEO4J_PLUGINS='["genai"]'`
@@ -56,13 +59,13 @@ ALTER DATABASE neo4j SET DEFAULT LANGUAGE CYPHER 25
 
 All `ai.text.*` functions accept a `configuration :: MAP` as last argument.
 
-| Provider string | Required keys | Notes |
-|---|---|---|
-| `'openai'` | `token`, `model` | `token` = OpenAI API key |
-| `'azure-openai'` | `token`, `resource`, `model` | `token` = OAuth2 bearer; `resource` = Azure resource name |
-| `'vertexai'` | `model`, `project`, `region`, `token` or `apiKey` | `publisher` defaults to `'google'` |
-| `'bedrock-titan'` | `model`, `region`, `accessKeyId`, `secretAccessKey` | Embedding only |
-| `'bedrock-nova'` | `model`, `region`, `accessKeyId`, `secretAccessKey` | Completion only |
+| Provider string   | Required keys                                       | Notes                                                     |
+| ----------------- | --------------------------------------------------- | --------------------------------------------------------- |
+| `'openai'`        | `token`, `model`                                    | `token` = OpenAI API key                                  |
+| `'azure-openai'`  | `token`, `resource`, `model`                        | `token` = OAuth2 bearer; `resource` = Azure resource name |
+| `'vertexai'`      | `model`, `project`, `region`, `token` or `apiKey`   | `publisher` defaults to `'google'`                        |
+| `'bedrock-titan'` | `model`, `region`, `accessKeyId`, `secretAccessKey` | Embedding only                                            |
+| `'bedrock-nova'`  | `model`, `region`, `accessKeyId`, `secretAccessKey` | Completion only                                           |
 
 Optional for all: `vendorOptions :: MAP` passes provider-specific extras (e.g. `{ dimensions: 1024 }` for OpenAI).
 
@@ -276,6 +279,7 @@ RETURN name, requiredConfigType
 ```
 
 Signatures:
+
 - `ai.text.tokenCount(input, provider, configuration = {}) :: INTEGER` — provider-driven tokenizer; uses provider config (token/model).
 - `ai.text.chunkByTokenLimit(input, limit, model = 'gpt-4', overlap = 0) :: LIST<STRING>` — local tokenizer keyed off `model`; no provider call, no `token` required.
 
@@ -286,6 +290,7 @@ Signatures:
 `SET node.embedding = ai.text.embed(...)` and `SET node.* = ai.text.structuredCompletion(...)` write to the graph.
 
 Before bulk writes:
+
 1. Count nodes first: `MATCH (c:Chunk) WHERE c.embedding IS NULL RETURN count(c)`
 2. Verify config with one test node before batch
 3. Use `CALL { ... } IN TRANSACTIONS OF 500 ROWS` for batches > 1000 nodes
@@ -295,29 +300,30 @@ Before bulk writes:
 
 ## Deprecated — Do NOT Use
 
-| Old function | Replacement |
-|---|---|
-| `genai.vector.encode()` [deprecated] | `ai.text.embed()` |
-| `genai.vector.encodeBatch()` [deprecated] | `CALL ai.text.embedBatch()` |
+| Old function                                        | Replacement                      |
+| --------------------------------------------------- | -------------------------------- |
+| `genai.vector.encode()` [deprecated]                | `ai.text.embed()`                |
+| `genai.vector.encodeBatch()` [deprecated]           | `CALL ai.text.embedBatch()`      |
 | `genai.vector.listEncodingProviders()` [deprecated] | `CALL ai.text.embed.providers()` |
 
 ---
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| `Unknown function 'ai.text.embed'` | Missing CYPHER 25 prefix OR plugin not installed | Add `CYPHER 25` prefix; verify plugin installed |
-| `Cypher version not supported` | Using `CYPHER 25` on Neo4j < 5.20 or missing plugin | Upgrade Neo4j; ensure GenAI plugin loaded |
-| `Configuration key 'token' missing` | Provider config map incomplete | Check required keys for provider (see table above) |
-| `null` returned from embed | Wrong model name or provider auth failed | Test with `RETURN ai.text.embed('test', 'openai', {token:$k, model:'text-embedding-3-small'})` standalone |
-| `Unsupported provider` | Provider string typo (case-sensitive, lowercase) | Use `'openai'` not `'OpenAI'`; run `CALL ai.text.embed.providers()` |
-| `ai.text.chat` fails on VertexAI | Chat only supported on openai/azure-openai | Switch to openai/azure-openai for chat |
+| Error                               | Cause                                               | Fix                                                                                                       |
+| ----------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `Unknown function 'ai.text.embed'`  | Missing CYPHER 25 prefix OR plugin not installed    | Add `CYPHER 25` prefix; verify plugin installed                                                           |
+| `Cypher version not supported`      | Using `CYPHER 25` on Neo4j < 5.20 or missing plugin | Upgrade Neo4j; ensure GenAI plugin loaded                                                                 |
+| `Configuration key 'token' missing` | Provider config map incomplete                      | Check required keys for provider (see table above)                                                        |
+| `null` returned from embed          | Wrong model name or provider auth failed            | Test with `RETURN ai.text.embed('test', 'openai', {token:$k, model:'text-embedding-3-small'})` standalone |
+| `Unsupported provider`              | Provider string typo (case-sensitive, lowercase)    | Use `'openai'` not `'OpenAI'`; run `CALL ai.text.embed.providers()`                                       |
+| `ai.text.chat` fails on VertexAI    | Chat only supported on openai/azure-openai          | Switch to openai/azure-openai for chat                                                                    |
 
 ---
 
 ## Checklist
-- [ ] `CYPHER 25` prefix present on every ai.text.* query
+
+- [ ] `CYPHER 25` prefix present on every ai.text.\* query
 - [ ] GenAI plugin installed (Aura: automatic; self-managed: JAR in plugins/)
 - [ ] API key passed as `$param`, never as literal string
 - [ ] `model` key explicit in config (no silent defaults)
@@ -330,6 +336,7 @@ Before bulk writes:
 ---
 
 ## References
+
 - [Full provider config](references/providers.md) — all required/optional keys per provider
 - [Official docs](https://neo4j.com/docs/genai/plugin/current/)
 - [API reference](https://neo4j.com/docs/genai/plugin/current/reference/functions-procedures/)

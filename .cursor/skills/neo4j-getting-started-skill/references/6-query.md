@@ -1,4 +1,5 @@
 # Stage 6 — query
+
 # Generate a library of validated Cypher queries covering the use-case.
 
 ## Step Q1 — Fetch current schema
@@ -36,6 +37,7 @@ The gate requires ≥5 queries, ≥2 of which are **traversal** queries (contain
 ### Always include (all experience levels)
 
 **Q1 — Overview (metadata, not traversal)**
+
 ```cypher
 // Q1: Node counts by label
 CYPHER 25
@@ -43,6 +45,7 @@ MATCH (n) RETURN labels(n)[0] AS label, count(n) AS count ORDER BY count DESC;
 ```
 
 **Q2 — Direct connections (traversal, 1-hop) ← use-case specific**
+
 ```cypher
 // Q2: [Traversal] Find direct neighbors of a given <Label>
 // $id = primary key of the starting node
@@ -53,6 +56,7 @@ LIMIT 25;
 ```
 
 **Q3 — Indirect pattern (traversal, 2+ hops) ← core use-case query**
+
 ```cypher
 // Q3: [Traversal] <Use-case-specific multi-hop query>
 // e.g. for recommendations: friends-of-friends not yet followed
@@ -65,6 +69,7 @@ RETURN target.name AS recommendation, strength;
 ```
 
 **Q4 — Aggregation (business metric)**
+
 ```cypher
 // Q4: Top <entities> by <metric>
 CYPHER 25
@@ -74,6 +79,7 @@ ORDER BY value DESC LIMIT 20;
 ```
 
 **Q5 — Filtered list**
+
 ```cypher
 // Q5: <Entities> matching criteria
 // $threshold = filter value
@@ -87,6 +93,7 @@ ORDER BY value DESC LIMIT 50;
 ### Intermediate / advanced additions
 
 **Q6 — Aggregation within traversal**
+
 ```cypher
 // Q6: [Traversal] Average <metric> across connected entities
 CYPHER 25
@@ -96,6 +103,7 @@ ORDER BY avgMetric DESC LIMIT 20;
 ```
 
 **Q7 — Vector similarity search** (only if vector index confirmed)
+
 ```cypher
 // Q7: Semantic similarity search
 // $embedding = query vector (inject at runtime)
@@ -112,6 +120,7 @@ ORDER BY score DESC;
 ```
 
 **Q8 — Fulltext search** (only if fulltext index confirmed)
+
 ```cypher
 // Q8: Fulltext search across <Label>
 // $searchTerm = user search input
@@ -184,6 +193,7 @@ MATCH (n) RETURN labels(n)[0] AS label, count(n) AS count ORDER BY count DESC;
 
 ```markdown
 ### 6-query
+
 status: done
 queries_total=<number>
 traversal_queries=<number>

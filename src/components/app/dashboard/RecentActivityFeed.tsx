@@ -16,10 +16,7 @@ import { RiskBadge } from "@/components/app/RiskBadge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const typeMeta: Record<
-  ActivityType,
-  { label: string; icon: typeof Activity }
-> = {
+const typeMeta: Record<ActivityType, { label: string; icon: typeof Activity }> = {
   "loan-approved": { label: "Loan approved", icon: UserCheck },
   "graph-updated": { label: "Graph updated", icon: GitBranch },
   "climate-refresh": { label: "Climate refresh", icon: CloudSun },
@@ -69,9 +66,7 @@ function ActivityRow({ item }: { item: ActivityItem }) {
           <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <span>Actor · {item.actor}</span>
             {item.confidence != null ? (
-              <span className="font-mono-data">
-                Confidence · {item.confidence.toFixed(2)}
-              </span>
+              <span className="font-mono-data">Confidence · {item.confidence.toFixed(2)}</span>
             ) : null}
           </div>
         </div>
@@ -84,15 +79,13 @@ function ActivityRow({ item }: { item: ActivityItem }) {
           aria-expanded={open}
         >
           Details
-          <ChevronDown
-            className={cn("h-3 w-3 transition", open && "rotate-180")}
-          />
+          <ChevronDown className={cn("h-3 w-3 transition", open && "rotate-180")} />
         </Button>
       </div>
       {open ? (
         <div className="ml-[4.75rem] mt-2 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
-          Full audit trail and linked entities will open from the farmer or
-          decision workspace in Phase 3.
+          Full audit trail and linked entities will open from the farmer or decision workspace in
+          Phase 3.
         </div>
       ) : null}
     </li>

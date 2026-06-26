@@ -3,6 +3,7 @@
 Skill for writing Java (and Kotlin) code with the official Neo4j Java Driver v6.
 
 **Covers:**
+
 - Maven/Gradle dependency setup
 - Driver creation, `verifyConnectivity`, lifecycle management
 - `executableQuery` — recommended default API
@@ -19,11 +20,13 @@ Skill for writing Java (and Kotlin) code with the official Neo4j Java Driver v6.
 **Compatibility:** Neo4j Java Driver v6 · Java 17+ · Kotlin 1.9+
 
 **Not covered:**
+
 - Cypher query authoring → `neo4j-cypher-skill`
 - Driver version migrations → `neo4j-migration-skill`
 - Spring Data Neo4j (`@Node`, `Neo4jRepository`) → `neo4j-spring-data-skill`
 
 **Install:**
+
 ```bash
 npx skills add https://github.com/neo4j-contrib/neo4j-skills --skill neo4j-driver-java-skill
 ```

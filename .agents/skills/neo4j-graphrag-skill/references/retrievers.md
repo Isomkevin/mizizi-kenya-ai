@@ -91,6 +91,7 @@ ToolsRetriever(
 ```
 
 Convert a retriever to a tool:
+
 ```python
 from neo4j_graphrag.tool import convert_to_tool
 tool = convert_to_tool(retriever, name="vector_search", description="Searches by embedding similarity")

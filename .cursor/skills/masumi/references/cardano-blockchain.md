@@ -28,6 +28,7 @@ Each tx:
 ```
 
 ### Masumi payment example
+
 ```
 Initial:    Buyer wallet UTXO: 100 USDM, 5 ADA
 Step 1:     Buyer sends 10 USDM → contract UTXO
@@ -37,6 +38,7 @@ Step 2:     Seller calls WithdrawPayment after unlockTime
 ```
 
 ### Why it matters
+
 - **No double-spend** — UTXO is destroyed when consumed.
 - **No reentrancy** — script can't be re-entered mid-validation.
 - **Concurrency** — different UTXOs can be spent in parallel; same UTXO = race.
@@ -47,6 +49,7 @@ Step 2:     Seller calls WithdrawPayment after unlockTime
 ## Wallets
 
 ### Wallet = mnemonic + derived keys
+
 ```
 24-word mnemonic (BIP-39)
  ↓ derive
@@ -59,15 +62,16 @@ address (bech32, starts with addr1 mainnet or addr_test1 preprod)
 
 ### Masumi's three-wallet model
 
-| Wallet | Holds mnemonic | Purpose | Network ops |
-|---|---|---|---|
-| **Purchasing** | Node (hot) | Pays tx fees, mints registry NFTs, sends purchases | High |
-| **Selling** | Node (hot) | Receives payments | Medium |
-| **Collection** | **You (cold/hardware on mainnet)** | Sweep destination for earnings | Low (sweeps only) |
+| Wallet         | Holds mnemonic                     | Purpose                                            | Network ops       |
+| -------------- | ---------------------------------- | -------------------------------------------------- | ----------------- |
+| **Purchasing** | Node (hot)                         | Pays tx fees, mints registry NFTs, sends purchases | High              |
+| **Selling**    | Node (hot)                         | Receives payments                                  | Medium            |
+| **Collection** | **You (cold/hardware on mainnet)** | Sweep destination for earnings                     | Low (sweeps only) |
 
 > Collection Wallet on mainnet **must be hardware** (Ledger, Keystone) or paper backup — node stores only the address, never the mnemonic.
 
 ### Address formats
+
 - `addr1...` (mainnet)
 - `addr_test1...` (preprod)
 - ~103 chars (base16) or shorter for enterprise addresses
@@ -89,6 +93,7 @@ Approximate Masumi ops:
 | Refund flow | ~0.5-0.8 ADA |
 
 ### Keep wallets topped up
+
 - **Purchasing** ≥ 10 ADA on mainnet (30+ tx headroom).
 - **Selling** ≥ 5 ADA (covers submit-result + collection cycles).
 - Auto-top-up from Collection Wallet when below threshold.
@@ -99,17 +104,17 @@ Approximate Masumi ops:
 
 Cardano supports **native tokens** alongside ADA (no smart contract needed for token logic — native).
 
-| Token | Use | Decimals |
-|---|---|---|
-| **ADA** | Tx fees, min-UTXO, staking | 6 (1 ADA = 1,000,000 lovelace) |
-| **USDM** | Service settlement | 6 |
-| **SUMI** | (Future governance) | TBD |
+| Token    | Use                        | Decimals                       |
+| -------- | -------------------------- | ------------------------------ |
+| **ADA**  | Tx fees, min-UTXO, staking | 6 (1 ADA = 1,000,000 lovelace) |
+| **USDM** | Service settlement         | 6                              |
+| **SUMI** | (Future governance)        | TBD                            |
 
 ### USDM / tUSDM full unit (policyId + assetName)
 
-| Network | Token | Policy ID | Asset Name | Concatenated unit |
-|---|---|---|---|---|
-| Mainnet | USDM | `c48cbb3d5e57ed56e276bc45f99ab39abe94e6cd7ac39fb402da47ad` | `0014df105553444d` | `c48cbb3d5e57ed56e276bc45f99ab39abe94e6cd7ac39fb402da47ad0014df105553444d` |
+| Network | Token | Policy ID                                                  | Asset Name           | Concatenated unit                                                            |
+| ------- | ----- | ---------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------- |
+| Mainnet | USDM  | `c48cbb3d5e57ed56e276bc45f99ab39abe94e6cd7ac39fb402da47ad` | `0014df105553444d`   | `c48cbb3d5e57ed56e276bc45f99ab39abe94e6cd7ac39fb402da47ad0014df105553444d`   |
 | Preprod | tUSDM | `16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde` | `0014df10745553444d` | `16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d` |
 
 Both = 6 decimals → multiply whole-token amounts by 1,000,000 for raw unit. Set `PAYMENT_UNIT=<concatenated unit>` in your agent's `.env`.
@@ -118,9 +123,10 @@ Both = 6 decimals → multiply whole-token amounts by 1,000,000 for raw unit. Se
 
 ```ts
 // Find USDM balance at an address
-const USDM = process.env.NETWORK === 'Mainnet'
-  ? 'c48cbb3d5e57ed56e276bc45f99ab39abe94e6cd7ac39fb402da47ad0014df105553444d'
-  : '16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d';
+const USDM =
+  process.env.NETWORK === "Mainnet"
+    ? "c48cbb3d5e57ed56e276bc45f99ab39abe94e6cd7ac39fb402da47ad0014df105553444d"
+    : "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d";
 
 const utxos = await blockfrost.addressesUtxos(addr);
 const totalRaw = utxos.reduce((s, u) => {
@@ -135,12 +141,14 @@ const usdm = Number(totalRaw) / 1_000_000;
 ## Block Production
 
 Ouroboros PoS:
+
 - **Slot** ≈ 1s
 - **Block** ≈ every 20s on average
 - Finality = probabilistic; ~20 blocks (≈7 min) for high confidence
 - Masumi node default: `BLOCK_CONFIRMATIONS_THRESHOLD=20`
 
 This means:
+
 - Payment detection has ~1-7 min latency.
 - Set `submitResultTime` ≥ 5 min so you have time after detection.
 - `unlockTime` ≥ 1 hour gives buyers real verification time.
@@ -150,6 +158,7 @@ This means:
 ## Network Endpoints
 
 ### Blockfrost (recommended)
+
 Get a project ID at https://blockfrost.io.
 
 ```bash
@@ -163,6 +172,7 @@ curl -H "project_id: $BLOCKFROST_API_KEY_MAINNET" \
 ```
 
 ### Alternatives
+
 - **Koios** — community, free, decentralized. `https://api.koios.rest/api/v1`
 - **Maestro** — enterprise, paid SLA. `https://www.gomaestro.org`
 - **Self-host cardano-node + db-sync** — full control, heavy ops (200+ GB disk).
@@ -172,6 +182,7 @@ curl -H "project_id: $BLOCKFROST_API_KEY_MAINNET" \
 ## Smart Contracts on Cardano
 
 Two roles in any contract:
+
 - **Datum** — state attached to the contract UTXO.
 - **Redeemer** — the action being attempted ("withdraw", "refund", ...).
 
@@ -183,6 +194,7 @@ False → tx rejected → no chain change
 ```
 
 Masumi uses two contracts:
+
 - **Payment** — escrow with `SubmitResult`, `WithdrawPayment`, `RequestRefund`, `WithdrawRefund`, `AuthorizeRefund`, `AdminResolve` redeemers.
 - **Registry** — minting + burning policy for agent NFTs.
 
@@ -192,18 +204,19 @@ Detail → [smart-contracts.md](smart-contracts.md).
 
 ## Networks: Preprod vs Mainnet
 
-| Aspect | Preprod | Mainnet |
-|---|---|---|
-| Network Magic | `1` | `764824073` |
-| Epoch length | 1 day | 5 days |
-| Cardanoscan | https://preprod.cardanoscan.io | https://cardanoscan.io |
-| Blockfrost | `cardano-preprod.blockfrost.io` | `cardano-mainnet.blockfrost.io` |
-| ADA faucet | https://docs.cardano.org/cardano-testnet/tools/faucet | None — buy on exchange |
-| USDM faucet | https://faucet.masumi.network (tUSDM) | None |
-| Data | Independent test chain | Real, permanent |
-| Use for | All dev + QA | Production only |
+| Aspect        | Preprod                                               | Mainnet                         |
+| ------------- | ----------------------------------------------------- | ------------------------------- |
+| Network Magic | `1`                                                   | `764824073`                     |
+| Epoch length  | 1 day                                                 | 5 days                          |
+| Cardanoscan   | https://preprod.cardanoscan.io                        | https://cardanoscan.io          |
+| Blockfrost    | `cardano-preprod.blockfrost.io`                       | `cardano-mainnet.blockfrost.io` |
+| ADA faucet    | https://docs.cardano.org/cardano-testnet/tools/faucet | None — buy on exchange          |
+| USDM faucet   | https://faucet.masumi.network (tUSDM)                 | None                            |
+| Data          | Independent test chain                                | Real, permanent                 |
+| Use for       | All dev + QA                                          | Production only                 |
 
 ### `.env` per network
+
 ```env
 NETWORK=Preprod
 BLOCKFROST_API_KEY_PREPROD=preprod...
@@ -211,6 +224,7 @@ PURCHASE_WALLET_PREPROD_MNEMONIC=word1 word2 ... word24
 SELLING_WALLET_PREPROD_MNEMONIC=word1 word2 ... word24
 COLLECTION_WALLET_PREPROD_ADDRESS=addr_test1q...
 ```
+
 Same shape with `_MAINNET_` suffix for mainnet. Don't mix.
 
 ---
@@ -218,24 +232,28 @@ Same shape with `_MAINNET_` suffix for mainnet. Don't mix.
 ## Common TS Patterns
 
 ### Wallet balance check
+
 ```ts
 async function isFunded(addr: string, minADA: number) {
   const utxos = await blockfrost.addressesUtxos(addr);
-  const lovelace = utxos.reduce((s, u) => s + BigInt(
-    u.amount.find((x: any) => x.unit === 'lovelace')?.quantity ?? 0
-  ), 0n);
+  const lovelace = utxos.reduce(
+    (s, u) => s + BigInt(u.amount.find((x: any) => x.unit === "lovelace")?.quantity ?? 0),
+    0n,
+  );
   return Number(lovelace) / 1_000_000 >= minADA;
 }
 ```
 
 ### Submit with retry
+
 ```ts
 async function submitWithRetry(signedTx: string, max = 3) {
   for (let i = 0; i < max; i++) {
-    try { return await blockfrost.txSubmit(signedTx); }
-    catch (e) {
+    try {
+      return await blockfrost.txSubmit(signedTx);
+    } catch (e) {
       if (i === max - 1) throw e;
-      await new Promise(r => setTimeout(r, 2000 * (i + 1)));
+      await new Promise((r) => setTimeout(r, 2000 * (i + 1)));
     }
   }
 }
@@ -245,15 +263,16 @@ async function submitWithRetry(signedTx: string, max = 3) {
 
 ## Debugging
 
-| Error | Cause | Fix |
-|---|---|---|
-| "UTxO not found" | UTXO already spent (race) | Refetch UTXOs, rebuild tx. |
-| "Insufficient collateral" | Plutus tx needs pure-ADA collateral UTXO ≥ 5 ADA | Keep a dedicated collateral UTXO in builder wallet. |
-| "Min UTXO requirement" | Output ADA below the protocol minimum | Bump output ADA (≥ 1-2 ADA for token outputs). |
-| "Script execution failed" | Validator returned False or hit budget limit | Decode datum/redeemer; re-evaluate locally with cardano-cli or aiken. |
-| "WrongNetwork" | Wallet/address from preprod used on mainnet (or vice versa) | Check `NETWORK` env + magic. |
+| Error                     | Cause                                                       | Fix                                                                   |
+| ------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------- |
+| "UTxO not found"          | UTXO already spent (race)                                   | Refetch UTXOs, rebuild tx.                                            |
+| "Insufficient collateral" | Plutus tx needs pure-ADA collateral UTXO ≥ 5 ADA            | Keep a dedicated collateral UTXO in builder wallet.                   |
+| "Min UTXO requirement"    | Output ADA below the protocol minimum                       | Bump output ADA (≥ 1-2 ADA for token outputs).                        |
+| "Script execution failed" | Validator returned False or hit budget limit                | Decode datum/redeemer; re-evaluate locally with cardano-cli or aiken. |
+| "WrongNetwork"            | Wallet/address from preprod used on mainnet (or vice versa) | Check `NETWORK` env + magic.                                          |
 
 ### Tools
+
 - **cardano-cli** — query UTXOs, inspect tx CBOR, evaluate scripts.
 - **cardanoscan.io** / **preprod.cardanoscan.io** — explorer w/ datum + script view.
 - **Lucid evaluator / Mesh CLI** — replay validator off-chain to surface why it failed.
@@ -281,6 +300,7 @@ async function submitWithRetry(signedTx: string, max = 3) {
 - Faucet (Masumi tUSDM preprod): https://faucet.masumi.network
 
 Next:
+
 - Smart contracts → [smart-contracts.md](smart-contracts.md)
 - Payment Service → [masumi-payments.md](masumi-payments.md)
 - Registry → [registry-identity.md](registry-identity.md)

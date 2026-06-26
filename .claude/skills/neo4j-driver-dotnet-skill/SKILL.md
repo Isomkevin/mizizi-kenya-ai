@@ -14,12 +14,14 @@ version: 1.0.1
 ---
 
 ## When to Use
+
 - Writing C# or .NET code connecting to Neo4j
 - Setting up `IDriver`, DI registration, or session/transaction lifecycle
 - Questions about `ExecutableQuery`, `IResultCursor`, async patterns, result mapping
 - Debugging sessions, type mapping, null safety, or error handling in .NET
 
 ## When NOT to Use
+
 - **Writing/optimizing Cypher queries** → `neo4j-cypher-skill`
 - **Upgrading from older driver version** → `neo4j-migration-skill`
 
@@ -31,11 +33,11 @@ version: 1.0.1
 dotnet add package Neo4j.Driver
 ```
 
-| Package | Use |
-|---|---|
-| `Neo4j.Driver` | Async API — **use this** |
-| `Neo4j.Driver.Simple` | Synchronous wrapper |
-| `Neo4j.Driver.Reactive` | System.Reactive streams |
+| Package                 | Use                      |
+| ----------------------- | ------------------------ |
+| `Neo4j.Driver`          | Async API — **use this** |
+| `Neo4j.Driver.Simple`   | Synchronous wrapper      |
+| `Neo4j.Driver.Reactive` | System.Reactive streams  |
 
 ---
 
@@ -148,12 +150,12 @@ public class PersonService(IDriver driver)
 
 ## Choose the Right API
 
-| API | When | Auto-retry | Streaming |
-|---|---|---|---|
-| `driver.ExecutableQuery()` | Most queries — simple default | ✅ | ❌ eager |
-| `session.ExecuteReadAsync/WriteAsync()` | Large results, multi-query tx | ✅ | ✅ |
-| `session.RunAsync()` | `LOAD CSV`, `CALL {} IN TRANSACTIONS` | ❌ | ✅ |
-| `session.BeginTransactionAsync()` | Multi-function, external coordination | ❌ | ✅ |
+| API                                     | When                                  | Auto-retry | Streaming |
+| --------------------------------------- | ------------------------------------- | ---------- | --------- |
+| `driver.ExecutableQuery()`              | Most queries — simple default         | ✅         | ❌ eager  |
+| `session.ExecuteReadAsync/WriteAsync()` | Large results, multi-query tx         | ✅         | ✅        |
+| `session.RunAsync()`                    | `LOAD CSV`, `CALL {} IN TRANSACTIONS` | ❌         | ✅        |
+| `session.BeginTransactionAsync()`       | Multi-function, external coordination | ❌         | ✅        |
 
 ---
 
@@ -231,6 +233,7 @@ Console.WriteLine($"Created {summary.Counters.NodesCreated} nodes");
 ```
 
 Cursor rules:
+
 - Consume with `ToListAsync()` or `FetchAsync()` loop **inside** the callback
 - Returning a cursor from the callback → transaction closes → cursor invalid → exception
 
@@ -249,6 +252,7 @@ var names = await session.ExecuteReadAsync(async tx =>
 ```
 
 Async void trap:
+
 ```csharp
 // ❌ CS1998 warning — async with no await; RunAsync Task discarded
 await session.ExecuteWriteAsync(async tx =>
@@ -276,13 +280,13 @@ while (await cursor.FetchAsync())          // true while records remain
 
 Cursor consumption methods:
 
-| Method | Records | Summary | Use |
-|---|---|---|---|
-| `ToListAsync()` | ✅ all | ❌ | Need records |
-| `ToListAsync(mapper)` | ✅ mapped | ❌ | Need mapped records |
-| `FetchAsync()` loop | ✅ one/time | ❌ until ConsumeAsync | Large/lazy |
-| `ConsumeAsync()` | ❌ discards | ✅ | Need counters |
-| `SingleAsync()` | ✅ exactly 1 | ❌ | Expect one row |
+| Method                | Records      | Summary               | Use                 |
+| --------------------- | ------------ | --------------------- | ------------------- |
+| `ToListAsync()`       | ✅ all       | ❌                    | Need records        |
+| `ToListAsync(mapper)` | ✅ mapped    | ❌                    | Need mapped records |
+| `FetchAsync()` loop   | ✅ one/time  | ❌ until ConsumeAsync | Large/lazy          |
+| `ConsumeAsync()`      | ❌ discards  | ✅                    | Need counters       |
+| `SingleAsync()`       | ✅ exactly 1 | ❌                    | Expect one row      |
 
 ---
 
@@ -309,21 +313,21 @@ if (record.Keys.Contains("city"))
 
 ## Type Mapping
 
-| Cypher | .NET default | Notes |
-|---|---|---|
-| `Integer` | `long` | safe: `int`, `long?`, `int?` |
-| `Float` | `double` | safe: `float`, `double?` |
-| `String` | `string` | use `string?` if nullable |
-| `Boolean` | `bool` | |
-| `List` | `IReadOnlyList<object>` | |
-| `Map` | `IReadOnlyDictionary<string,object>` | |
-| `Node` | `INode` | `.Labels`, `.Properties`, `.ElementId` |
-| `Relationship` | `IRelationship` | `.Type`, `.StartNodeElementId` |
-| `Date` | `LocalDate` | `.ToDateOnly()` (.NET 6+) |
-| `DateTime` | `ZonedDateTime` | `.ToDateTimeOffset()` (ms precision) |
-| `LocalDateTime` | `LocalDateTime` | |
-| `Duration` | `Duration` | `.ToTimeSpan()` throws if has months/days |
-| `null` | `null` | use nullable types |
+| Cypher          | .NET default                         | Notes                                     |
+| --------------- | ------------------------------------ | ----------------------------------------- |
+| `Integer`       | `long`                               | safe: `int`, `long?`, `int?`              |
+| `Float`         | `double`                             | safe: `float`, `double?`                  |
+| `String`        | `string`                             | use `string?` if nullable                 |
+| `Boolean`       | `bool`                               |                                           |
+| `List`          | `IReadOnlyList<object>`              |                                           |
+| `Map`           | `IReadOnlyDictionary<string,object>` |                                           |
+| `Node`          | `INode`                              | `.Labels`, `.Properties`, `.ElementId`    |
+| `Relationship`  | `IRelationship`                      | `.Type`, `.StartNodeElementId`            |
+| `Date`          | `LocalDate`                          | `.ToDateOnly()` (.NET 6+)                 |
+| `DateTime`      | `ZonedDateTime`                      | `.ToDateTimeOffset()` (ms precision)      |
+| `LocalDateTime` | `LocalDateTime`                      |                                           |
+| `Duration`      | `Duration`                           | `.ToTimeSpan()` throws if has months/days |
+| `null`          | `null`                               | use nullable types                        |
 
 `ElementId` stable within one transaction only — do not use to MATCH across separate transactions.
 
@@ -409,6 +413,7 @@ Catch `ClientException` before `Neo4jException` — it's a subclass; generic han
 `ex.GqlStatus` — stable GQL status codes; prefer over string-matching `ex.Code`.
 
 Explicit transaction rollback can itself throw — isolate it:
+
 ```csharp
 catch (Exception original)
 {
@@ -424,36 +429,37 @@ If `CommitAsync()` throws a network error, commit may or may not have succeeded 
 
 ## Common Mistakes
 
-| Mistake | Fix |
-|---|---|
-| `using var driver` | `await using var driver` — `IDriver` is `IAsyncDisposable` |
-| `using var session` | `await using var session` |
-| `IDriver` as Scoped/Transient in DI | Register as Singleton |
-| `IAsyncSession` in DI | Never — open per unit of work |
-| Missing `await` on `ExecuteAsync()` | Task silently never runs |
-| `async tx => tx.RunAsync(...)` no inner await | Remove `async`, return Task directly |
-| Omit `database` in `QueryConfig`/`AsyncSession` | Always specify — saves a round-trip |
-| No `CancellationToken` in web apps | Propagate `HttpContext.RequestAborted` |
-| `.As<string>()` on null graph value | `.As<string?>()` — non-nullable throws |
-| `record["key"]` absent key | Check `record.Keys.Contains()` first |
-| `cursor.Current` after FetchAsync loop | Last record, not null — don't use after loop |
-| `FetchAsync()` after `false` return | Throws — stop loop, don't call again |
-| Return cursor from managed tx callback | Consume with `ToListAsync()` inside callback |
-| Need counters from session write | `await cursor.ConsumeAsync()` |
-| `AsObject<T>()` CS1061 compile error | Add `using Neo4j.Driver.Preview.Mapping;` |
-| `ResultAvailableAfter` for total timing | Use `ResultConsumedAfter` (full wall-clock) |
-| Custom class in `WithParameters` for UNWIND | Use anonymous types or `Dictionary<string,object>` |
-| Rename C# param but not Cypher `$param` | Anonymous property names must match `$param` names |
-| `ExecuteWriteAsync` for reads | Use `ExecuteReadAsync` — routes to replicas |
-| Side effects inside managed tx callback | Move outside — callback retried on failure |
-| `Duration.ToTimeSpan()` with months/days | Only safe for pure second/nanosecond durations |
-| Catch `Neo4jException` before `ClientException` | `ClientException` is subclass — catch it first |
+| Mistake                                         | Fix                                                        |
+| ----------------------------------------------- | ---------------------------------------------------------- |
+| `using var driver`                              | `await using var driver` — `IDriver` is `IAsyncDisposable` |
+| `using var session`                             | `await using var session`                                  |
+| `IDriver` as Scoped/Transient in DI             | Register as Singleton                                      |
+| `IAsyncSession` in DI                           | Never — open per unit of work                              |
+| Missing `await` on `ExecuteAsync()`             | Task silently never runs                                   |
+| `async tx => tx.RunAsync(...)` no inner await   | Remove `async`, return Task directly                       |
+| Omit `database` in `QueryConfig`/`AsyncSession` | Always specify — saves a round-trip                        |
+| No `CancellationToken` in web apps              | Propagate `HttpContext.RequestAborted`                     |
+| `.As<string>()` on null graph value             | `.As<string?>()` — non-nullable throws                     |
+| `record["key"]` absent key                      | Check `record.Keys.Contains()` first                       |
+| `cursor.Current` after FetchAsync loop          | Last record, not null — don't use after loop               |
+| `FetchAsync()` after `false` return             | Throws — stop loop, don't call again                       |
+| Return cursor from managed tx callback          | Consume with `ToListAsync()` inside callback               |
+| Need counters from session write                | `await cursor.ConsumeAsync()`                              |
+| `AsObject<T>()` CS1061 compile error            | Add `using Neo4j.Driver.Preview.Mapping;`                  |
+| `ResultAvailableAfter` for total timing         | Use `ResultConsumedAfter` (full wall-clock)                |
+| Custom class in `WithParameters` for UNWIND     | Use anonymous types or `Dictionary<string,object>`         |
+| Rename C# param but not Cypher `$param`         | Anonymous property names must match `$param` names         |
+| `ExecuteWriteAsync` for reads                   | Use `ExecuteReadAsync` — routes to replicas                |
+| Side effects inside managed tx callback         | Move outside — callback retried on failure                 |
+| `Duration.ToTimeSpan()` with months/days        | Only safe for pure second/nanosecond durations             |
+| Catch `Neo4jException` before `ClientException` | `ClientException` is subclass — catch it first             |
 
 ---
 
 ## References
 
 Load on demand:
+
 - [references/transactions.md](references/transactions.md) — explicit transactions, `BeginTransactionAsync`, rollback, commit uncertainty, `TransactionConfig` (timeout, metadata), causal consistency and bookmarks
 - [references/performance.md](references/performance.md) — spatial types (Point/WGS-84/Cartesian), connection pool tuning, `WithFetchSize`, session config options, `CancellationToken` patterns, large result streaming
 - [references/object-mapping.md](references/object-mapping.md) — `AsObject<T>`, blueprint mapping, lambda mapping, `AsObjectsAsync<T>`, repository pattern example
@@ -461,6 +467,7 @@ Load on demand:
 ---
 
 ## Checklist
+
 - [ ] `IDriver` registered as singleton in DI (or `await using` for short-lived apps)
 - [ ] `await using` on driver and sessions (not plain `using`)
 - [ ] `database` specified in `QueryConfig` / `AsyncSession` config

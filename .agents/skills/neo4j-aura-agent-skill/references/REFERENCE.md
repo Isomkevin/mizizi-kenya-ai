@@ -11,6 +11,7 @@ https://api.neo4j.io/v2beta1
 ## Auth
 
 All requests require a Bearer token obtained via:
+
 ```
 POST https://api.neo4j.io/oauth/token
 Authorization: Basic base64(CLIENT_ID:CLIENT_SECRET)
@@ -24,30 +25,30 @@ Token TTL: 3600 s. On 401/403: re-authenticate.
 
 ## Agent Endpoints
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/organizations/{orgId}/projects/{projectId}/agents` | List agents |
-| `POST` | `/organizations/{orgId}/projects/{projectId}/agents` | Create agent |
-| `GET` | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}` | Get agent |
-| `PUT` | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}` | Full replace |
-| `PATCH` | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}` | Partial update |
-| `DELETE` | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}` | Delete agent |
-| `POST` | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}/invoke` | Invoke agent |
+| Method   | Path                                                                  | Description    |
+| -------- | --------------------------------------------------------------------- | -------------- |
+| `GET`    | `/organizations/{orgId}/projects/{projectId}/agents`                  | List agents    |
+| `POST`   | `/organizations/{orgId}/projects/{projectId}/agents`                  | Create agent   |
+| `GET`    | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}`        | Get agent      |
+| `PUT`    | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}`        | Full replace   |
+| `PATCH`  | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}`        | Partial update |
+| `DELETE` | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}`        | Delete agent   |
+| `POST`   | `/organizations/{orgId}/projects/{projectId}/agents/{agentId}/invoke` | Invoke agent   |
 
 ---
 
 ## CreateAgentRequest Schema
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `name` | string | ✅ | Max 100 chars |
-| `description` | string | ✅ | |
-| `dbid` | string | ✅ | AuraDB instance ID |
-| `is_private` | boolean | ✅ | `false` = accessible to project members; `true` = creator only |
-| `tools` | array | ✅ | Min 1 tool; see Tool Schemas |
-| `system_prompt` | string | ❌ | Custom instructions for the LLM |
-| `is_mcp_enabled` | boolean | ❌ | Enable MCP server endpoint |
-| `enabled` | boolean | ❌ | Default: `true` |
+| Field            | Type    | Required | Notes                                                          |
+| ---------------- | ------- | -------- | -------------------------------------------------------------- |
+| `name`           | string  | ✅       | Max 100 chars                                                  |
+| `description`    | string  | ✅       |                                                                |
+| `dbid`           | string  | ✅       | AuraDB instance ID                                             |
+| `is_private`     | boolean | ✅       | `false` = accessible to project members; `true` = creator only |
+| `tools`          | array   | ✅       | Min 1 tool; see Tool Schemas                                   |
+| `system_prompt`  | string  | ❌       | Custom instructions for the LLM                                |
+| `is_mcp_enabled` | boolean | ❌       | Enable MCP server endpoint                                     |
+| `enabled`        | boolean | ❌       | Default: `true`                                                |
 
 ## PatchAgentRequest Schema
 
@@ -120,19 +121,19 @@ Always confirm `provider`, `model`, and `dimension` with the user before writing
 
 ### OpenAI (`provider: "openai"`)
 
-| Model | Default Dimension | Configurable |
-|---|---|---|
-| `text-embedding-3-small` | 1536 | Yes |
-| `text-embedding-3-large` | 3072 | Yes |
-| `text-embedding-ada-002` | 1536 | No — always 1536 |
+| Model                    | Default Dimension | Configurable     |
+| ------------------------ | ----------------- | ---------------- |
+| `text-embedding-3-small` | 1536              | Yes              |
+| `text-embedding-3-large` | 3072              | Yes              |
+| `text-embedding-ada-002` | 1536              | No — always 1536 |
 
 ### Vertex AI (`provider: "vertexai"`)
 
-| Model | Default Dimension | Configurable | Notes |
-|---|---|---|---|
-| `gemini-embedding-001` | 3072 | Yes (1–3072) | General purpose |
-| `text-embedding-005` | 768 | Yes (1–768) | Optimized for retrieval |
-| `text-multilingual-embedding-002` | 768 | Yes (1–768) | Multilingual |
+| Model                             | Default Dimension | Configurable | Notes                   |
+| --------------------------------- | ----------------- | ------------ | ----------------------- |
+| `gemini-embedding-001`            | 3072              | Yes (1–3072) | General purpose         |
+| `text-embedding-005`              | 768               | Yes (1–768)  | Optimized for retrieval |
+| `text-multilingual-embedding-002` | 768               | Yes (1–768)  | Multilingual            |
 
 ---
 
@@ -168,11 +169,10 @@ Always confirm `provider`, `model`, and `dimension` with the user before writing
 ```
 
 Or multi-turn:
+
 ```json
 {
-  "input": [
-    { "role": "user", "content": "What contracts does Acme Corp have?" }
-  ]
+  "input": [{ "role": "user", "content": "What contracts does Acme Corp have?" }]
 }
 ```
 
@@ -203,6 +203,7 @@ Note: Aura Agent does NOT store conversation history between requests. Include p
 `type` enum: `message` | `error`
 
 Error response:
+
 ```json
 {
   "type": "error",
@@ -218,16 +219,16 @@ Error response:
 
 ## HTTP Status Codes
 
-| Code | Meaning |
-|---|---|
-| `200` | Success (list, get, update, invoke) |
-| `201` | Agent created |
-| `202` | Delete accepted |
-| `400` | Invalid request body or parameters |
-| `401` | Token expired or missing |
+| Code  | Meaning                                      |
+| ----- | -------------------------------------------- |
+| `200` | Success (list, get, update, invoke)          |
+| `201` | Agent created                                |
+| `202` | Delete accepted                              |
+| `400` | Invalid request body or parameters           |
+| `401` | Token expired or missing                     |
 | `403` | Insufficient permissions (not project admin) |
-| `404` | Agent/project/org not found |
-| `500` | Server error — retry with backoff |
+| `404` | Agent/project/org not found                  |
+| `500` | Server error — retry with backoff            |
 
 ---
 
@@ -236,24 +237,24 @@ Error response:
 Used when reading `schema.json` to set `data_type` in CypherTemplate parameters.
 `fetch_schema.py` pre-computes the `aura_data_type` field on every property.
 
-| Neo4j Property Type | Aura `data_type` | Notes |
-|---|---|---|
-| `STRING` | `string` | |
-| `INTEGER` | `integer` | |
-| `LONG` | `integer` | Neo4j internal; maps to integer |
-| `FLOAT` | `number` | |
-| `DOUBLE` | `number` | |
-| `BOOLEAN` | `boolean` | |
-| `DATE` | `string` | Pass as ISO 8601: `"2024-01-15"` |
-| `DATE_TIME` | `string` | Pass as ISO 8601: `"2024-01-15T10:00:00Z"` |
-| `LOCAL_DATE_TIME` | `string` | Pass as `"2024-01-15T10:00:00"` |
-| `LOCAL_TIME` | `string` | Pass as `"10:00:00"` |
-| `TIME` | `string` | Pass as `"10:00:00+01:00"` |
-| `DURATION` | `string` | Pass as ISO 8601 duration: `"P1Y2M"` |
-| `POINT` | `string` | Pass as WKT: `"POINT(1.0 2.0)"` |
-| `LIST` | `string` | Serialize as JSON string |
-| `MAP` | `string` | Serialize as JSON string |
-| `ANY` | `string` | Fallback |
+| Neo4j Property Type | Aura `data_type` | Notes                                      |
+| ------------------- | ---------------- | ------------------------------------------ |
+| `STRING`            | `string`         |                                            |
+| `INTEGER`           | `integer`        |                                            |
+| `LONG`              | `integer`        | Neo4j internal; maps to integer            |
+| `FLOAT`             | `number`         |                                            |
+| `DOUBLE`            | `number`         |                                            |
+| `BOOLEAN`           | `boolean`        |                                            |
+| `DATE`              | `string`         | Pass as ISO 8601: `"2024-01-15"`           |
+| `DATE_TIME`         | `string`         | Pass as ISO 8601: `"2024-01-15T10:00:00Z"` |
+| `LOCAL_DATE_TIME`   | `string`         | Pass as `"2024-01-15T10:00:00"`            |
+| `LOCAL_TIME`        | `string`         | Pass as `"10:00:00"`                       |
+| `TIME`              | `string`         | Pass as `"10:00:00+01:00"`                 |
+| `DURATION`          | `string`         | Pass as ISO 8601 duration: `"P1Y2M"`       |
+| `POINT`             | `string`         | Pass as WKT: `"POINT(1.0 2.0)"`            |
+| `LIST`              | `string`         | Serialize as JSON string                   |
+| `MAP`               | `string`         | Serialize as JSON string                   |
+| `ANY`               | `string`         | Fallback                                   |
 
 ---
 
@@ -329,6 +330,7 @@ Output of `scripts/fetch_schema.py`. Extends `get_structured_schema()` with type
 ```
 
 Key fields:
+
 - `aura_data_type` — Aura-compatible `data_type` value; use directly in CypherTemplate parameters
 - `low_cardinality` — `true` if ≤50 distinct values; `description` MUST list valid values when true
 - `values` — sorted list of distinct values; only present when `low_cardinality: true`
@@ -349,11 +351,13 @@ All Aura Agents run in `europe-west1` (Belgium, GCP). Regardless of AuraDB insta
 Enable via `is_private: false` and optionally `is_mcp_enabled: true` in the agent config.
 
 External endpoint URL format:
+
 ```
 https://api.neo4j.io/v2beta1/organizations/{orgId}/projects/{projectId}/agents/{agentId}/invoke
 ```
 
 MCP server URL format:
+
 ```
 https://api.neo4j.io/v2beta1/organizations/{orgId}/projects/{projectId}/agents/{agentId}/mcp
 ```

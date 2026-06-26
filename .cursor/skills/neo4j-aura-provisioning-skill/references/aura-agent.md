@@ -11,6 +11,7 @@ Use LangChain/LangGraph/etc. for: custom orchestration, multi-agent coordination
 ## Prerequisites
 
 In organization settings, both must be enabled:
+
 - **Generative AI assistance**
 - **Aura Agent**
 
@@ -22,11 +23,11 @@ Agent loop: interpret user input → plan tools → execute tools (read-only gra
 
 ## Tool Types
 
-| Tool | Description | Use when |
-|---|---|---|
-| **Cypher Template** | Parameterized Cypher — agent extracts params from question | Known, repeatable query patterns |
-| **Similarity Search** | Vector search using a vector index + embeddings | Semantic similarity ("products similar to X") |
-| **Text2Cypher** | LLM generates Cypher at runtime from natural language | Ad-hoc questions not covered by templates |
+| Tool                  | Description                                                | Use when                                      |
+| --------------------- | ---------------------------------------------------------- | --------------------------------------------- |
+| **Cypher Template**   | Parameterized Cypher — agent extracts params from question | Known, repeatable query patterns              |
+| **Similarity Search** | Vector search using a vector index + embeddings            | Semantic similarity ("products similar to X") |
+| **Text2Cypher**       | LLM generates Cypher at runtime from natural language      | Ad-hoc questions not covered by templates     |
 
 All tools are **read-only**. Agent cannot write to the database.
 
@@ -42,6 +43,7 @@ Agents can be exposed as MCP servers for use with external clients (Cursor, Clau
 4. Copy MCP endpoint: `...` menu → "Copy MCP server endpoint"
 
 MCP config for Cursor (`~/.cursor/mcp.json`):
+
 ```json
 {
   "mcpServers": {

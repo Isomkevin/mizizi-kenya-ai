@@ -2,15 +2,15 @@
 
 ## When to Use
 
-| Condition | Use Data Importer |
-|---|---|
-| Dataset < 1M rows | YES |
-| No Cypher knowledge | YES |
-| Need visual model + import in one step | YES |
-| Aura (no file:/// access) | YES — upload local CSVs |
-| Need list/array properties on import | NO — strings only; post-process after |
-| > 1M rows | NO — use LOAD CSV + CALL IN TRANSACTIONS |
-| Need custom type coercion during load | NO — post-process after |
+| Condition                              | Use Data Importer                        |
+| -------------------------------------- | ---------------------------------------- |
+| Dataset < 1M rows                      | YES                                      |
+| No Cypher knowledge                    | YES                                      |
+| Need visual model + import in one step | YES                                      |
+| Aura (no file:/// access)              | YES — upload local CSVs                  |
+| Need list/array properties on import   | NO — strings only; post-process after    |
+| > 1M rows                              | NO — use LOAD CSV + CALL IN TRANSACTIONS |
+| Need custom type coercion during load  | NO — post-process after                  |
 
 ## Access in Aura
 
@@ -54,6 +54,7 @@ Lists/arrays NOT supported — stored as delimited strings. Post-process with `s
 ## Multi-pass for De-normalized Data
 
 De-normalized CSV (one row = person + movie + role) requires multiple passes:
+
 - Cannot create multiple node types from one file in single pass via GUI
 - Pass 1: Map CSV → Person nodes; import
 - Pass 2: Map same CSV → Movie nodes; import

@@ -517,9 +517,7 @@ export function riskColor(level: RiskLevel): string {
 export function metricValue(county: CountyIntel, metric: MapMetric): number {
   switch (metric) {
     case "risk":
-      return (
-        { "very-low": 1, low: 2, medium: 3, high: 4, critical: 5 }[county.risk] ?? 3
-      );
+      return { "very-low": 1, low: 2, medium: 3, high: 4, critical: 5 }[county.risk] ?? 3;
     case "loanVolume":
       return county.loanVolumeM;
     case "climate":

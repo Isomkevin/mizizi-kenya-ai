@@ -11,6 +11,7 @@ Skill for the Neo4j Visualization Library (NVL) — covering:
 - Container setup, Web Worker fallback, telemetry opt-out
 
 **Not covered** (see sibling tools / skills):
+
 - Out-of-the-box embedded graph view with default styling → `GraphVisualization` component in `@neo4j-ndl/react` (Neo4j Needle design system) — wraps NVL with defaults
 - Python / Jupyter graph visualization → `neo4j/python-graph-visualization` (Python port of NVL)
 - Cypher query authoring → `neo4j-cypher-skill`

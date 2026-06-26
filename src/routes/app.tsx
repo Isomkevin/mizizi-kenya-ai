@@ -11,8 +11,7 @@ export const Route = createFileRoute("/app")({
       { title: "Mizizi · Platform" },
       {
         name: "description",
-        content:
-          "The Mizizi connected intelligence workspace for agricultural finance.",
+        content: "The Mizizi connected intelligence workspace for agricultural finance.",
       },
     ],
   }),

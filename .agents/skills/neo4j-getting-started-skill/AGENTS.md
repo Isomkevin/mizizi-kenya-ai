@@ -95,15 +95,15 @@ neo4j-getting-started-skill/
 
 ## Success Gate Definitions
 
-| Gate | What it checks | Pass condition |
-|------|---------------|----------------|
-| `db_running` | DB connectivity | `driver.verify_connectivity()` no exception |
-| `model_valid` | Schema completeness | ≥2 node labels, ≥1 relationship type |
-| `data_present` | Data loaded | `MATCH (n) RETURN count(n)` ≥ persona `min_nodes` |
-| `queries_work` | Query correctness | ≥3 of 5 queries return ≥1 row |
-| `app_generated` | App file exists + valid | File exists + syntax check passes |
-| `mcp_configured` | MCP connected | Settings JSON has neo4j server entry |
-| `time_budget` | Within time limit | elapsed ≤ `timeout_seconds` from persona YAML |
+| Gate             | What it checks          | Pass condition                                    |
+| ---------------- | ----------------------- | ------------------------------------------------- |
+| `db_running`     | DB connectivity         | `driver.verify_connectivity()` no exception       |
+| `model_valid`    | Schema completeness     | ≥2 node labels, ≥1 relationship type              |
+| `data_present`   | Data loaded             | `MATCH (n) RETURN count(n)` ≥ persona `min_nodes` |
+| `queries_work`   | Query correctness       | ≥3 of 5 queries return ≥1 row                     |
+| `app_generated`  | App file exists + valid | File exists + syntax check passes                 |
+| `mcp_configured` | MCP connected           | Settings JSON has neo4j server entry              |
+| `time_budget`    | Within time limit       | elapsed ≤ `timeout_seconds` from persona YAML     |
 
 ## Dependencies (pyproject.toml — to be created)
 

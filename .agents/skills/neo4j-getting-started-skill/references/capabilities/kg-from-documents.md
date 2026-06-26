@@ -1,5 +1,7 @@
 # Capability — kg-from-documents
+
 # Build a knowledge graph from unstructured documents using neo4j-graphrag SimpleKGPipeline.
+
 # Used in the `load` stage when DATA_SOURCE=documents.
 
 `neo4j-graphrag` `SimpleKGPipeline` — full ETL from raw text to entity/relationship graph with embeddings. Requires LLM for extraction, embedder for chunk embeddings, Neo4j with vector + fulltext indexes.
@@ -63,6 +65,7 @@ asyncio.run(pipeline.run_async(text=sample.read_text(encoding="utf-8", errors="r
 ```
 
 After running, inspect the graph:
+
 ```cypher
 CYPHER 25
 CALL db.schema.visualization()
@@ -283,6 +286,7 @@ Check what was actually created (entity labels may differ from specified schema)
 CYPHER 25
 MATCH (n) RETURN labels(n)[0] AS label, count(n) AS cnt ORDER BY cnt DESC
 ```
+
 ```cypher
 CYPHER 25
 MATCH ()-[r]->() RETURN type(r) AS rel, count(r) AS cnt ORDER BY cnt DESC
@@ -290,14 +294,14 @@ MATCH ()-[r]->() RETURN type(r) AS rel, count(r) AS cnt ORDER BY cnt DESC
 
 **SimpleKGPipeline default graph structure:**
 
-| Neo4j element | Description |
-|--------------|-------------|
-| `:Chunk` | Text chunk nodes with `.embedding` vector property |
-| `:__KGBuilder__` | Extracted entity nodes (Party, Jurisdiction, etc. stored here) |
-| `[:FROM_CHUNK]` | `(:__KGBuilder__)-[:FROM_CHUNK]->(:Chunk)` — entity came from this chunk |
-| `[:FROM_DOCUMENT]` | `(:Chunk)-[:FROM_DOCUMENT]->(:__KGBuilder__ {label:"Document"})` |
-| `[:NEXT_CHUNK]` | Sequential chunk chain |
-| Custom rels | `IMPOSES`, `PARTY_TO`, `GOVERNS` etc. as specified in PATTERNS |
+| Neo4j element      | Description                                                              |
+| ------------------ | ------------------------------------------------------------------------ |
+| `:Chunk`           | Text chunk nodes with `.embedding` vector property                       |
+| `:__KGBuilder__`   | Extracted entity nodes (Party, Jurisdiction, etc. stored here)           |
+| `[:FROM_CHUNK]`    | `(:__KGBuilder__)-[:FROM_CHUNK]->(:Chunk)` — entity came from this chunk |
+| `[:FROM_DOCUMENT]` | `(:Chunk)-[:FROM_DOCUMENT]->(:__KGBuilder__ {label:"Document"})`         |
+| `[:NEXT_CHUNK]`    | Sequential chunk chain                                                   |
+| Custom rels        | `IMPOSES`, `PARTY_TO`, `GOVERNS` etc. as specified in PATTERNS           |
 
 Vector index is on `:Chunk` nodes. The `retrieval_query` for `VectorCypherRetriever` must traverse from `node` (a `Chunk`) to `__KGBuilder__` entities via `FROM_CHUNK`:
 
@@ -308,7 +312,6 @@ RETURN name, state, populationPercent
 ```
 
 Wait for `state=ONLINE` and `populationPercent=100` before running vector queries.
-
 
 ## Step K6 — Test retrieval
 
@@ -483,11 +486,11 @@ Swap `tools_retriever` for the single `retriever` in the `@st.cache_resource` fu
 
 ## Common issues
 
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Vector index `POPULATING` | Index still building | Wait and re-check `populationPercent` |
-| `EmbeddingError` / `AuthenticationError` | Missing API key | Set `OPENAI_API_KEY` / `COHERE_API_KEY` in `.env` |
-| Empty chunks | Documents too short | Ensure each doc has ≥100 chars |
-| Slow ingestion | Large docs + many entities | Use `gpt-5.4-mini` for extraction; run docs sequentially |
-| Dimensions mismatch | Wrong `vector.dimensions` in index | Drop and recreate vector index matching your model's output |
-| `retrieval_query` returns no source | Wrong relationship type | Inspect schema with `CALL db.schema.visualization()` and adjust MATCH |
+| Issue                                    | Cause                              | Fix                                                                   |
+| ---------------------------------------- | ---------------------------------- | --------------------------------------------------------------------- |
+| Vector index `POPULATING`                | Index still building               | Wait and re-check `populationPercent`                                 |
+| `EmbeddingError` / `AuthenticationError` | Missing API key                    | Set `OPENAI_API_KEY` / `COHERE_API_KEY` in `.env`                     |
+| Empty chunks                             | Documents too short                | Ensure each doc has ≥100 chars                                        |
+| Slow ingestion                           | Large docs + many entities         | Use `gpt-5.4-mini` for extraction; run docs sequentially              |
+| Dimensions mismatch                      | Wrong `vector.dimensions` in index | Drop and recreate vector index matching your model's output           |
+| `retrieval_query` returns no source      | Wrong relationship type            | Inspect schema with `CALL db.schema.visualization()` and adjust MATCH |

@@ -1,5 +1,7 @@
 # Capability — mcp-config
+
 # Configure the official neo4j-mcp server for different agent environments.
+
 # Reference this from the `build` stage when APP_TYPE=mcp or integration is requested.
 
 ## Binary location
@@ -39,6 +41,7 @@ Use that absolute path in all config files below.
 ## Claude Code
 
 Project-level (`.claude/settings.json` — checked in, safe since no secrets if using env vars):
+
 ```json
 {
   "mcpServers": {
@@ -56,6 +59,7 @@ Project-level (`.claude/settings.json` — checked in, safe since no secrets if 
 ```
 
 User-level (`~/.claude/settings.json` — applies to all projects):
+
 ```json
 {
   "mcpServers": {
@@ -75,6 +79,7 @@ User-level (`~/.claude/settings.json` — applies to all projects):
 ## Read-only mode (recommended for production / shared DBs)
 
 Add to env:
+
 ```json
 "NEO4J_READ_ONLY": "true"
 ```
@@ -83,12 +88,12 @@ This disables the `write-cypher` tool entirely.
 
 ## Available MCP tools after restart
 
-| Tool | Description |
-|------|-------------|
-| `get-schema` | Introspect node labels, relationship types, property keys |
-| `read-cypher` | Execute read-only Cypher |
-| `write-cypher` | Execute write Cypher (disabled in read-only mode) |
-| `list-gds-procedures` | List GDS procedures (only if GDS installed) |
+| Tool                  | Description                                               |
+| --------------------- | --------------------------------------------------------- |
+| `get-schema`          | Introspect node labels, relationship types, property keys |
+| `read-cypher`         | Execute read-only Cypher                                  |
+| `write-cypher`        | Execute write Cypher (disabled in read-only mode)         |
+| `list-gds-procedures` | List GDS procedures (only if GDS installed)               |
 
 ## Verify config is working
 

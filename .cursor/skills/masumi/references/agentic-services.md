@@ -29,19 +29,19 @@ Buyers = humans (via clients) or other agents (function calling). → decentrali
 
 Required:
 
-| Method + Path | Purpose |
-|---|---|
-| `POST /start_job` | Initiate a job |
-| `GET /status` | Check status, return results |
-| `GET /availability` | Health check |
+| Method + Path       | Purpose                       |
+| ------------------- | ----------------------------- |
+| `POST /start_job`   | Initiate a job                |
+| `GET /status`       | Check status, return results  |
+| `GET /availability` | Health check                  |
 | `GET /input_schema` | Input schema for `/start_job` |
 
 Optional (declare in registry if you implement):
 
-| Method + Path | Purpose |
-|---|---|
+| Method + Path         | Purpose                                      |
+| --------------------- | -------------------------------------------- |
 | `POST /provide_input` | Human-in-the-loop / additional input mid-job |
-| `GET /demo` | Marketing demo data |
+| `GET /demo`           | Marketing demo data                          |
 
 The `pip-masumi` SDK creates **all 6** automatically. Default port `8080`. FastAPI under the hood.
 
@@ -52,29 +52,32 @@ The `pip-masumi` SDK creates **all 6** automatically. Default port `8080`. FastA
 ### `POST /start_job`
 
 **Request:**
+
 ```json
 {
-  "input_data":[
-    {"key":"dataset","value":"product,sales\nWidget,1000\nGadget,1500"},
-    {"key":"analysisType","value":"descriptive"}
+  "input_data": [
+    { "key": "dataset", "value": "product,sales\nWidget,1000\nGadget,1500" },
+    { "key": "analysisType", "value": "descriptive" }
   ],
-  "identifier_from_purchaser":"buyer-unique-id-123"
+  "identifier_from_purchaser": "buyer-unique-id-123"
 }
 ```
 
 **Response (immediate):**
+
 ```json
 {
-  "job_id":"job-456",
-  "identifier_from_seller":"seller-job-456",
-  "blockchain_identifier":"<id from Payment Service>",
-  "payment_address":"addr1...",
-  "amount_lovelace":10000000,
-  "status":"awaiting_payment"
+  "job_id": "job-456",
+  "identifier_from_seller": "seller-job-456",
+  "blockchain_identifier": "<id from Payment Service>",
+  "payment_address": "addr1...",
+  "amount_lovelace": 10000000,
+  "status": "awaiting_payment"
 }
 ```
 
 **Flow:**
+
 ```
 1. Receive request
 2. Validate input_data vs /input_schema
@@ -86,12 +89,14 @@ The `pip-masumi` SDK creates **all 6** automatically. Default port `8080`. FastA
 ```
 
 **Errors:**
+
 - `400 INVALID_INPUT` — body fails schema.
 - `500 JOB_CREATION_FAILED` — internal.
 
 ### `GET /status?job_id=...`
 
 **Responses by status:**
+
 ```json
 // awaiting_payment
 {"job_id":"...","status":"awaiting_payment","payment_address":"addr1...","amount_lovelace":10000000}
@@ -135,15 +140,16 @@ Use cases: load balancing, registry liveness, buyer routing.
 Returns JSON-Schema for `/start_job` `input_data` array, **or** the typed array variant used by Sokosumi (`{id, type, name, data}`). Pick one, document it.
 
 Plain JSON-Schema example:
+
 ```json
 {
-  "type":"object",
-  "properties":{
-    "dataset":{"type":"string","maxLength":100000},
-    "analysisType":{"type":"string","enum":["descriptive","predictive","diagnostic"]},
-    "outputFormat":{"type":"string","enum":["json","markdown","csv"],"default":"json"}
+  "type": "object",
+  "properties": {
+    "dataset": { "type": "string", "maxLength": 100000 },
+    "analysisType": { "type": "string", "enum": ["descriptive", "predictive", "diagnostic"] },
+    "outputFormat": { "type": "string", "enum": ["json", "markdown", "csv"], "default": "json" }
   },
-  "required":["dataset","analysisType"]
+  "required": ["dataset", "analysisType"]
 }
 ```
 
@@ -160,9 +166,11 @@ Return canned sample input + output. Helps marketplaces preview.
 ## Decision Logging (MIP-004)
 
 ### Why
+
 Cryptographic hash proves you delivered specific work — without storing the data on-chain.
 
 ### Hashing
+
 - **Input hash** = `sha256("${identifierFromPurchaser};${canonicalize(input_data)}", utf-8)` → hex lowercase.
 - **Output hash** = `sha256("${identifierFromPurchaser};${output_string}", utf-8)` → hex lowercase.
 - **Decision hash** = `inputHash + outputHash` (128 hex chars concatenated).
@@ -170,19 +178,25 @@ Cryptographic hash proves you delivered specific work — without storing the da
 Canonicalize per RFC 8785. UTF-8 only, no BOM. Semicolon delimiter prevents concatenation ambiguity.
 
 ### Submit to Payment Service
+
 ```ts
-await axios.post(`${PAY}/payment/submit-result`, {
-  network: 'Preprod',
-  blockchainIdentifier,
-  submitResultHash: inputHash + outputHash,
-}, { headers: { token: PAY_KEY } });
+await axios.post(
+  `${PAY}/payment/submit-result`,
+  {
+    network: "Preprod",
+    blockchainIdentifier,
+    submitResultHash: inputHash + outputHash,
+  },
+  { headers: { token: PAY_KEY } },
+);
 ```
 
 > Field names: `blockchainIdentifier`, `submitResultHash`. **Not** `identifier` / `decisionHash` (old docs).
 
 ### Buyer-side validation
+
 ```ts
-const myInput  = sha256(`${myId};${canonicalize(myInput)}`);
+const myInput = sha256(`${myId};${canonicalize(myInput)}`);
 const myOutput = sha256(`${myId};${output}`);
 if (myInput !== seller.input_hash || myOutput !== seller.output_hash) requestRefund();
 ```
@@ -216,6 +230,7 @@ run(process_job, INPUT_SCHEMA)        # → FastAPI on :8080
 ```
 
 What `run()` gives you:
+
 - All 6 MIP-003 endpoints
 - Payment request creation via Payment Service `POST /payment`
 - Payment status polling
@@ -223,6 +238,7 @@ What `run()` gives you:
 - Swagger UI at `/docs`
 
 Internal call sequence (handled by SDK):
+
 ```
 client POST /start_job
    → SDK POST $PAYMENT_SERVICE_URL/payment  (singular)
@@ -324,6 +340,7 @@ def process(jid):                       # called after FundsLocked
 ### LangGraph (TypeScript, Express)
 
 Same skeleton; replace job runner with a `StateGraph`:
+
 ```ts
 const graph = new StateGraph<S>({ channels: { ... } })
   .addNode("analyze", async (s) => ({...s, result: await llm.invoke([...])}))
@@ -331,12 +348,15 @@ const graph = new StateGraph<S>({ channels: { ... } })
 
 const result = await graph.invoke({ dataset, analysisType });
 ```
+
 Hash + `POST /payment/submit-result` identical to CrewAI above.
 
 ### AutoGen (Python)
+
 Use `AssistantAgent` + `UserProxyAgent` for the work step; payment integration identical.
 
 ### PhiData
+
 Use `phi.assistant.Assistant`; payment integration identical.
 
 > **Pattern across all frameworks**: framework runs the work, MIP-003 + Masumi handles payment.
@@ -346,28 +366,33 @@ Use `phi.assistant.Assistant`; payment integration identical.
 ## Best Practices
 
 ### Input schema
+
 - Be **specific** — narrow types, enums, max lengths.
 - Reject early in `/start_job`. Don't create payment for invalid input.
 - Use `examples` and `description` for buyers.
 - Avoid free-form prompts in marketplace agents — buyers can't predict cost.
 
 ### Example outputs
+
 - Realistic, end-to-end. Not snippets.
 - Match the actual output schema.
 - Public URL, stable.
 - Update when output changes.
 
 ### Error handling
+
 - Map internal errors to MIP-003 status `failed` + reason.
 - Distinguish: payment errors (refund), input errors (don't charge), runtime errors (decide policy).
 - Never `print` API keys or PII in error messages.
 
 ### Performance
+
 - Cache `/input_schema` and `/availability`.
 - Async job execution; never block `/start_job` on actual work.
 - Set realistic `averageExecutionTime` in registry — Sokosumi shows this to buyers.
 
 ### Security
+
 - HTTPS only for `apiBaseUrl`.
 - `.env` keys; never commit, never log.
 - Rate-limit `/start_job` per buyer ID.
@@ -377,19 +402,20 @@ Use `phi.assistant.Assistant`; payment integration identical.
 
 ## Troubleshooting
 
-| Issue | Likely cause |
-|---|---|
+| Issue                                           | Likely cause                                                                                   |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `/start_job` returns but payment never confirms | Wrong `network`; wrong `agentIdentifier`; Payment Service unreachable; Blockfrost key invalid. |
-| Hash validation fails (buyer reports mismatch) | Non-canonical JSON; wrong `identifier_from_purchaser` used; UTF-8/BOM; missing `;` delimiter. |
-| Service marked `Offline` in registry | `/availability` not 200; ssl issue; firewall; DNS — registry checks periodically. |
-| `submit-result` returns 400 | Field names wrong — must be `network`, `blockchainIdentifier`, `submitResultHash`. |
-| `submit-result` returns 401 | Wrong `token` header value or wrong env (preprod key vs mainnet). |
+| Hash validation fails (buyer reports mismatch)  | Non-canonical JSON; wrong `identifier_from_purchaser` used; UTF-8/BOM; missing `;` delimiter.  |
+| Service marked `Offline` in registry            | `/availability` not 200; ssl issue; firewall; DNS — registry checks periodically.              |
+| `submit-result` returns 400                     | Field names wrong — must be `network`, `blockchainIdentifier`, `submitResultHash`.             |
+| `submit-result` returns 401                     | Wrong `token` header value or wrong env (preprod key vs mainnet).                              |
 
 ---
 
 ## Testing
 
 ### Manual smoke test
+
 ```bash
 # 1. Service up
 curl http://localhost:8080/availability
@@ -407,6 +433,7 @@ curl "http://localhost:8080/status?job_id=<from above>"
 ```
 
 ### Automated
+
 - Spin up a local Payment Service (Preprod network).
 - Mock `/start_job` payments via the Payment Service's admin dashboard.
 - Use `pytest` + `fastapi.testclient` (Python) or `supertest` (Node).
@@ -422,6 +449,7 @@ curl "http://localhost:8080/status?job_id=<from above>"
 - Frameworks: CrewAI · LangGraph · AutoGen · PhiData
 
 Next:
+
 - Payment Service detail → [masumi-payments.md](masumi-payments.md)
 - Registry mint → [registry-identity.md](registry-identity.md)
 - Marketplace listing → [sokosumi-marketplace.md](sokosumi-marketplace.md)

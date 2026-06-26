@@ -12,11 +12,13 @@ allowed-tools: Bash WebFetch
 ---
 
 ## When to Use
+
 - Writing Go code that connects to Neo4j
 - Setting up `neo4j.NewDriver()`, `ExecuteQuery()`, or session/transaction patterns
 - Debugging connection errors, result iteration, type assertions, causal consistency
 
 ## When NOT to Use
+
 - **Writing/optimizing Cypher** → `neo4j-cypher-skill`
 - **v5→v6 migration steps** → `neo4j-migration-skill`
 
@@ -32,10 +34,10 @@ Import: `github.com/neo4j/neo4j-go-driver/v6/neo4j`
 
 **v5→v6 rename** (deprecated aliases still compile, remove before v7):
 
-| v5 | v6 |
-|----|----|
+| v5                                | v6                     |
+| --------------------------------- | ---------------------- |
 | `neo4j.NewDriverWithContext(...)` | `neo4j.NewDriver(...)` |
-| `neo4j.DriverWithContext` | `neo4j.Driver` |
+| `neo4j.DriverWithContext`         | `neo4j.Driver`         |
 
 ---
 
@@ -92,12 +94,12 @@ URI schemes: `neo4j+s://` (Aura/TLS+routing), `neo4j://` (plain+routing), `bolt+
 
 ## Choosing the Right API
 
-| API | Use when | Auto-retry | Lazy results |
-|-----|----------|:----------:|:------------:|
-| `neo4j.ExecuteQuery()` | Most queries — simple default | ✅ | ❌ eager |
-| `session.ExecuteRead/Write()` | Large result sets / streaming | ✅ | ✅ |
-| `session.BeginTransaction()` | Spans multiple functions / ext coordination | ❌ | ✅ |
-| `session.Run()` | `CALL IN TRANSACTIONS` / auto-commit only | ❌ | ✅ |
+| API                           | Use when                                    | Auto-retry | Lazy results |
+| ----------------------------- | ------------------------------------------- | :--------: | :----------: |
+| `neo4j.ExecuteQuery()`        | Most queries — simple default               |     ✅     |   ❌ eager   |
+| `session.ExecuteRead/Write()` | Large result sets / streaming               |     ✅     |      ✅      |
+| `session.BeginTransaction()`  | Spans multiple functions / ext coordination |     ❌     |      ✅      |
+| `session.Run()`               | `CALL IN TRANSACTIONS` / auto-commit only   |     ❌     |      ✅      |
 
 `CALL { … } IN TRANSACTIONS` and `USING PERIODIC COMMIT` manage their own transactions — use `session.Run()`. They fail inside managed transactions.
 
@@ -128,6 +130,7 @@ fmt.Println(result.Summary.Counters().NodesCreated())
 ```
 
 Key options:
+
 ```go
 neo4j.ExecuteQueryWithDatabase("mydb")          // required for performance
 neo4j.ExecuteQueryWithReadersRouting()           // route reads to replicas
@@ -219,6 +222,7 @@ if err != nil {
 ```
 
 Helpers:
+
 ```go
 neo4j.IsNeo4jError(err)                // server-side Cypher/database error
 neo4j.IsTransactionExecutionLimit(err) // managed tx retries exhausted
@@ -231,21 +235,21 @@ In managed tx callback: return error → driver retries if transient.
 
 ## Data Types
 
-| Cypher | Go |
-|--------|----|
-| `Integer` | `int64` |
-| `Float` | `float64` |
-| `String` | `string` |
-| `Boolean` | `bool` |
-| `List` | `[]any` |
-| `Map` | `map[string]any` |
-| `Node` | `neo4j.Node` |
+| Cypher         | Go                   |
+| -------------- | -------------------- |
+| `Integer`      | `int64`              |
+| `Float`        | `float64`            |
+| `String`       | `string`             |
+| `Boolean`      | `bool`               |
+| `List`         | `[]any`              |
+| `Map`          | `map[string]any`     |
+| `Node`         | `neo4j.Node`         |
 | `Relationship` | `neo4j.Relationship` |
-| `Path` | `neo4j.Path` |
-| `Date` | `neo4j.Date` |
-| `DateTime` | `neo4j.Time` |
-| `Duration` | `neo4j.Duration` |
-| `null` | `nil` |
+| `Path`         | `neo4j.Path`         |
+| `Date`         | `neo4j.Date`         |
+| `DateTime`     | `neo4j.Time`         |
+| `Duration`     | `neo4j.Duration`     |
+| `null`         | `nil`                |
 
 ```go
 // Typed extraction (v6+, preferred):
@@ -379,16 +383,16 @@ Cross-session (parallel workers): combine bookmarks explicitly — see [referenc
 
 ## Common Errors
 
-| Error / Symptom | Cause | Fix |
-|-----------------|-------|-----|
-| `ConnectivityError` at startup | URI wrong / TLS mismatch / firewall | Check scheme (`neo4j+s://` for Aura), credentials, port 7687 |
-| `ConnectivityError` mid-run | Pool exhausted | Increase `MaxConnectionPoolSize`; check for leaked sessions |
-| Panic on type assertion | `record.Get()` returned nil/wrong type | Use `neo4j.GetRecordValue[T]()` or check `ok` first |
-| `res.Err()` non-nil after loop | Network error mid-stream | Handle error; re-run transaction |
-| Callback retried unexpectedly | Side effect inside managed tx | Move side effects outside callback |
-| Context deadline exceeded | No timeout on context | Use `context.WithTimeout` |
-| 0 results, query looks correct | Wrong `DatabaseName` | Always set `DatabaseName` in config |
-| `CALL IN TRANSACTIONS` fails | Run inside managed tx | Use `session.Run()` (auto-commit) |
+| Error / Symptom                | Cause                                  | Fix                                                          |
+| ------------------------------ | -------------------------------------- | ------------------------------------------------------------ |
+| `ConnectivityError` at startup | URI wrong / TLS mismatch / firewall    | Check scheme (`neo4j+s://` for Aura), credentials, port 7687 |
+| `ConnectivityError` mid-run    | Pool exhausted                         | Increase `MaxConnectionPoolSize`; check for leaked sessions  |
+| Panic on type assertion        | `record.Get()` returned nil/wrong type | Use `neo4j.GetRecordValue[T]()` or check `ok` first          |
+| `res.Err()` non-nil after loop | Network error mid-stream               | Handle error; re-run transaction                             |
+| Callback retried unexpectedly  | Side effect inside managed tx          | Move side effects outside callback                           |
+| Context deadline exceeded      | No timeout on context                  | Use `context.WithTimeout`                                    |
+| 0 results, query looks correct | Wrong `DatabaseName`                   | Always set `DatabaseName` in config                          |
+| `CALL IN TRANSACTIONS` fails   | Run inside managed tx                  | Use `session.Run()` (auto-commit)                            |
 
 ---
 
@@ -396,19 +400,21 @@ Cross-session (parallel workers): combine bookmarks explicitly — see [referenc
 
 Load on demand:
 Load on demand:
+
 - [references/advanced-config.md](references/advanced-config.md) — connection pool tuning, custom address resolver, notification config, Bolt logging, auth options, URI scheme table
 - [references/repository-pattern.md](references/repository-pattern.md) — repository wrapper pattern, cross-session causal consistency with bookmarks
 
 ## WebFetch
 
-| Need | URL |
-|------|-----|
-| Go driver manual | `https://neo4j.com/docs/go-manual/current/` |
-| API reference | `https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j` |
+| Need             | URL                                                            |
+| ---------------- | -------------------------------------------------------------- |
+| Go driver manual | `https://neo4j.com/docs/go-manual/current/`                    |
+| API reference    | `https://pkg.go.dev/github.com/neo4j/neo4j-go-driver/v6/neo4j` |
 
 ---
 
 ## Checklist
+
 - [ ] One driver created at startup; shared across goroutines; `defer driver.Close(ctx)`
 - [ ] `driver.VerifyConnectivity(ctx)` called at startup
 - [ ] `DatabaseName` set in all `SessionConfig` / `ExecuteQueryWithDatabase`

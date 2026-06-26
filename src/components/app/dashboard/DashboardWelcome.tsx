@@ -18,18 +18,12 @@ export function DashboardWelcome() {
         <div className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
           {w.greeting}
         </div>
-        <h1 className="font-display text-4xl leading-tight md:text-5xl">
-          {w.subtitle}
-        </h1>
+        <h1 className="font-display text-4xl leading-tight md:text-5xl">{w.subtitle}</h1>
         <p className="max-w-2xl text-muted-foreground">{w.summary}</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <SnapshotCard
-          icon={CloudSun}
-          label="Weather insight"
-          value={w.weatherInsight}
-        />
+        <SnapshotCard icon={CloudSun} label="Weather insight" value={w.weatherInsight} />
         <SnapshotCard
           label="Pending approvals"
           value={`${w.pendingApprovals} applications`}
@@ -76,12 +70,7 @@ function SnapshotCard({
           {label}
         </div>
       </div>
-      <div
-        className={cn(
-          "mt-2 text-sm font-medium capitalize leading-snug",
-          valueClassName,
-        )}
-      >
+      <div className={cn("mt-2 text-sm font-medium capitalize leading-snug", valueClassName)}>
         {value}
       </div>
     </div>

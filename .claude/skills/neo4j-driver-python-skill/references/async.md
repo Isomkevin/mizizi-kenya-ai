@@ -34,15 +34,15 @@ async def run_queries(driver):
 
 ## Async Result Methods
 
-| Method | Returns | Notes |
-|---|---|---|
-| `await result.values()` | `list[list]` | One inner list per row |
-| `await result.data()` | `list[dict]` | One dict per record, keyed by column name |
-| `await result.single()` | `Record` | Raises if 0 or 2+ results |
-| `await result.single(strict=False)` | `Record \| None` | None for 0, raises for 2+ |
-| `await result.fetch(n)` | `list[Record]` | Up to n records |
-| `await result.consume()` | `ResultSummary` | Discards remaining |
-| `async for record in result` | iterates `Record` | Lazy streaming |
+| Method                              | Returns           | Notes                                     |
+| ----------------------------------- | ----------------- | ----------------------------------------- |
+| `await result.values()`             | `list[list]`      | One inner list per row                    |
+| `await result.data()`               | `list[dict]`      | One dict per record, keyed by column name |
+| `await result.single()`             | `Record`          | Raises if 0 or 2+ results                 |
+| `await result.single(strict=False)` | `Record \| None`  | None for 0, raises for 2+                 |
+| `await result.fetch(n)`             | `list[Record]`    | Up to n records                           |
+| `await result.consume()`            | `ResultSummary`   | Discards remaining                        |
+| `async for record in result`        | iterates `Record` | Lazy streaming                            |
 
 ## FastAPI Lifespan Pattern
 

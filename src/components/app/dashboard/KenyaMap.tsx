@@ -3,12 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  countyIntel,
-  mapMetricLabels,
-  metricValue,
-  riskColor,
-} from "@/lib/mock/dashboard";
+import { countyIntel, mapMetricLabels, metricValue, riskColor } from "@/lib/mock/dashboard";
 import type { CountyIntel } from "@/lib/mock/dashboard";
 import type { MapMetric } from "@/lib/mock/types";
 import { cn } from "@/lib/utils";
@@ -133,19 +128,13 @@ export function KenyaMap() {
               <Stat label="Farmers" value={selected.farmers.toLocaleString()} />
               <Stat label="Cooperatives" value={String(selected.cooperatives)} />
               <Stat label="Applications" value={String(selected.applications)} />
-              <Stat
-                label="Loan volume"
-                value={`KES ${selected.loanVolumeM}M`}
-              />
+              <Stat label="Loan volume" value={`KES ${selected.loanVolumeM}M`} />
               <Stat label="Approval rate" value={`${selected.approvalRate}%`} />
-              <Stat
-                label="Climate exposure"
-                value={`${selected.climateExposure}%`}
-              />
+              <Stat label="Climate exposure" value={`${selected.climateExposure}%`} />
             </dl>
             <p className="text-xs text-muted-foreground">
-              Zooming reveals cooperatives, farmers, and in-flight applications
-              for this county — full drill-down ships in Phase 6 analytics.
+              Zooming reveals cooperatives, farmers, and in-flight applications for this county —
+              full drill-down ships in Phase 6 analytics.
             </p>
           </div>
         ) : (

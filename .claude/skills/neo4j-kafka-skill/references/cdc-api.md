@@ -4,12 +4,12 @@ Source: [neo4j.com/docs/cdc/current/](https://neo4j.com/docs/cdc/current/)
 
 ## Requirements
 
-| Requirement | Detail |
-|---|---|
-| Neo4j version | 5.13+ |
-| Edition | Enterprise Edition, AuraDB Business Critical, AuraDB VDC |
-| Self-managed config | `db.cdc.enabled=true` in `neo4j.conf` |
-| Aura | Enabled by default on BC/VDC tiers |
+| Requirement         | Detail                                                   |
+| ------------------- | -------------------------------------------------------- |
+| Neo4j version       | 5.13+                                                    |
+| Edition             | Enterprise Edition, AuraDB Business Critical, AuraDB VDC |
+| Self-managed config | `db.cdc.enabled=true` in `neo4j.conf`                    |
+| Aura                | Enabled by default on BC/VDC tiers                       |
 
 CDC is NOT available on Community Edition or AuraDB Free/Professional.
 
@@ -39,10 +39,10 @@ Use to replay full CDC history.
 
 ### `db.cdc.query(from, selectors)`
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `from` | STRING | `""` (= current) | Starting cursor (exclusive) |
-| `selectors` | LIST OF MAP | `[]` (= all) | Filter criteria |
+| Parameter   | Type        | Default          | Description                 |
+| ----------- | ----------- | ---------------- | --------------------------- |
+| `from`      | STRING      | `""` (= current) | Starting cursor (exclusive) |
+| `selectors` | LIST OF MAP | `[]` (= all)     | Filter criteria             |
 
 Returns: `id`, `txId`, `seq`, `metadata`, `event`
 
@@ -63,18 +63,18 @@ Selectors are ANDed within one map, ORed across list items.
 ]
 ```
 
-| Field | Values | Scope | Description |
-|---|---|---|---|
-| `select` | `'e'` (all), `'n'` (nodes), `'r'` (rels) | both | Entity type filter |
-| `operation` | `'c'` (create), `'u'` (update), `'d'` (delete) | both | Operation type |
-| `labels` | `['Label1', 'Label2']` | nodes | Node must have ALL listed labels |
-| `type` | `'REL_TYPE'` | rels | Relationship type |
-| `elementId` | element ID string | both | Specific entity by ID |
-| `key` | `{prop: value}` | both | Match by key property (requires key constraint) |
-| `changesTo` | `['prop1', 'prop2']` | both | ALL listed properties must change (AND) |
-| `authenticatedUser` | username string | both | Filter by auth user |
-| `executingUser` | username string | both | Filter by executing user |
-| `txMetadata` | `{key: value}` | both | Match transaction metadata annotation |
+| Field               | Values                                         | Scope | Description                                     |
+| ------------------- | ---------------------------------------------- | ----- | ----------------------------------------------- |
+| `select`            | `'e'` (all), `'n'` (nodes), `'r'` (rels)       | both  | Entity type filter                              |
+| `operation`         | `'c'` (create), `'u'` (update), `'d'` (delete) | both  | Operation type                                  |
+| `labels`            | `['Label1', 'Label2']`                         | nodes | Node must have ALL listed labels                |
+| `type`              | `'REL_TYPE'`                                   | rels  | Relationship type                               |
+| `elementId`         | element ID string                              | both  | Specific entity by ID                           |
+| `key`               | `{prop: value}`                                | both  | Match by key property (requires key constraint) |
+| `changesTo`         | `['prop1', 'prop2']`                           | both  | ALL listed properties must change (AND)         |
+| `authenticatedUser` | username string                                | both  | Filter by auth user                             |
+| `executingUser`     | username string                                | both  | Filter by executing user                        |
+| `txMetadata`        | `{key: value}`                                 | both  | Match transaction metadata annotation           |
 
 ---
 
@@ -100,7 +100,7 @@ Selectors are ANDed within one map, ORed across list items.
     "eventType": "n",
     "operation": "c",
     "labels": ["Person", "Employee"],
-    "keys": {"id": "user-001"},
+    "keys": { "id": "user-001" },
     "state": {
       "before": null,
       "after": {
@@ -132,19 +132,19 @@ Selectors are ANDed within one map, ORed across list items.
     "start": {
       "elementId": "4:abc123:0",
       "labels": ["Person"],
-      "keys": {"id": "user-001"}
+      "keys": { "id": "user-001" }
     },
     "end": {
       "elementId": "4:abc123:1",
       "labels": ["Person"],
-      "keys": {"id": "user-002"}
+      "keys": { "id": "user-002" }
     },
     "state": {
       "before": {
-        "properties": {"since": 2020}
+        "properties": { "since": 2020 }
       },
       "after": {
-        "properties": {"since": 2020, "strength": 0.9}
+        "properties": { "since": 2020, "strength": 0.9 }
       }
     }
   }
@@ -153,11 +153,11 @@ Selectors are ANDed within one map, ORed across list items.
 
 ### State field presence by operation
 
-| operation | `state.before` | `state.after` |
-|---|---|---|
-| `c` (create) | `null` | populated |
-| `u` (update) | populated (changed props only in DIFF mode) | populated |
-| `d` (delete) | populated | `null` |
+| operation    | `state.before`                              | `state.after` |
+| ------------ | ------------------------------------------- | ------------- |
+| `c` (create) | `null`                                      | populated     |
+| `u` (update) | populated (changed props only in DIFF mode) | populated     |
+| `d` (delete) | populated                                   | `null`        |
 
 `captureMode: DIFF` — `before` contains only changed properties.
 `captureMode: FULL` — `before` contains all properties at time of change.
@@ -276,6 +276,7 @@ MERGE (p:Person {id: $id}) SET p += $props
 ```
 
 Then filter in CDC:
+
 ```cypher
 CALL db.cdc.query($cursor, [
   {select: 'n', txMetadata: {source: 'crm'}}
@@ -287,19 +288,19 @@ RETURN id, event;
 
 ## Source Connector Config Reference
 
-| Property | Type | Default | Description |
-|---|---|---|---|
-| `connector.class` | STRING | — | `org.neo4j.connectors.kafka.source.Neo4jConnector` |
-| `neo4j.source-strategy` | STRING | — | `CDC` or `QUERY` |
-| `neo4j.start-from` | STRING | `NOW` | `NOW` \| `EARLIEST` \| cursor string |
-| `neo4j.cdc.poll-interval` | DURATION | `1s` | How often to check for new changes |
-| `neo4j.cdc.poll-duration` | DURATION | `5s` | Max duration per poll call |
-| `neo4j.cdc.topic.<T>.patterns.<N>.pattern` | STRING | — | Entity pattern for topic T, index N |
-| `neo4j.cdc.topic.<T>.patterns.<N>.operation` | STRING | — | `CREATE` \| `UPDATE` \| `DELETE` |
-| `neo4j.cdc.topic.<T>.patterns.<N>.changesTo` | STRING | — | Comma-separated property names |
-| `neo4j.cdc.topic.<T>.key-strategy` | STRING | — | Key generation for Kafka message key |
-| `neo4j.query` | STRING | — | Cypher with `$lastCheck` param (QUERY strategy) |
-| `neo4j.query.streaming-property` | STRING | — | Return column used as cursor |
-| `neo4j.query.topic` | STRING | — | Target Kafka topic (QUERY strategy) |
-| `neo4j.query.polling-interval` | DURATION | `5s` | Poll frequency (QUERY strategy) |
-| `neo4j.query.polling-duration` | DURATION | `10s` | Poll duration (QUERY strategy) |
+| Property                                     | Type     | Default | Description                                        |
+| -------------------------------------------- | -------- | ------- | -------------------------------------------------- |
+| `connector.class`                            | STRING   | —       | `org.neo4j.connectors.kafka.source.Neo4jConnector` |
+| `neo4j.source-strategy`                      | STRING   | —       | `CDC` or `QUERY`                                   |
+| `neo4j.start-from`                           | STRING   | `NOW`   | `NOW` \| `EARLIEST` \| cursor string               |
+| `neo4j.cdc.poll-interval`                    | DURATION | `1s`    | How often to check for new changes                 |
+| `neo4j.cdc.poll-duration`                    | DURATION | `5s`    | Max duration per poll call                         |
+| `neo4j.cdc.topic.<T>.patterns.<N>.pattern`   | STRING   | —       | Entity pattern for topic T, index N                |
+| `neo4j.cdc.topic.<T>.patterns.<N>.operation` | STRING   | —       | `CREATE` \| `UPDATE` \| `DELETE`                   |
+| `neo4j.cdc.topic.<T>.patterns.<N>.changesTo` | STRING   | —       | Comma-separated property names                     |
+| `neo4j.cdc.topic.<T>.key-strategy`           | STRING   | —       | Key generation for Kafka message key               |
+| `neo4j.query`                                | STRING   | —       | Cypher with `$lastCheck` param (QUERY strategy)    |
+| `neo4j.query.streaming-property`             | STRING   | —       | Return column used as cursor                       |
+| `neo4j.query.topic`                          | STRING   | —       | Target Kafka topic (QUERY strategy)                |
+| `neo4j.query.polling-interval`               | DURATION | `5s`    | Poll frequency (QUERY strategy)                    |
+| `neo4j.query.polling-duration`               | DURATION | `10s`   | Poll duration (QUERY strategy)                     |

@@ -4,62 +4,62 @@
 **Date:** 2026-06-27  
 **Status:** Implementation-Ready  
 **Team:** LESOM Dynamics  
-**Authors:** Kevin Isom, Mercy Wairimu  
+**Authors:** Kevin Isom, Mercy Wairimu
 
 ---
 
 ## Table of Contents
 
-1. Executive Summary  
-2. Product Vision  
-3. Problem Statement  
-4. Goals and Success Metrics  
-5. User Personas  
-6. User Stories  
-7. Functional Requirements  
-8. Non-Functional Requirements  
-9. Complete Feature Breakdown  
-10. System Architecture  
-11. Application Architecture  
-12. Database Design  
-13. API Specification  
-14. Authentication & Authorization  
-15. User Roles & Permissions  
-16. Backend Services  
-17. Frontend Architecture  
-18. State Management  
-19. Data Flow  
-20. Business Logic  
-21. AI Components  
-22. Background Jobs & Queues  
-23. Event-Driven Architecture  
-24. Third-Party Integrations  
-25. Infrastructure & DevOps  
-26. CI/CD Pipeline  
-27. Security Architecture  
-28. Privacy & Compliance  
-29. Performance & Scalability Strategy  
-30. Caching Strategy  
-31. Monitoring, Logging & Observability  
-32. Error Handling  
-33. Analytics & Telemetry  
-34. Testing Strategy  
-35. Deployment Strategy  
-36. Environment Configuration  
-37. Configuration Management  
-38. Feature Flags  
-39. Data Migration Strategy  
-40. Backup & Disaster Recovery  
-41. Project Folder Structure  
-42. Technology Stack Justification  
-43. Sequence Diagrams  
-44. Architecture Diagrams  
-45. Complete Development Roadmap  
-46. MVP Scope  
-47. Post-MVP Roadmap  
-48. Risks & Mitigations  
-49. Technical Debt Considerations  
-50. Future Extensibility  
+1. Executive Summary
+2. Product Vision
+3. Problem Statement
+4. Goals and Success Metrics
+5. User Personas
+6. User Stories
+7. Functional Requirements
+8. Non-Functional Requirements
+9. Complete Feature Breakdown
+10. System Architecture
+11. Application Architecture
+12. Database Design
+13. API Specification
+14. Authentication & Authorization
+15. User Roles & Permissions
+16. Backend Services
+17. Frontend Architecture
+18. State Management
+19. Data Flow
+20. Business Logic
+21. AI Components
+22. Background Jobs & Queues
+23. Event-Driven Architecture
+24. Third-Party Integrations
+25. Infrastructure & DevOps
+26. CI/CD Pipeline
+27. Security Architecture
+28. Privacy & Compliance
+29. Performance & Scalability Strategy
+30. Caching Strategy
+31. Monitoring, Logging & Observability
+32. Error Handling
+33. Analytics & Telemetry
+34. Testing Strategy
+35. Deployment Strategy
+36. Environment Configuration
+37. Configuration Management
+38. Feature Flags
+39. Data Migration Strategy
+40. Backup & Disaster Recovery
+41. Project Folder Structure
+42. Technology Stack Justification
+43. Sequence Diagrams
+44. Architecture Diagrams
+45. Complete Development Roadmap
+46. MVP Scope
+47. Post-MVP Roadmap
+48. Risks & Mitigations
+49. Technical Debt Considerations
+50. Future Extensibility
 
 ---
 
@@ -117,27 +117,27 @@ Agricultural finance fails smallholder farmers because risk is hard to see, veri
 
 ### MVP Goals (June 27 Demo)
 
-| Goal | Metric | Target |
-|---|---|---|
-| Graph completeness | Farmer nodes with ≥3 relationship types | 100% of seeded synthetic farmers |
-| Scoring coverage | Risk tier assigned per farmer | 100% |
-| Explanation quality | Officer explanation ≤300 words, cites ≥2 graph paths | 100% |
-| SMS explanation | ≤160 characters, English and Kiswahili | 100% |
-| Demo reliability | End-to-end flow completes without error in demo | 3/3 test profiles |
-| Masumi loop | At least one live agentic data fetch with on-chain hash | Demonstrated once |
-| Featherless | Explanation generated via Featherless API | Yes |
-| Lovable | Dashboard scaffolded and shown in Lovable workspace | Yes |
+| Goal                | Metric                                                  | Target                           |
+| ------------------- | ------------------------------------------------------- | -------------------------------- |
+| Graph completeness  | Farmer nodes with ≥3 relationship types                 | 100% of seeded synthetic farmers |
+| Scoring coverage    | Risk tier assigned per farmer                           | 100%                             |
+| Explanation quality | Officer explanation ≤300 words, cites ≥2 graph paths    | 100%                             |
+| SMS explanation     | ≤160 characters, English and Kiswahili                  | 100%                             |
+| Demo reliability    | End-to-end flow completes without error in demo         | 3/3 test profiles                |
+| Masumi loop         | At least one live agentic data fetch with on-chain hash | Demonstrated once                |
+| Featherless         | Explanation generated via Featherless API               | Yes                              |
+| Lovable             | Dashboard scaffolded and shown in Lovable workspace     | Yes                              |
 
 ### Post-MVP (3–6 months)
 
-| Goal | Metric | Target |
-|---|---|---|
-| Pilot SACCO onboarding | Active loan officers using dashboard | 5 |
-| Farmer profiles in graph | Verified, consented farmer nodes | 1,000 |
-| Approval rate delta | Collateral-free approvals vs baseline | +15% |
-| Decision time | Officer time-to-decision vs manual baseline | -60% |
-| Farmer engagement | Farmers who received SMS and responded or re-applied | >30% |
-| Data agent uptime | Masumi agent jobs completing successfully | >95% |
+| Goal                     | Metric                                               | Target |
+| ------------------------ | ---------------------------------------------------- | ------ |
+| Pilot SACCO onboarding   | Active loan officers using dashboard                 | 5      |
+| Farmer profiles in graph | Verified, consented farmer nodes                     | 1,000  |
+| Approval rate delta      | Collateral-free approvals vs baseline                | +15%   |
+| Decision time            | Officer time-to-decision vs manual baseline          | -60%   |
+| Farmer engagement        | Farmers who received SMS and responded or re-applied | >30%   |
+| Data agent uptime        | Masumi agent jobs completing successfully            | >95%   |
 
 ---
 
@@ -428,7 +428,7 @@ raw_score = (
 System prompt (fixed, not user-editable):
 
 ```
-You are a factual translator for an agricultural credit scoring system. You will receive a structured JSON object containing graph-derived risk scoring facts about a farmer. Your task is to rewrite these facts as clear, plain-language prose in the target language. 
+You are a factual translator for an agricultural credit scoring system. You will receive a structured JSON object containing graph-derived risk scoring facts about a farmer. Your task is to rewrite these facts as clear, plain-language prose in the target language.
 
 STRICT RULES:
 1. Only use facts present in the input JSON. Do not infer, invent, or add any information not in the JSON.
@@ -452,6 +452,7 @@ User prompt: structured JSON from scoring engine + metadata.
 - If validation fails: retry once with adjusted prompt. If second attempt fails: return fallback template (hardcoded, graph-fact-filled string, no LLM).
 
 **Fallback templates (Kiswahili, Tier 2):**
+
 > `"Ombi lako limepitiwa. Rekodi yako ya kulipa katika [cooperative_name] ni nzuri. Endelea kulipa kwa wakati."`
 
 **Failure modes:**
@@ -599,14 +600,14 @@ User prompt: structured JSON from scoring engine + metadata.
 
 ### Performance
 
-| Metric | Target |
-|---|---|
-| Farmer profile page load (P95) | <3 seconds |
-| Scoring engine response | <15 seconds (cold), <2 seconds (cached) |
-| Explanation generation | <10 seconds |
-| Graph query (depth-1 neighbourhood) | <500ms |
-| SMS delivery initiation | <5 seconds after officer action |
-| API endpoints (non-scoring) | <500ms P99 |
+| Metric                              | Target                                  |
+| ----------------------------------- | --------------------------------------- |
+| Farmer profile page load (P95)      | <3 seconds                              |
+| Scoring engine response             | <15 seconds (cold), <2 seconds (cached) |
+| Explanation generation              | <10 seconds                             |
+| Graph query (depth-1 neighbourhood) | <500ms                                  |
+| SMS delivery initiation             | <5 seconds after officer action         |
+| API endpoints (non-scoring)         | <500ms P99                              |
 
 ### Scalability
 
@@ -650,33 +651,33 @@ User prompt: structured JSON from scoring engine + metadata.
 
 ## 9. Complete Feature Breakdown
 
-| Feature ID | Feature Name | Priority | Complexity | Owner | MVP |
-|---|---|---|---|---|---|
-| F-001 | Farmer identity resolution | P0 | High | Kevin | Yes |
-| F-002 | Graph schema population | P0 | High | Kevin | Yes |
-| F-003 | GDS scoring engine | P0 | High | Kevin | Yes |
-| F-004 | Explanation engine (officer) | P0 | Medium | Kevin | Yes |
-| F-005 | Explanation engine (farmer/SMS) | P0 | Medium | Kevin | Yes |
-| F-006 | Officer dashboard — farmer profile | P0 | High | Mercy | Yes |
-| F-007 | Officer dashboard — graph visualisation | P0 | Medium | Mercy | Yes |
-| F-008 | Officer dashboard — actions (approve/deny/annotate) | P0 | Medium | Mercy | Yes |
-| F-009 | Masumi orchestrator agent | P1 | High | Kevin | Yes (demo) |
-| F-010 | Masumi cooperative data agent | P1 | High | Kevin | Yes (demo) |
-| F-011 | Masumi climate data agent | P1 | Medium | Kevin | Yes (demo) |
-| F-012 | USSD/SMS mockup | P0 | Low | Mercy | Yes |
-| F-013 | Synthetic data seeder | P0 | Low | Kevin | Yes |
-| F-014 | Auth — login/JWT | P0 | Low | Kevin | Yes |
-| F-015 | Role-based access control | P0 | Low | Kevin | Yes |
-| F-016 | Decision audit trail | P1 | Medium | Kevin | Yes |
-| F-017 | Officer tier override | P1 | Low | Mercy | Yes |
-| F-018 | Data enrichment request (officer-triggered) | P1 | Medium | Kevin | Yes |
-| F-019 | Branch analytics dashboard | P2 | Medium | Mercy | No |
-| F-020 | CSV data upload | P1 | Medium | Kevin | Yes |
-| F-021 | Consent management | P1 | Medium | Kevin | Yes |
-| F-022 | Bias detection flag | P2 | High | Kevin | No |
-| F-023 | Africa's Talking SMS integration | P2 | Low | Kevin | No |
-| F-024 | Masumi mobile money agent | P2 | High | Kevin | No |
-| F-025 | Insurance use case module | P3 | Very High | Kevin | No |
+| Feature ID | Feature Name                                        | Priority | Complexity | Owner | MVP        |
+| ---------- | --------------------------------------------------- | -------- | ---------- | ----- | ---------- |
+| F-001      | Farmer identity resolution                          | P0       | High       | Kevin | Yes        |
+| F-002      | Graph schema population                             | P0       | High       | Kevin | Yes        |
+| F-003      | GDS scoring engine                                  | P0       | High       | Kevin | Yes        |
+| F-004      | Explanation engine (officer)                        | P0       | Medium     | Kevin | Yes        |
+| F-005      | Explanation engine (farmer/SMS)                     | P0       | Medium     | Kevin | Yes        |
+| F-006      | Officer dashboard — farmer profile                  | P0       | High       | Mercy | Yes        |
+| F-007      | Officer dashboard — graph visualisation             | P0       | Medium     | Mercy | Yes        |
+| F-008      | Officer dashboard — actions (approve/deny/annotate) | P0       | Medium     | Mercy | Yes        |
+| F-009      | Masumi orchestrator agent                           | P1       | High       | Kevin | Yes (demo) |
+| F-010      | Masumi cooperative data agent                       | P1       | High       | Kevin | Yes (demo) |
+| F-011      | Masumi climate data agent                           | P1       | Medium     | Kevin | Yes (demo) |
+| F-012      | USSD/SMS mockup                                     | P0       | Low        | Mercy | Yes        |
+| F-013      | Synthetic data seeder                               | P0       | Low        | Kevin | Yes        |
+| F-014      | Auth — login/JWT                                    | P0       | Low        | Kevin | Yes        |
+| F-015      | Role-based access control                           | P0       | Low        | Kevin | Yes        |
+| F-016      | Decision audit trail                                | P1       | Medium     | Kevin | Yes        |
+| F-017      | Officer tier override                               | P1       | Low        | Mercy | Yes        |
+| F-018      | Data enrichment request (officer-triggered)         | P1       | Medium     | Kevin | Yes        |
+| F-019      | Branch analytics dashboard                          | P2       | Medium     | Mercy | No         |
+| F-020      | CSV data upload                                     | P1       | Medium     | Kevin | Yes        |
+| F-021      | Consent management                                  | P1       | Medium     | Kevin | Yes        |
+| F-022      | Bias detection flag                                 | P2       | High       | Kevin | No         |
+| F-023      | Africa's Talking SMS integration                    | P2       | Low        | Kevin | No         |
+| F-024      | Masumi mobile money agent                           | P2       | High       | Kevin | No         |
+| F-025      | Insurance use case module                           | P3       | Very High  | Kevin | No         |
 
 ---
 
@@ -1318,21 +1319,21 @@ def require_role(*roles: str):
 
 ## 15. User Roles & Permissions
 
-| Permission | LOAN_OFFICER | CREDIT_MANAGER | ADMIN | AGENT_OPERATOR |
-|---|:---:|:---:|:---:|:---:|
-| Search / view farmers | ✓ | ✓ | ✓ | — |
-| Run / view scoring | ✓ | ✓ | ✓ | — |
-| Generate explanation | ✓ | ✓ | ✓ | — |
-| Create decision | ✓ | ✓ | ✓ | — |
-| Override tier | ✓ | ✓ | ✓ | — |
-| View own-branch decisions | ✓ | ✓ | ✓ | — |
-| View all-branch decisions | — | ✓ | ✓ | — |
-| View analytics | — | ✓ | ✓ | — |
-| Upload CSV | ✓ | ✓ | ✓ | — |
-| Manage users | — | — | ✓ | — |
-| View agent jobs | — | — | ✓ | ✓ |
-| Retry agent jobs | — | — | ✓ | — |
-| Toggle feature flags | — | — | ✓ | — |
+| Permission                | LOAN_OFFICER | CREDIT_MANAGER | ADMIN | AGENT_OPERATOR |
+| ------------------------- | :----------: | :------------: | :---: | :------------: |
+| Search / view farmers     |      ✓       |       ✓        |   ✓   |       —        |
+| Run / view scoring        |      ✓       |       ✓        |   ✓   |       —        |
+| Generate explanation      |      ✓       |       ✓        |   ✓   |       —        |
+| Create decision           |      ✓       |       ✓        |   ✓   |       —        |
+| Override tier             |      ✓       |       ✓        |   ✓   |       —        |
+| View own-branch decisions |      ✓       |       ✓        |   ✓   |       —        |
+| View all-branch decisions |      —       |       ✓        |   ✓   |       —        |
+| View analytics            |      —       |       ✓        |   ✓   |       —        |
+| Upload CSV                |      ✓       |       ✓        |   ✓   |       —        |
+| Manage users              |      —       |       —        |   ✓   |       —        |
+| View agent jobs           |      —       |       —        |   ✓   |       ✓        |
+| Retry agent jobs          |      —       |       —        |   ✓   |       —        |
+| Toggle feature flags      |      —       |       —        |   ✓   |       —        |
 
 Row-level security: all decision queries filter on `branch_id` from the JWT claim. Enforced at service layer, not just UI.
 
@@ -1421,20 +1422,27 @@ const router = createBrowserRouter([
 
 ```typescript
 // Force simulation
-const simulation = d3.forceSimulation(nodes)
-  .force("link",      d3.forceLink(edges).id(d => d.id).distance(90))
-  .force("charge",    d3.forceManyBody().strength(-250))
-  .force("center",    d3.forceCenter(width / 2, height / 2))
+const simulation = d3
+  .forceSimulation(nodes)
+  .force(
+    "link",
+    d3
+      .forceLink(edges)
+      .id((d) => d.id)
+      .distance(90),
+  )
+  .force("charge", d3.forceManyBody().strength(-250))
+  .force("center", d3.forceCenter(width / 2, height / 2))
   .force("collision", d3.forceCollide(32));
 
 // Node colour by type
 const nodeColor: Record<string, string> = {
-  Farmer:         "#1D9E75",
-  Cooperative:    "#1D9E75",
-  PeerGroup:      "#7F77DD",
-  InputDealer:    "#7F77DD",
-  ClimateRiskZone:"#EF9F27",  // amber if risk flagged
-  default:        "#B4B2A9",
+  Farmer: "#1D9E75",
+  Cooperative: "#1D9E75",
+  PeerGroup: "#7F77DD",
+  InputDealer: "#7F77DD",
+  ClimateRiskZone: "#EF9F27", // amber if risk flagged
+  default: "#B4B2A9",
 };
 ```
 
@@ -1473,12 +1481,12 @@ interface AppStore {
 
 // TanStack Query key factory (prevents stale key collisions)
 export const queryKeys = {
-  farmer:       (id: string) => ["farmer", id],
-  scoring:      (id: string) => ["scoring", id],
-  decisions:    (id: string) => ["decisions", id],
-  graph:        (id: string) => ["graph", id],
-  explanation:  (id: string, aud: string, lang: string) => ["explanation", id, aud, lang],
-  branchLog:    (params: object) => ["branch-decisions", params],
+  farmer: (id: string) => ["farmer", id],
+  scoring: (id: string) => ["scoring", id],
+  decisions: (id: string) => ["decisions", id],
+  graph: (id: string) => ["graph", id],
+  explanation: (id: string, aud: string, lang: string) => ["explanation", id, aud, lang],
+  branchLog: (params: object) => ["branch-decisions", params],
 };
 ```
 
@@ -1488,8 +1496,8 @@ Query configuration defaults:
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime:        5 * 60 * 1000,   // 5 min
-      gcTime:           30 * 60 * 1000,  // 30 min
+      staleTime: 5 * 60 * 1000, // 5 min
+      gcTime: 30 * 60 * 1000, // 30 min
       refetchOnWindowFocus: true,
       retry: 2,
     },
@@ -1497,9 +1505,9 @@ const queryClient = new QueryClient({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["farmer"] });
         queryClient.invalidateQueries({ queryKey: ["decisions"] });
-      }
-    }
-  }
+      },
+    },
+  },
 });
 ```
 
@@ -1590,12 +1598,12 @@ Celery beat (every 6h) → enrichment_tasks.check_graph_completeness
 
 ### Risk tier to lending action mapping
 
-| Tier | Label | Recommended action | Suggested product |
-|---|---|---|---|
-| 1 | Excellent | Approve, standard terms | Standard input credit |
-| 2 | Creditworthy | Approve, consider climate product | Input credit + drought-indexed insurance |
-| 3 | Marginal | Request more info; co-operative chair endorsement | Group lending product |
-| 4 | High Risk | Decline individual; refer to group product | Cooperative group loan |
+| Tier | Label        | Recommended action                                | Suggested product                        |
+| ---- | ------------ | ------------------------------------------------- | ---------------------------------------- |
+| 1    | Excellent    | Approve, standard terms                           | Standard input credit                    |
+| 2    | Creditworthy | Approve, consider climate product                 | Input credit + drought-indexed insurance |
+| 3    | Marginal     | Request more info; co-operative chair endorsement | Group lending product                    |
+| 4    | High Risk    | Decline individual; refer to group product        | Cooperative group loan                   |
 
 These mappings are displayed as non-binding guidance in the action panel. Final decision is the officer's.
 
@@ -1790,17 +1798,17 @@ Query `decision_log` for `sms_status = 'FAILED'` and `sms_sent_at < NOW() - INTE
 
 ### Event catalog
 
-| Event | Trigger | Consumer(s) | Side effect |
-|---|---|---|---|
-| `farmer.scored` | ScoringService completes | ExplanationService | Pre-generate and cache both officer + farmer explanations |
-| `farmer.enriched` | Masumi agent confirms delivery | ScoringService | Invalidate scoring cache; re-score farmer |
-| `decision.created` | Officer POSTs decision | SMSService, AuditLogger | Queue SMS send; snapshot scoring payload to PostgreSQL |
-| `sms.delivered` | Africa's Talking webhook | DecisionLog | Update `sms_status` to DELIVERED |
-| `sms.failed` | AT webhook or retry exhausted | AlertService | Log; notify officer via dashboard toast (next load) |
-| `farmer.consent_revoked` | Consent management | All caches, IngestionService | Purge PII from Redis; block future enrichment |
-| `masumi.job.delivered` | ClimateDataAgent confirms | IngestionService | Write to Neo4j staging queue; update completeness |
-| `masumi.job.failed` | Escrow timeout (Masumi) | OrchestratorAgent | Retry or cancel; log alert |
-| `identity.conflict` | IdentityService detects dupe national_id | AdminAlertService | Create ticket in admin queue |
+| Event                    | Trigger                                  | Consumer(s)                  | Side effect                                               |
+| ------------------------ | ---------------------------------------- | ---------------------------- | --------------------------------------------------------- |
+| `farmer.scored`          | ScoringService completes                 | ExplanationService           | Pre-generate and cache both officer + farmer explanations |
+| `farmer.enriched`        | Masumi agent confirms delivery           | ScoringService               | Invalidate scoring cache; re-score farmer                 |
+| `decision.created`       | Officer POSTs decision                   | SMSService, AuditLogger      | Queue SMS send; snapshot scoring payload to PostgreSQL    |
+| `sms.delivered`          | Africa's Talking webhook                 | DecisionLog                  | Update `sms_status` to DELIVERED                          |
+| `sms.failed`             | AT webhook or retry exhausted            | AlertService                 | Log; notify officer via dashboard toast (next load)       |
+| `farmer.consent_revoked` | Consent management                       | All caches, IngestionService | Purge PII from Redis; block future enrichment             |
+| `masumi.job.delivered`   | ClimateDataAgent confirms                | IngestionService             | Write to Neo4j staging queue; update completeness         |
+| `masumi.job.failed`      | Escrow timeout (Masumi)                  | OrchestratorAgent            | Retry or cancel; log alert                                |
+| `identity.conflict`      | IdentityService detects dupe national_id | AdminAlertService            | Create ticket in admin queue                              |
 
 Events implemented as Celery task dispatches in MVP. Full async event bus (Redis Streams or Kafka) is Phase 2.
 
@@ -1900,7 +1908,7 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    environment: {POSTGRES_DB: mizizi, POSTGRES_USER: mizizi, POSTGRES_PASSWORD: mizizi}
+    environment: { POSTGRES_DB: mizizi, POSTGRES_USER: mizizi, POSTGRES_PASSWORD: mizizi }
     volumes: ["postgres_data:/var/lib/postgresql/data"]
     ports: ["5432:5432"]
 
@@ -1926,19 +1934,19 @@ services:
     image: masuminetwork/registry-service:latest
     ports: ["3000:3000"]
 
-volumes: {postgres_data, redis_data, neo4j_data}
+volumes: { postgres_data, redis_data, neo4j_data }
 ```
 
 ### Production hosting (Fly.io)
 
 Primary region: `jnb` (Johannesburg — lowest latency to Kenya).
 
-| Service | Fly app name | Machines | Memory | Public? |
-|---|---|---|---|---|
-| API | `mizizi-api` | 2 (auto-scale 5) | 512MB | Yes (HTTPS) |
-| Worker | `mizizi-worker` | 1 | 512MB | No |
-| Agents | `mizizi-agents` | 1 | 256MB | No |
-| Dashboard | `mizizi-dashboard` | Static / Vercel | — | Yes (CDN) |
+| Service   | Fly app name       | Machines         | Memory | Public?     |
+| --------- | ------------------ | ---------------- | ------ | ----------- |
+| API       | `mizizi-api`       | 2 (auto-scale 5) | 512MB  | Yes (HTTPS) |
+| Worker    | `mizizi-worker`    | 1                | 512MB  | No          |
+| Agents    | `mizizi-agents`    | 1                | 256MB  | No          |
+| Dashboard | `mizizi-dashboard` | Static / Vercel  | —      | Yes (CDN)   |
 
 All internal services communicate over Fly private WireGuard network (`.internal` DNS). Neo4j AuraDB, Featherless, Masumi, Open-Meteo, ICPAC, Africa's Talking accessed over public TLS.
 
@@ -2024,31 +2032,31 @@ jobs:
 
 ### Threat model summary
 
-| Threat | Mitigation |
-|---|---|
-| Unauthorized data access | JWT RBAC + branch_id row-level filter at service layer |
-| PII data breach (DB) | AES-256 column encryption; national_id + phone never in logs |
-| LLM prompt injection | System prompt server-side; user input never in system prompt; no raw PII in LLM calls |
-| SQL/Cypher injection | SQLAlchemy ORM + parameterised Cypher (`$param` only); zero string interpolation |
-| SSRF via agents | Strict allowlist: Open-Meteo, ICPAC, registered cooperative URLs only |
-| Masumi escrow manipulation | Masumi SDK handles contract; app only signs job delivery hash; cannot modify escrow |
-| Brute-force login | Redis rate limit: 5 attempts per 10min per IP; lockout with 429 response |
-| JWT theft | 1h access token TTL; HttpOnly refresh cookie; rotation on every refresh |
-| Supply chain | `pip-audit` + `npm audit` in CI; pinned dependency versions in `requirements.txt` |
-| AT webhook spoofing | HMAC signature verification on every inbound webhook |
+| Threat                     | Mitigation                                                                            |
+| -------------------------- | ------------------------------------------------------------------------------------- |
+| Unauthorized data access   | JWT RBAC + branch_id row-level filter at service layer                                |
+| PII data breach (DB)       | AES-256 column encryption; national_id + phone never in logs                          |
+| LLM prompt injection       | System prompt server-side; user input never in system prompt; no raw PII in LLM calls |
+| SQL/Cypher injection       | SQLAlchemy ORM + parameterised Cypher (`$param` only); zero string interpolation      |
+| SSRF via agents            | Strict allowlist: Open-Meteo, ICPAC, registered cooperative URLs only                 |
+| Masumi escrow manipulation | Masumi SDK handles contract; app only signs job delivery hash; cannot modify escrow   |
+| Brute-force login          | Redis rate limit: 5 attempts per 10min per IP; lockout with 429 response              |
+| JWT theft                  | 1h access token TTL; HttpOnly refresh cookie; rotation on every refresh               |
+| Supply chain               | `pip-audit` + `npm audit` in CI; pinned dependency versions in `requirements.txt`     |
+| AT webhook spoofing        | HMAC signature verification on every inbound webhook                                  |
 
 ### Data classification and handling
 
-| Data | Class | Storage | Encryption | Logged? |
-|---|---|---|---|---|
-| National ID | Restricted | Neo4j (node property) | AES-256 | Never |
-| Phone number | Restricted | Neo4j + PostgreSQL | AES-256; SHA-256 hash for matching | Never |
-| Full name | Confidential | Neo4j | None | First name only, truncated |
-| Repayment history | Confidential | Neo4j | None | Aggregates only |
-| Risk tier + score | Internal | PostgreSQL + Redis | None | Yes |
-| SMS content | Confidential | PostgreSQL | Column-level | No |
-| Masumi tx hashes | Internal | Neo4j + PostgreSQL | None | Yes |
-| API access logs | Internal | Log platform | None | Yes (no PII fields) |
+| Data              | Class        | Storage               | Encryption                         | Logged?                    |
+| ----------------- | ------------ | --------------------- | ---------------------------------- | -------------------------- |
+| National ID       | Restricted   | Neo4j (node property) | AES-256                            | Never                      |
+| Phone number      | Restricted   | Neo4j + PostgreSQL    | AES-256; SHA-256 hash for matching | Never                      |
+| Full name         | Confidential | Neo4j                 | None                               | First name only, truncated |
+| Repayment history | Confidential | Neo4j                 | None                               | Aggregates only            |
+| Risk tier + score | Internal     | PostgreSQL + Redis    | None                               | Yes                        |
+| SMS content       | Confidential | PostgreSQL            | Column-level                       | No                         |
+| Masumi tx hashes  | Internal     | Neo4j + PostgreSQL    | None                               | Yes                        |
+| API access logs   | Internal     | Log platform          | None                               | Yes (no PII fields)        |
 
 ### Network security
 
@@ -2077,15 +2085,15 @@ All internal services on Fly private network (not internet-accessible). Only the
 
 ### Data retention schedule
 
-| Data type | Retention | Purge mechanism |
-|---|---|---|
-| Farmer PII | Consent active + 7 years | Manual admin action; automated 7-year cron |
-| Decision log | 10 years (regulatory) | Manual admin only |
-| Masumi job logs | 3 years | Automated nightly cron |
-| SMS content | 2 years | Automated nightly cron |
-| Scoring snapshots | 5 years | Automated nightly cron |
-| API access logs | 90 days | Log platform retention policy |
-| Redis cache | TTL-based | Auto-expiry |
+| Data type         | Retention                | Purge mechanism                            |
+| ----------------- | ------------------------ | ------------------------------------------ |
+| Farmer PII        | Consent active + 7 years | Manual admin action; automated 7-year cron |
+| Decision log      | 10 years (regulatory)    | Manual admin only                          |
+| Masumi job logs   | 3 years                  | Automated nightly cron                     |
+| SMS content       | 2 years                  | Automated nightly cron                     |
+| Scoring snapshots | 5 years                  | Automated nightly cron                     |
+| API access logs   | 90 days                  | Log platform retention policy              |
+| Redis cache       | TTL-based                | Auto-expiry                                |
 
 ---
 
@@ -2123,18 +2131,18 @@ All internal services on Fly private network (not internet-accessible). Only the
 
 ## 30. Caching Strategy
 
-| Target | Key | TTL | Invalidation |
-|---|---|---|---|
-| Scoring result | `scoring:{farmer_id}:latest` | 1h | Force refresh; new data ingested; scoring version bump |
-| Officer explanation | `explanation:{id}:OFFICER:EN:{ver}` | 24h | Scoring version change |
-| Farmer SMS (SW) | `explanation:{id}:FARMER:SW:{ver}` | 24h | Scoring version change |
-| Farmer SMS (EN) | `explanation:{id}:FARMER:EN:{ver}` | 24h | Scoring version change |
-| Farmer profile (graph) | `profile:{farmer_id}` | 15m | New decision or enrichment event |
-| Feature flags | `feature_flags` | 5m | Flag updated in DB |
-| Louvain communities | `gds:louvain:{cooperative_id}` | 6h | New Farmer node added to cooperative |
-| Cooperative stats | `coop:stats:{cooperative_id}` | 1h | `update_cooperative_stats` task |
-| ICPAC zone data | `icpac:{zone_id}:{season}` | 24h | Season boundary |
-| Open-Meteo data | `openmeteo:{geohash}` | 24h | Daily refresh |
+| Target                 | Key                                 | TTL | Invalidation                                           |
+| ---------------------- | ----------------------------------- | --- | ------------------------------------------------------ |
+| Scoring result         | `scoring:{farmer_id}:latest`        | 1h  | Force refresh; new data ingested; scoring version bump |
+| Officer explanation    | `explanation:{id}:OFFICER:EN:{ver}` | 24h | Scoring version change                                 |
+| Farmer SMS (SW)        | `explanation:{id}:FARMER:SW:{ver}`  | 24h | Scoring version change                                 |
+| Farmer SMS (EN)        | `explanation:{id}:FARMER:EN:{ver}`  | 24h | Scoring version change                                 |
+| Farmer profile (graph) | `profile:{farmer_id}`               | 15m | New decision or enrichment event                       |
+| Feature flags          | `feature_flags`                     | 5m  | Flag updated in DB                                     |
+| Louvain communities    | `gds:louvain:{cooperative_id}`      | 6h  | New Farmer node added to cooperative                   |
+| Cooperative stats      | `coop:stats:{cooperative_id}`       | 1h  | `update_cooperative_stats` task                        |
+| ICPAC zone data        | `icpac:{zone_id}:{season}`          | 24h | Season boundary                                        |
+| Open-Meteo data        | `openmeteo:{geohash}`               | 24h | Daily refresh                                          |
 
 All caches use cache-aside pattern. No write-through. On cache miss: compute from primary store, write to cache, return. On cache error: log warning, compute from primary store (no hard failure on cache miss).
 
@@ -2183,15 +2191,15 @@ cache_hit_ratio = Gauge("mizizi_cache_hit_ratio", "Cache hit ratio", ["cache_typ
 
 ### Alerting rules
 
-| Condition | Threshold | Channel |
-|---|---|---|
-| API 5xx rate | >5% over 5min | Slack #alerts |
-| Scoring service degraded | No successful score in 10min | Slack #alerts + PagerDuty |
-| Neo4j connection failures | >3 in 1min | Slack #alerts |
-| SMS failure rate | >20% over 1h | Slack #alerts |
-| Masumi job failure rate | >50% over 6h | Slack #alerts |
-| Bias flag triggered | Any `POTENTIAL_BIAS_DETECTED` event | Email admin |
-| Cache hit ratio | <40% on scoring cache | Slack #warnings |
+| Condition                 | Threshold                           | Channel                   |
+| ------------------------- | ----------------------------------- | ------------------------- |
+| API 5xx rate              | >5% over 5min                       | Slack #alerts             |
+| Scoring service degraded  | No successful score in 10min        | Slack #alerts + PagerDuty |
+| Neo4j connection failures | >3 in 1min                          | Slack #alerts             |
+| SMS failure rate          | >20% over 1h                        | Slack #alerts             |
+| Masumi job failure rate   | >50% over 6h                        | Slack #alerts             |
+| Bias flag triggered       | Any `POTENTIAL_BIAS_DETECTED` event | Email admin               |
+| Cache hit ratio           | <40% on scoring cache               | Slack #warnings           |
 
 ### Distributed tracing
 
@@ -2208,7 +2216,7 @@ OpenTelemetry (OTLP) with trace propagation across: FastAPI → Celery tasks →
   "error": {
     "code": "SCORING_TIMEOUT",
     "message": "Scoring is taking longer than expected. A cached result has been returned.",
-    "detail": {"cached": true, "cached_at": "2026-06-27T09:00:00Z", "cache_age_seconds": 1800},
+    "detail": { "cached": true, "cached_at": "2026-06-27T09:00:00Z", "cache_age_seconds": 1800 },
     "request_id": "req_abc123"
   }
 }
@@ -2216,27 +2224,27 @@ OpenTelemetry (OTLP) with trace propagation across: FastAPI → Celery tasks →
 
 ### Complete error code reference
 
-| Code | HTTP | Description |
-|---|---|---|
-| `INVALID_CREDENTIALS` | 401 | Wrong email or password |
-| `TOKEN_EXPIRED` | 401 | Access token expired |
-| `TOKEN_REVOKED` | 401 | Refresh token revoked |
-| `FORBIDDEN` | 403 | Insufficient role |
-| `CONSENT_REQUIRED` | 403 | No active consent for this farmer |
-| `FARMER_NOT_FOUND` | 404 | No Farmer node with given ID |
-| `NO_SCORE_AVAILABLE` | 404 | Farmer never scored |
-| `IDENTITY_CONFLICT` | 409 | Duplicate national ID across two farmer nodes |
-| `INVALID_OVERRIDE_REASON` | 422 | Override reason <20 characters |
-| `INVALID_CSV_FORMAT` | 422 | CSV missing required columns or malformed |
-| `CSV_TOO_LARGE` | 413 | CSV exceeds 10MB |
-| `SCORING_UNAVAILABLE` | 503 | GDS down, no cache available |
-| `SCORING_TIMEOUT` | 200+flag | GDS slow; cached result returned |
-| `EXPLANATION_FALLBACK` | 200+flag | Featherless unavailable; template used |
-| `INSUFFICIENT_DATA` | 200+flag | Low completeness; tier is advisory |
-| `SMS_SEND_FAILED` | 200+flag | SMS failed; decision still recorded |
-| `STALE_CLIMATE_DATA` | 200+flag | Climate zone data older than current season |
-| `GDS_FALLBACK` | 200+flag | Cypher-only scoring used (GDS unavailable) |
-| `ICPAC_FALLBACK` | 200+flag | Open-Meteo used as drought proxy |
+| Code                      | HTTP     | Description                                   |
+| ------------------------- | -------- | --------------------------------------------- |
+| `INVALID_CREDENTIALS`     | 401      | Wrong email or password                       |
+| `TOKEN_EXPIRED`           | 401      | Access token expired                          |
+| `TOKEN_REVOKED`           | 401      | Refresh token revoked                         |
+| `FORBIDDEN`               | 403      | Insufficient role                             |
+| `CONSENT_REQUIRED`        | 403      | No active consent for this farmer             |
+| `FARMER_NOT_FOUND`        | 404      | No Farmer node with given ID                  |
+| `NO_SCORE_AVAILABLE`      | 404      | Farmer never scored                           |
+| `IDENTITY_CONFLICT`       | 409      | Duplicate national ID across two farmer nodes |
+| `INVALID_OVERRIDE_REASON` | 422      | Override reason <20 characters                |
+| `INVALID_CSV_FORMAT`      | 422      | CSV missing required columns or malformed     |
+| `CSV_TOO_LARGE`           | 413      | CSV exceeds 10MB                              |
+| `SCORING_UNAVAILABLE`     | 503      | GDS down, no cache available                  |
+| `SCORING_TIMEOUT`         | 200+flag | GDS slow; cached result returned              |
+| `EXPLANATION_FALLBACK`    | 200+flag | Featherless unavailable; template used        |
+| `INSUFFICIENT_DATA`       | 200+flag | Low completeness; tier is advisory            |
+| `SMS_SEND_FAILED`         | 200+flag | SMS failed; decision still recorded           |
+| `STALE_CLIMATE_DATA`      | 200+flag | Climate zone data older than current season   |
+| `GDS_FALLBACK`            | 200+flag | Cypher-only scoring used (GDS unavailable)    |
+| `ICPAC_FALLBACK`          | 200+flag | Open-Meteo used as drought proxy              |
 
 ### Frontend error handling
 
@@ -2255,20 +2263,20 @@ OpenTelemetry (OTLP) with trace propagation across: FastAPI → Celery tasks →
 
 ### Server-side events (PostgreSQL `analytics_events`)
 
-| Event | Properties |
-|---|---|
-| `officer.login` | `{user_id, branch_id}` |
-| `farmer.profile_viewed` | `{farmer_id, tier, data_completeness}` |
-| `scoring.run` | `{farmer_id, tier, duration_ms, cached, gds_fallback}` |
+| Event                   | Properties                                               |
+| ----------------------- | -------------------------------------------------------- | -------- |
+| `officer.login`         | `{user_id, branch_id}`                                   |
+| `farmer.profile_viewed` | `{farmer_id, tier, data_completeness}`                   |
+| `scoring.run`           | `{farmer_id, tier, duration_ms, cached, gds_fallback}`   |
 | `explanation.generated` | `{farmer_id, audience, language, fallback, duration_ms}` |
-| `decision.created` | `{farmer_id, decision, tier_system, override: bool}` |
-| `sms.sent` | `{farmer_id, language, status}` |
-| `enrichment.requested` | `{farmer_id, data_types, triggered_by: "officer"|"auto"}` |
-| `masumi.job.created` | `{job_type, agent_did}` |
-| `masumi.job.delivered` | `{job_type, duration_ms, usdm_amount}` |
-| `masumi.job.failed` | `{job_type, error_code}` |
-| `identity.merged` | `{farmer_id, confidence, matched_fields}` |
-| `identity.conflict` | `{national_id_hash, farmer_ids}` |
+| `decision.created`      | `{farmer_id, decision, tier_system, override: bool}`     |
+| `sms.sent`              | `{farmer_id, language, status}`                          |
+| `enrichment.requested`  | `{farmer_id, data_types, triggered_by: "officer"         | "auto"}` |
+| `masumi.job.created`    | `{job_type, agent_did}`                                  |
+| `masumi.job.delivered`  | `{job_type, duration_ms, usdm_amount}`                   |
+| `masumi.job.failed`     | `{job_type, error_code}`                                 |
+| `identity.merged`       | `{farmer_id, confidence, matched_fields}`                |
+| `identity.conflict`     | `{national_id_hash, farmer_ids}`                         |
 
 No PII in properties. `farmer_id` is UUID only. Aggregated weekly for branch analytics dashboard (Credit Manager view).
 
@@ -2421,17 +2429,17 @@ LOG_LEVEL=INFO
 
 ## 38. Feature Flags
 
-| Flag key | Default (MVP) | Description |
-|---|---|---|
-| `masumi_agents_enabled` | `true` | Enable autonomous Masumi data agents |
-| `sms_real_delivery` | `false` | Use Africa's Talking real SMS; false = log only |
-| `bias_detection_enabled` | `false` | Run demographic parity check post-scoring |
-| `graph_viz_enabled` | `true` | Show D3 graph neighbourhood in dashboard |
-| `override_audit_strict` | `true` | Require ≥20 char reason for tier override |
-| `enrichment_auto` | `true` | Auto-trigger enrichment for low-completeness farmers |
-| `scoring_version_v2` | `false` | Experimental v2 scoring formula (GNN-based) |
-| `offline_action_queue` | `true` | Queue officer actions when offline |
-| `insurance_module` | `false` | Enable insurance risk tab on farmer profile |
+| Flag key                 | Default (MVP) | Description                                          |
+| ------------------------ | ------------- | ---------------------------------------------------- |
+| `masumi_agents_enabled`  | `true`        | Enable autonomous Masumi data agents                 |
+| `sms_real_delivery`      | `false`       | Use Africa's Talking real SMS; false = log only      |
+| `bias_detection_enabled` | `false`       | Run demographic parity check post-scoring            |
+| `graph_viz_enabled`      | `true`        | Show D3 graph neighbourhood in dashboard             |
+| `override_audit_strict`  | `true`        | Require ≥20 char reason for tier override            |
+| `enrichment_auto`        | `true`        | Auto-trigger enrichment for low-completeness farmers |
+| `scoring_version_v2`     | `false`       | Experimental v2 scoring formula (GNN-based)          |
+| `offline_action_queue`   | `true`        | Queue officer actions when offline                   |
+| `insurance_module`       | `false`       | Enable insurance risk tab on farmer profile          |
 
 Feature flag check with rollout support:
 
@@ -2530,14 +2538,14 @@ For pilot SACCO onboarding: cooperative provides CSV of farmer repayment records
 
 ### Recovery runbook
 
-| Failure | Recovery steps |
-|---|---|
-| PostgreSQL down | 1. `fly postgres failover`. 2. Verify connection string. 3. Run `alembic upgrade head`. |
-| Neo4j AuraDB down | 1. AuraDB Console: restore from latest snapshot. 2. Re-run `seed_graph.py` if demo data lost. 3. Warm GDS projections. |
-| Redis down | 1. Restart Fly Redis machine. 2. Cache warms automatically on first requests. 3. Scoring falls back to Neo4j direct queries until cache fills. |
-| API machine failure | Fly auto-restarts. If region-wide: `flyctl regions add lon` (add London region). |
-| Celery worker failure | Tasks remain in Redis broker queue. Restart worker machine: `flyctl machine restart`. |
-| Masumi Preprod outage | Use pre-recorded demo: `python demo/replay_masumi_job.py` plays back a captured Masumi transaction. |
+| Failure               | Recovery steps                                                                                                                                 |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| PostgreSQL down       | 1. `fly postgres failover`. 2. Verify connection string. 3. Run `alembic upgrade head`.                                                        |
+| Neo4j AuraDB down     | 1. AuraDB Console: restore from latest snapshot. 2. Re-run `seed_graph.py` if demo data lost. 3. Warm GDS projections.                         |
+| Redis down            | 1. Restart Fly Redis machine. 2. Cache warms automatically on first requests. 3. Scoring falls back to Neo4j direct queries until cache fills. |
+| API machine failure   | Fly auto-restarts. If region-wide: `flyctl regions add lon` (add London region).                                                               |
+| Celery worker failure | Tasks remain in Redis broker queue. Restart worker machine: `flyctl machine restart`.                                                          |
+| Masumi Preprod outage | Use pre-recorded demo: `python demo/replay_masumi_job.py` plays back a captured Masumi transaction.                                            |
 
 ---
 
@@ -2709,20 +2717,20 @@ mizizi/
 
 ## 42. Technology Stack Justification
 
-| Component | Choice | Justification |
-|---|---|---|
-| Graph DB | Neo4j Aura + GDS | Competition partner; pathfinding = explanation by construction; GDS is production-grade; Louvain + centrality cover all scoring dimensions without custom algorithm code |
-| API framework | FastAPI (Python 3.12) | Async-native; automatic OpenAPI docs; same language as scoring and agent code; Pydantic validation throughout; large ecosystem for data/ML adjacent work |
-| Graph scoring | Neo4j GDS | Avoids maintaining custom algorithm implementations; GDS runs in-memory against the live graph; no data export required; well-tested and documented |
-| LLM provider | Featherless AI | Competition partner; open-source models deployable in SACCO environments without per-token commercial licensing; OpenAI-compatible API (minimal integration effort); Mixtral-8x7B strong on multilingual tasks including Kiswahili |
-| Agent payments | Masumi (Cardano) | Competition partner; on-chain escrow matches the data incentive use case exactly; immutable audit log aligns with consent/compliance requirements; Python SDK; Docker dev environment available |
-| Frontend | React 18 + Vite + shadcn/ui | Ecosystem maturity; TypeScript; Lovable scaffolds React natively; shadcn/ui provides accessible, clean components without opinionated styling conflicts |
-| Frontend scaffolding | Lovable | Competition partner; AI app builder reduces time on non-graph UI work; Kevin focuses on Neo4j backend, Mercy iterates on UI in Lovable; all generated code reviewed and committed |
-| Background jobs | Celery + Redis | Battle-tested queue/worker stack; task routing per queue; beat scheduler; idempotent retry semantics; simple to monitor |
-| Auth | JWT RS256 | Asymmetric signing; public key distributable; 1-hour TTL; HttpOnly cookie for refresh; standard and well-understood |
-| SMS gateway | Africa's Talking | Dominant provider in Kenya/East Africa; USSD support; sandbox mode for development; reliable delivery webhook |
-| Hosting | Fly.io | Docker-native; low cost; Johannesburg region (lowest latency to Kenya); managed Postgres + Redis; simple CLI deploy |
-| ORM | SQLAlchemy (async) + Alembic | Production-grade; async support; Alembic for reproducible migrations |
+| Component            | Choice                       | Justification                                                                                                                                                                                                                      |
+| -------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Graph DB             | Neo4j Aura + GDS             | Competition partner; pathfinding = explanation by construction; GDS is production-grade; Louvain + centrality cover all scoring dimensions without custom algorithm code                                                           |
+| API framework        | FastAPI (Python 3.12)        | Async-native; automatic OpenAPI docs; same language as scoring and agent code; Pydantic validation throughout; large ecosystem for data/ML adjacent work                                                                           |
+| Graph scoring        | Neo4j GDS                    | Avoids maintaining custom algorithm implementations; GDS runs in-memory against the live graph; no data export required; well-tested and documented                                                                                |
+| LLM provider         | Featherless AI               | Competition partner; open-source models deployable in SACCO environments without per-token commercial licensing; OpenAI-compatible API (minimal integration effort); Mixtral-8x7B strong on multilingual tasks including Kiswahili |
+| Agent payments       | Masumi (Cardano)             | Competition partner; on-chain escrow matches the data incentive use case exactly; immutable audit log aligns with consent/compliance requirements; Python SDK; Docker dev environment available                                    |
+| Frontend             | React 18 + Vite + shadcn/ui  | Ecosystem maturity; TypeScript; Lovable scaffolds React natively; shadcn/ui provides accessible, clean components without opinionated styling conflicts                                                                            |
+| Frontend scaffolding | Lovable                      | Competition partner; AI app builder reduces time on non-graph UI work; Kevin focuses on Neo4j backend, Mercy iterates on UI in Lovable; all generated code reviewed and committed                                                  |
+| Background jobs      | Celery + Redis               | Battle-tested queue/worker stack; task routing per queue; beat scheduler; idempotent retry semantics; simple to monitor                                                                                                            |
+| Auth                 | JWT RS256                    | Asymmetric signing; public key distributable; 1-hour TTL; HttpOnly cookie for refresh; standard and well-understood                                                                                                                |
+| SMS gateway          | Africa's Talking             | Dominant provider in Kenya/East Africa; USSD support; sandbox mode for development; reliable delivery webhook                                                                                                                      |
+| Hosting              | Fly.io                       | Docker-native; low cost; Johannesburg region (lowest latency to Kenya); managed Postgres + Redis; simple CLI deploy                                                                                                                |
+| ORM                  | SQLAlchemy (async) + Alembic | Production-grade; async support; Alembic for reproducible migrations                                                                                                                                                               |
 
 ---
 
@@ -2985,35 +2993,35 @@ Scoring paths (highlighted): Louvain runs on the PeerGroup + Cooperative subgrap
 
 ## 48. Risks & Mitigations
 
-| Risk | Prob | Impact | Mitigation |
-|---|---|---|---|
-| Neo4j GDS timeout on small synthetic graph | Low | Medium | Pre-warm projections at startup; fallback to Cypher-only scoring with `GDS_FALLBACK` flag |
-| Featherless API downtime | Medium | Medium | 24h explanation cache; hardcoded fallback template library for all tier × audience × language combinations |
-| Masumi Cardano Preprod instability | High | Low (demo only) | Pre-record captured Masumi tx JSON; `demo/replay_masumi_job.py` plays it back; live preferred, not blocking |
-| Kiswahili LLM output quality | Medium | High | Human-reviewed fallback templates ready for all 4 tiers; reviewer (Mercy) checks every generated SW explanation before demo |
-| PII in LLM prompt (accidental) | Low | Very High | System prompt server-side only; unit test asserts no name/phone/national_id fields in user prompt; code review gate |
-| Demo Neo4j connection failure | Low | Very High | Export graph as JSON backup before demo; static fixture server can respond to profile queries offline |
-| Scoring bias against female farmers | Medium | Very High | Manual parity check of demo dataset (5 male, 5 female with equivalent repayment); bias detection in Phase 2 |
-| Lovable-generated code quality | Medium | Medium | All scaffolded code reviewed by Kevin before commit; backend stays Kevin-owned; Mercy owns Lovable-generated frontend |
-| Six-day timeline slip (scoring critical path) | Medium | High | Scoring engine (Day 3–4) is the only blocker; dashboard and Masumi can be partially mocked if scoring slips |
-| ICPAC API unavailability | Medium | Low | Open-Meteo precipitation anomaly as drought proxy; `ICPAC_FALLBACK` flag; pre-cached zone data for demo area |
+| Risk                                          | Prob   | Impact          | Mitigation                                                                                                                  |
+| --------------------------------------------- | ------ | --------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Neo4j GDS timeout on small synthetic graph    | Low    | Medium          | Pre-warm projections at startup; fallback to Cypher-only scoring with `GDS_FALLBACK` flag                                   |
+| Featherless API downtime                      | Medium | Medium          | 24h explanation cache; hardcoded fallback template library for all tier × audience × language combinations                  |
+| Masumi Cardano Preprod instability            | High   | Low (demo only) | Pre-record captured Masumi tx JSON; `demo/replay_masumi_job.py` plays it back; live preferred, not blocking                 |
+| Kiswahili LLM output quality                  | Medium | High            | Human-reviewed fallback templates ready for all 4 tiers; reviewer (Mercy) checks every generated SW explanation before demo |
+| PII in LLM prompt (accidental)                | Low    | Very High       | System prompt server-side only; unit test asserts no name/phone/national_id fields in user prompt; code review gate         |
+| Demo Neo4j connection failure                 | Low    | Very High       | Export graph as JSON backup before demo; static fixture server can respond to profile queries offline                       |
+| Scoring bias against female farmers           | Medium | Very High       | Manual parity check of demo dataset (5 male, 5 female with equivalent repayment); bias detection in Phase 2                 |
+| Lovable-generated code quality                | Medium | Medium          | All scaffolded code reviewed by Kevin before commit; backend stays Kevin-owned; Mercy owns Lovable-generated frontend       |
+| Six-day timeline slip (scoring critical path) | Medium | High            | Scoring engine (Day 3–4) is the only blocker; dashboard and Masumi can be partially mocked if scoring slips                 |
+| ICPAC API unavailability                      | Medium | Low             | Open-Meteo precipitation anomaly as drought proxy; `ICPAC_FALLBACK` flag; pre-cached zone data for demo area                |
 
 ---
 
 ## 49. Technical Debt Considerations
 
-| Debt | Introduced by | Acceptable until | Payoff trigger |
-|---|---|---|---|
-| Synthetic data only | No real cooperative API | Pilot SACCO onboarding | First real farmer records ingested |
-| Monolithic FastAPI app | MVP speed | ~50 concurrent users | Service extraction (scoring service first) |
-| Celery on Redis broker | MVP simplicity | Production launch | Redis Streams or RabbitMQ for durability |
-| Manual GDS projection refresh | No streaming edges | >1,000 new edges/day | GDS streaming projection (Neo4j 5.x feature) |
-| Hardcoded scoring weights | Expert-set, not learned | Pilot data accumulated | Model v2 GNN (Phase 3) |
-| Polling instead of WebSocket | MVP simplicity | Officer collaboration feature | WebSocket upgrade in Phase 2 |
-| No data lineage graph | MVP scope | Regulatory audit | DataSource node extended with full lineage (Phase 3) |
-| Lovable-scaffolded frontend | Speed | Post-pilot | Incremental component rewrite as needed |
-| No rate limiting on Featherless | Low volume | >100 officers | Token bucket in Redis |
-| Cardano Preprod only | MVP | Production launch | Masumi Mainnet migration (Phase 2) |
+| Debt                            | Introduced by           | Acceptable until              | Payoff trigger                                       |
+| ------------------------------- | ----------------------- | ----------------------------- | ---------------------------------------------------- |
+| Synthetic data only             | No real cooperative API | Pilot SACCO onboarding        | First real farmer records ingested                   |
+| Monolithic FastAPI app          | MVP speed               | ~50 concurrent users          | Service extraction (scoring service first)           |
+| Celery on Redis broker          | MVP simplicity          | Production launch             | Redis Streams or RabbitMQ for durability             |
+| Manual GDS projection refresh   | No streaming edges      | >1,000 new edges/day          | GDS streaming projection (Neo4j 5.x feature)         |
+| Hardcoded scoring weights       | Expert-set, not learned | Pilot data accumulated        | Model v2 GNN (Phase 3)                               |
+| Polling instead of WebSocket    | MVP simplicity          | Officer collaboration feature | WebSocket upgrade in Phase 2                         |
+| No data lineage graph           | MVP scope               | Regulatory audit              | DataSource node extended with full lineage (Phase 3) |
+| Lovable-scaffolded frontend     | Speed                   | Post-pilot                    | Incremental component rewrite as needed              |
+| No rate limiting on Featherless | Low volume              | >100 officers                 | Token bucket in Redis                                |
+| Cardano Preprod only            | MVP                     | Production launch             | Masumi Mainnet migration (Phase 2)                   |
 
 ---
 
@@ -3073,8 +3081,8 @@ Adding Uganda or Rwanda requires:
 
 ---
 
-*End of Mizizi Technical PRD v1.0.0*
+_End of Mizizi Technical PRD v1.0.0_
 
-*Prepared by LESOM Dynamics for Kenya AI Challenge 2026 — AgriFin Finance Challenge*
+_Prepared by LESOM Dynamics for Kenya AI Challenge 2026 — AgriFin Finance Challenge_
 
-*This document is the canonical implementation specification. All architectural decisions documented herein supersede verbal specifications. Assumptions are marked inline. An AI coding agent implementing this system should begin with Section 45 (Development Roadmap) and reference individual functional requirement sections (FR-001 through FR-008) for implementation detail on each feature.*
+_This document is the canonical implementation specification. All architectural decisions documented herein supersede verbal specifications. Assumptions are marked inline. An AI coding agent implementing this system should begin with Section 45 (Development Roadmap) and reference individual functional requirement sections (FR-001 through FR-008) for implementation detail on each feature._

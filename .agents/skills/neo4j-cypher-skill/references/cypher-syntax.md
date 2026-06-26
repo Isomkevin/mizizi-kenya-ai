@@ -10,15 +10,16 @@ Version markers: `[2025.01]` = new/changed in Cypher 25 / Neo4j 2025.x — older
 
 ### Index decision table
 
-| Index type | Best for | `CONTAINS`/`ENDS WITH` | Spatial | Fulltext |
-|---|---|---|---|---|
-| `RANGE` | `=`, `>`, `<`, `STARTS WITH`, `IS NOT NULL` | Slow (use TEXT instead) | ❌ | ❌ |
-| `TEXT` | `CONTAINS`, `ENDS WITH`, `=` on strings, list `IN` with strings | ✅ | ❌ | ❌ |
-| `POINT` | `point.distance()`, `point.withinBBox()` | ❌ | ✅ | ❌ |
-| `FULLTEXT` | Lucene tokenized search; multiple labels/props | ❌ | ❌ | ✅ |
-| `COMPOSITE` | Queries always testing 2+ properties together | — | ❌ | ❌ |
+| Index type  | Best for                                                        | `CONTAINS`/`ENDS WITH`  | Spatial | Fulltext |
+| ----------- | --------------------------------------------------------------- | ----------------------- | ------- | -------- |
+| `RANGE`     | `=`, `>`, `<`, `STARTS WITH`, `IS NOT NULL`                     | Slow (use TEXT instead) | ❌      | ❌       |
+| `TEXT`      | `CONTAINS`, `ENDS WITH`, `=` on strings, list `IN` with strings | ✅                      | ❌      | ❌       |
+| `POINT`     | `point.distance()`, `point.withinBBox()`                        | ❌                      | ✅      | ❌       |
+| `FULLTEXT`  | Lucene tokenized search; multiple labels/props                  | ❌                      | ❌      | ✅       |
+| `COMPOSITE` | Queries always testing 2+ properties together                   | —                       | ❌      | ❌       |
 
 Create syntax:
+
 ```cypher
 CREATE RANGE INDEX    name IF NOT EXISTS FOR (n:Label) ON (n.prop)
 CREATE TEXT INDEX     name IF NOT EXISTS FOR (n:Label) ON (n.prop)
@@ -51,6 +52,7 @@ CREATE CONSTRAINT name IF NOT EXISTS FOR ()-[r:TYPE]-() REQUIRE r.prop IS RELATI
 ```
 
 Rules:
+
 - Add uniqueness constraint on MERGE key before loading data
 - `IF NOT EXISTS` prevents error on re-run
 - `SHOW CONSTRAINTS YIELD name, type` to inspect
@@ -204,6 +206,7 @@ RETURN n.status,
 No `least()` / `greatest()` — use `CASE WHEN a < b THEN a ELSE b END`.
 
 Conditional counting — `count(x WHERE ...)` is SQL, not Cypher:
+
 ```cypher
 // DO:
 sum(CASE WHEN r.rating = 5 THEN 1 ELSE 0 END) AS fiveStarCount
@@ -238,6 +241,7 @@ toStringOrNull(n.value)
 ```
 
 Type predicates for mixed-type properties: [2025.01]
+
 ```cypher
 MATCH (n:Event)
 WHERE n.value IS :: INTEGER NOT NULL  // true only for non-null INTEGER values
@@ -280,6 +284,7 @@ coll.sort(list)                             // [2025.01] native — replaces apo
 `2 IN [1, null, 3]` returns `null` — guard with `IS NOT NULL` before membership tests.
 
 **Pattern comprehension:**
+
 ```cypher
 MATCH (n:Person {id: $id})
 RETURN [(n)-[:KNOWS]->(f:Person) | f.name] AS friends,
@@ -325,10 +330,10 @@ elementId(n)         // STRING internal ID [replaces deprecated id(n) — pre-20
 
 ## FOREACH vs UNWIND
 
-| Use | When |
-|---|---|
+| Use                                   | When                                       |
+| ------------------------------------- | ------------------------------------------ |
 | `FOREACH (x IN list \| write-clause)` | Side-effect writes only — no RETURN needed |
-| `UNWIND list AS x` | Need to read, filter, or return list items |
+| `UNWIND list AS x`                    | Need to read, filter, or return list items |
 
 `FOREACH` cannot be followed by `RETURN` or `WITH`. When in doubt, use `UNWIND`.
 
@@ -412,6 +417,7 @@ RETURN b.name, point.distance(b.coords, $origin) AS distM
 ```
 
 POINT index (required for fast spatial queries):
+
 ```cypher
 CREATE POINT INDEX location_coords IF NOT EXISTS
 FOR (n:Location) ON (n.coords)
@@ -498,13 +504,13 @@ RETURN p.name, movieCount
 // CALL { WITH x ... } deprecated [pre-2025 form] -- use CALL (x) { ... } [2025.01]
 ```
 
-| Goal | Use |
-|---|---|
-| Boolean existence check | `EXISTS { (a)-[:R]->(b) }` |
-| Count matching subgraph | `COUNT { (a)-[:R]->(b) }` |
-| Collect related items into a list | `COLLECT { MATCH (a)-[:R]->(b) RETURN b.name }` |
-| Nullable join | `OPTIONAL MATCH` (simple) or `OPTIONAL CALL` (complex) |
-| Subquery with own aggregation or writes | `CALL (x) { ... }` |
+| Goal                                    | Use                                                    |
+| --------------------------------------- | ------------------------------------------------------ |
+| Boolean existence check                 | `EXISTS { (a)-[:R]->(b) }`                             |
+| Count matching subgraph                 | `COUNT { (a)-[:R]->(b) }`                              |
+| Collect related items into a list       | `COLLECT { MATCH (a)-[:R]->(b) RETURN b.name }`        |
+| Nullable join                           | `OPTIONAL MATCH` (simple) or `OPTIONAL CALL` (complex) |
+| Subquery with own aggregation or writes | `CALL (x) { ... }`                                     |
 
 ---
 
@@ -527,28 +533,29 @@ RETURN [x IN n | x.name] AS via, dst.name AS reached
 ```
 
 Syntax rules:
+
 - Prefer `{1,}` over `+`, `{0,}` over `*`
 - Quantifier goes **outside** the group: `(pattern){N,M}`
 - Groups must start AND end with a node
 
 Match modes [2025.01] (immediately after `MATCH`):
 
-| Mode | Semantics |
-|---|---|
-| `DIFFERENT RELATIONSHIPS` | Default — each relationship traversed at most once per path |
-| `REPEATABLE ELEMENTS` | Nodes AND relationships may be revisited; requires bounded `{m,n}` |
-| `ACYCLIC` [2026.03] | No repeated nodes within a path; GQL path mode — prevents cycles |
+| Mode                      | Semantics                                                          |
+| ------------------------- | ------------------------------------------------------------------ |
+| `DIFFERENT RELATIONSHIPS` | Default — each relationship traversed at most once per path        |
+| `REPEATABLE ELEMENTS`     | Nodes AND relationships may be revisited; requires bounded `{m,n}` |
+| `ACYCLIC` [2026.03]       | No repeated nodes within a path; GQL path mode — prevents cycles   |
 
 `ACYCLIC` is placed before the path pattern: `MATCH p = ACYCLIC (a)-[:R]-+(b)`.  
 Nodes cannot repeat within a path; may still repeat across paths (equijoins work).
 
 Path selectors (immediately after `MATCH`, before the pattern):
 
-| Selector | Semantics |
-|---|---|
-| `SHORTEST 1` | One shortest path |
-| `ALL SHORTEST` | All shortest paths of equal minimum length |
-| `ANY` | Any single path (no length guarantee) |
+| Selector            | Semantics                                            |
+| ------------------- | ---------------------------------------------------- |
+| `SHORTEST 1`        | One shortest path                                    |
+| `ALL SHORTEST`      | All shortest paths of equal minimum length           |
+| `ANY`               | Any single path (no length guarantee)                |
 | `SHORTEST k GROUPS` | All paths grouped by length up to k distinct lengths |
 
 Path modes combine with shortest selectors [2026.05]: `MATCH ANY SHORTEST ACYCLIC (a)-[:R]-+(b)` — `ACYCLIC` valid with `ANY SHORTEST`, `SHORTEST k`, `ALL SHORTEST`, `SHORTEST k GROUPS`.
@@ -679,6 +686,7 @@ CALL (move, insertBefore, insertAfter) {
 ```
 
 Rules:
+
 - Branches receive only params declared in `CALL(params)`
 - Mutually exclusive — first matching WHEN wins
 - Each branch can contain full write clauses; `ELSE` is optional
@@ -705,6 +713,7 @@ MATCH (n:Marvel|(DCComics&!Batman)) RETURN n
 ```
 
 Dynamic label quantifiers in MATCH (require `$()` wrapper) [2025.01]:
+
 ```cypher
 // Node must have ALL labels in the list
 MATCH (n:$all($labelList)) RETURN n

@@ -5,11 +5,14 @@
 `<db-name>-schema.json` — name after your database (e.g. `movies-schema.json`). Place anywhere in the project.
 
 ### Generate from existing database (requires APOC)
+
 ```bash
 pip install neo4j python-dotenv
 python scripts/generate_schema.py <db-name>
 ```
+
 `.env` (add to `.gitignore`):
+
 ```
 NEO4J_URI=neo4j+s://<instance>.databases.neo4j.io
 NEO4J_USERNAME=neo4j
@@ -18,14 +21,17 @@ NEO4J_DATABASE=neo4j
 ```
 
 ### Build interactively (no DB needed)
+
 ```bash
 python scripts/define_schema.py
 ```
 
 ### Convert from existing JSON schema
+
 ```bash
 python scripts/import_neo4j_schema.py path/to/input-schema.json
 ```
+
 Auto-detects: `neo4j-graphrag-python` SchemaBuilder, `graph-schema-introspector`, `graph-schema-json-js-utils`, `mcp-neo4j-data-modeling`.
 
 ---
@@ -39,7 +45,7 @@ Auto-detects: `neo4j-graphrag-python` SchemaBuilder, `graph-schema-introspector`
     "Theme": {
       "type": "node",
       "properties": {
-        "name":     { "type": "STRING" },
+        "name": { "type": "STRING" },
         "theme_id": { "type": "INTEGER" }
       },
       "relationships": {
@@ -49,22 +55,25 @@ Auto-detects: `neo4j-graphrag-python` SchemaBuilder, `graph-schema-introspector`
     "Set": {
       "type": "node",
       "properties": {
-        "name":         { "type": "STRING" },
-        "id":           { "type": "STRING" },
-        "year":         { "type": "INTEGER" },
-        "pieces":       { "type": "INTEGER" }
+        "name": { "type": "STRING" },
+        "id": { "type": "STRING" },
+        "year": { "type": "INTEGER" },
+        "pieces": { "type": "INTEGER" }
       },
       "relationships": {
-        "HAS_SET":     { "direction": "in",  "labels": ["Theme"], "properties": {} },
-        "HAS_MINIFIG": { "direction": "out", "labels": ["Minifig"],
-                         "properties": { "quantity": { "type": "INTEGER" } } }
+        "HAS_SET": { "direction": "in", "labels": ["Theme"], "properties": {} },
+        "HAS_MINIFIG": {
+          "direction": "out",
+          "labels": ["Minifig"],
+          "properties": { "quantity": { "type": "INTEGER" } }
+        }
       }
     },
     "Minifig": {
       "type": "node",
       "properties": {
-        "name":      { "type": "STRING" },
-        "fig_num":   { "type": "STRING" },
+        "name": { "type": "STRING" },
+        "fig_num": { "type": "STRING" },
         "num_parts": { "type": "INTEGER" }
       }
     },
@@ -85,15 +94,18 @@ Reason about intent before asking. Ask only when unable to resolve — never gen
 **1. Existence** — labels, rel-types, properties must be in schema. On miss: try synonym resolution → structural match → ask.
 
 **2. Synonym mapping**
+
 - Unambiguous → resolve silently: `ℹ️ Resolved 'Minifigure' → 'Minifig'.`
 - Ambiguous → pick most likely from context, note: `ℹ️ 'Fig' → 'Minifig' (context). Correct if wrong.`
 - No match → surface candidates: `⚠️ 'Character' not found. Did you mean: Theme, Set, Minifig?`
 
 **3. Property type** — valid types: `STRING` `INTEGER` `FLOAT` `BOOLEAN` `DATE` `DATETIME` `LOCAL_DATETIME` `TIME` `LOCAL_TIME` `DURATION` `POINT` `LIST<TYPE>`. On mismatch:
+
 - String against INTEGER (`'unknown'`, `'n/a'`) → rewrite as `IS NULL` and note
 - Clearly wrong literal → propose correction and ask
 
 **4. Relationship direction** — `out` = `(a)-[:R]->(b)`, `in` = `(b)-[:R]->(a)`. Wrong direction → correct silently, note:
+
 ```
 HAS_SET | Schema: Theme──→Set | Prompt: Set──→Theme | ↩ Corrected
 ```
@@ -105,6 +117,7 @@ HAS_SET | Schema: Theme──→Set | Prompt: Set──→Theme | ↩ Corrected
 ## Examples
 
 ### Valid query
+
 ```
 User: "List minifigures in the Cloud City set"
 
@@ -118,6 +131,7 @@ ORDER BY m.name
 ```
 
 ### Entity not found
+
 ```
 User: "Find all Character nodes linked to a Movie"
 
@@ -129,6 +143,7 @@ Did you mean Set linked to Minifig, or are you querying a different database?
 ```
 
 ### Synonym resolved
+
 ```
 User: "Find all Minifigures in a set"
 
@@ -141,6 +156,7 @@ RETURN m.name AS minifigName, m.fig_num AS figNum
 ```
 
 ### Type mismatch
+
 ```
 User: "Find sets where pieces is 'unknown'"
 

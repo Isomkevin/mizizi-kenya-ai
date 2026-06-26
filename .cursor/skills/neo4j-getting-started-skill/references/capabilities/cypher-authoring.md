@@ -1,5 +1,7 @@
 # Capability — cypher-authoring
+
 # Guidelines for generating correct Cypher 25 queries.
+
 # For deep Cypher authoring, load neo4j-cypher-authoring-skill if available.
 
 ## When to use neo4j-cypher-authoring-skill
@@ -7,6 +9,7 @@
 If `neo4j-cypher-authoring-skill` is available, defer all Cypher generation to it — it has comprehensive Cypher 25 rules, QPE handling, and a schema-first protocol that produces higher-quality queries.
 
 To check:
+
 ```bash
 ls ../neo4j-cypher-authoring-skill/SKILL.md 2>/dev/null && echo "Available" || echo "Not found"
 ```
@@ -52,14 +55,16 @@ CALL (row) {
 ### Schema-first protocol
 
 Before writing any MATCH clause:
+
 1. Confirm node labels exist in schema
-2. Confirm relationship types exist in schema  
+2. Confirm relationship types exist in schema
 3. Confirm property names are spelled correctly
 4. Check whether indexes exist for the lookup property
 
 ### GDS / APOC guard
 
 Only generate GDS or APOC queries after confirming availability:
+
 ```bash
 cypher-shell ... "CALL gds.version() YIELD version" 2>/dev/null || echo "GDS not available"
 ```
@@ -69,6 +74,7 @@ Aura Free has no GDS. Local Docker default image has no GDS unless plugin flag i
 ### Vector / fulltext search
 
 **Vector** (confirmed index exists):
+
 ```cypher
 CYPHER 25
 MATCH (node)
@@ -81,6 +87,7 @@ RETURN node.text AS text, score ORDER BY score DESC;
 ```
 
 **Fulltext**:
+
 ```cypher
 CYPHER 25
 CALL db.index.fulltext.queryNodes('index_name', $searchTerm)
@@ -139,16 +146,16 @@ Apply whenever ORDER BY or LIMIT precedes property access: use `WITH node, aggre
 
 ## Common pitfalls (validated against Neo4j 2026.x / CYPHER 25)
 
-| Wrong | Correct | Note |
-|-------|---------|------|
-| `-- comment` | `// comment` | Cypher uses `//`, not SQL `--` |
-| `OPTIONS { indexConfig: { 'vector.dimensions': 1536 } }` | `OPTIONS { indexConfig: { \`vector.dimensions\`: 1536 } }` | Map keys in OPTIONS must be backtick identifiers, not strings |
-| `(a)-[:REL*0..5]->(b)` | `(a) (()-[:REL]->()){0,5} (b)` | Use quantified path patterns (QPP) in CYPHER 25, not `*min..max` |
-| `CALL db.index.vector.queryNodes('idx', k, $vec) YIELD node, score` | `MATCH (node) SEARCH node IN (VECTOR INDEX idx FOR $vec LIMIT k) SCORE AS score` | New `SEARCH` clause (Neo4j 2026.01+); procedure still works but is deprecated |
-| `driver.execute_query("CALL (row) { ... } IN TRANSACTIONS OF N ROWS")` | `session.run("CALL (row) { ... } IN TRANSACTIONS OF N ROWS")` | `CALL {} IN TRANSACTIONS` requires an auto-commit (implicit) transaction — `execute_query` uses a managed transaction and will fail |
-| `CALL { MATCH (n) DETACH DELETE n } IN TRANSACTIONS OF 10000 ROWS` | `MATCH (n) CALL (n) { DETACH DELETE n } IN TRANSACTIONS OF 1000 ROWS` | Pass binding variable `(n)` into subquery so each node is its own batch row; outer CALL {} with inner MATCH doesn't batch at all — runs one giant tx |
-| `CALL { UNWIND $batch AS row MERGE ... } IN TRANSACTIONS OF 500 ROWS` | `UNWIND $batch AS row CALL (row) { MERGE ... } IN TRANSACTIONS OF 500 ROWS` | Always wrong: `IN TRANSACTIONS OF N ROWS` batches on rows flowing *into* the subquery from outside. With UNWIND inside, the whole list runs in one transaction — batching has no effect. Move UNWIND outside and import the variable via `CALL (row) { ... }` |
-| `WHERE NOT (a)-[:REL]->(b)` | `WHERE NOT exists { (a)-[:REL]->(b) }` | Pattern predicates are deprecated in CYPHER 25 — use EXISTS subquery |
-| `WHERE (a)-[:REL]->(b)` | `WHERE exists { (a)-[:REL]->(b) }` | Same — positive pattern check also needs EXISTS subquery |
-| `OPTIONAL MATCH (n)<-[:REL]-(m) RETURN count(DISTINCT m)` | `RETURN count { (n)<-[:REL]-() }` | Use inline COUNT subquery instead of OPTIONAL MATCH + count(DISTINCT) |
-| `RETURN n.name, count(x) ORDER BY count(x)` | `WITH n, count(x) AS cnt ORDER BY cnt LIMIT k RETURN n.name, cnt` | Access properties after aggregation + sort/limit, not before — avoids reading properties on rows that will be discarded |
+| Wrong                                                                  | Correct                                                                          | Note                                                                                                                                                                                                                                                          |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-- comment`                                                           | `// comment`                                                                     | Cypher uses `//`, not SQL `--`                                                                                                                                                                                                                                |
+| `OPTIONS { indexConfig: { 'vector.dimensions': 1536 } }`               | `OPTIONS { indexConfig: { \`vector.dimensions\`: 1536 } }`                       | Map keys in OPTIONS must be backtick identifiers, not strings                                                                                                                                                                                                 |
+| `(a)-[:REL*0..5]->(b)`                                                 | `(a) (()-[:REL]->()){0,5} (b)`                                                   | Use quantified path patterns (QPP) in CYPHER 25, not `*min..max`                                                                                                                                                                                              |
+| `CALL db.index.vector.queryNodes('idx', k, $vec) YIELD node, score`    | `MATCH (node) SEARCH node IN (VECTOR INDEX idx FOR $vec LIMIT k) SCORE AS score` | New `SEARCH` clause (Neo4j 2026.01+); procedure still works but is deprecated                                                                                                                                                                                 |
+| `driver.execute_query("CALL (row) { ... } IN TRANSACTIONS OF N ROWS")` | `session.run("CALL (row) { ... } IN TRANSACTIONS OF N ROWS")`                    | `CALL {} IN TRANSACTIONS` requires an auto-commit (implicit) transaction — `execute_query` uses a managed transaction and will fail                                                                                                                           |
+| `CALL { MATCH (n) DETACH DELETE n } IN TRANSACTIONS OF 10000 ROWS`     | `MATCH (n) CALL (n) { DETACH DELETE n } IN TRANSACTIONS OF 1000 ROWS`            | Pass binding variable `(n)` into subquery so each node is its own batch row; outer CALL {} with inner MATCH doesn't batch at all — runs one giant tx                                                                                                          |
+| `CALL { UNWIND $batch AS row MERGE ... } IN TRANSACTIONS OF 500 ROWS`  | `UNWIND $batch AS row CALL (row) { MERGE ... } IN TRANSACTIONS OF 500 ROWS`      | Always wrong: `IN TRANSACTIONS OF N ROWS` batches on rows flowing _into_ the subquery from outside. With UNWIND inside, the whole list runs in one transaction — batching has no effect. Move UNWIND outside and import the variable via `CALL (row) { ... }` |
+| `WHERE NOT (a)-[:REL]->(b)`                                            | `WHERE NOT exists { (a)-[:REL]->(b) }`                                           | Pattern predicates are deprecated in CYPHER 25 — use EXISTS subquery                                                                                                                                                                                          |
+| `WHERE (a)-[:REL]->(b)`                                                | `WHERE exists { (a)-[:REL]->(b) }`                                               | Same — positive pattern check also needs EXISTS subquery                                                                                                                                                                                                      |
+| `OPTIONAL MATCH (n)<-[:REL]-(m) RETURN count(DISTINCT m)`              | `RETURN count { (n)<-[:REL]-() }`                                                | Use inline COUNT subquery instead of OPTIONAL MATCH + count(DISTINCT)                                                                                                                                                                                         |
+| `RETURN n.name, count(x) ORDER BY count(x)`                            | `WITH n, count(x) AS cnt ORDER BY cnt LIMIT k RETURN n.name, cnt`                | Access properties after aggregation + sort/limit, not before — avoids reading properties on rows that will be discarded                                                                                                                                       |

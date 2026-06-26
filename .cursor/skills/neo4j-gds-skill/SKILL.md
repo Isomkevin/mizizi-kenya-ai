@@ -14,6 +14,7 @@ allowed-tools: Bash WebFetch
 ---
 
 ## When to Use
+
 - Running GDS algorithms against embedded GDS plugin through Python client (`graphdatascience`)
 - Running GDS algorithms through `CALL gds.*` Cypher procedures
 - Aura Pro, self-managed Neo4j, local Neo4j, or offline DBMS with GDS plugin installed
@@ -23,6 +24,7 @@ allowed-tools: Bash WebFetch
 - Memory estimation before large graph operations
 
 ## When NOT to Use
+
 - **Aura Graph Analytics Sessions / AGA / `GdsSessions` / `AuraGraphDataScience`** → `neo4j-aura-graph-analytics-skill`
 - **AuraDB Cypher API with `{ memory: ... }` or `{ sessionId: ... }`** → `neo4j-aura-graph-analytics-skill`
 - **Cypher query authoring** → `neo4j-cypher-skill`
@@ -30,13 +32,13 @@ allowed-tools: Bash WebFetch
 - **GraphRAG retrieval** → `neo4j-graphrag-skill`
 - **Creating/querying vector indexes over written embeddings** → `neo4j-vector-index-skill`
 
-| Context | Use |
-|---|---|
-| Aura Pro with GDS plugin | This skill |
-| Self-managed/local/offline Neo4j with GDS plugin | This skill |
-| AuraDB serverless analytics session | `neo4j-aura-graph-analytics-skill` |
-| Self-managed Neo4j attached to AGA session | `neo4j-aura-graph-analytics-skill` |
-| Non-Neo4j data source | `neo4j-aura-graph-analytics-skill` |
+| Context                                          | Use                                |
+| ------------------------------------------------ | ---------------------------------- |
+| Aura Pro with GDS plugin                         | This skill                         |
+| Self-managed/local/offline Neo4j with GDS plugin | This skill                         |
+| AuraDB serverless analytics session              | `neo4j-aura-graph-analytics-skill` |
+| Self-managed Neo4j attached to AGA session       | `neo4j-aura-graph-analytics-skill` |
+| Non-Neo4j data source                            | `neo4j-aura-graph-analytics-skill` |
 
 ---
 
@@ -66,6 +68,7 @@ pip install graphdatascience[rust_ext]    # 3–10× faster serialization
 Compatibility: graphdatascience v1.22 — GDS >= 2.6 and < 2.28 / < 2026.6, Python >= 3.10 and < 3.15, Neo4j Driver >= 4.4.12 and < 7.0.
 
 V2 rules:
+
 - Prefer `gds.v2.*` when endpoint exists.
 - Use snake_case endpoints and parameters: `page_rank`, `fast_rp`, `mutate_property`, `write_property`.
 - Use typed result attributes: `result.write_millis`, not `result["writeMillis"]`.
@@ -163,12 +166,12 @@ Projection estimate fallback: use v1 `gds.graph.project.estimate(...)` if v2 est
 
 ## Execution Modes
 
-| Mode | Side effect | Returns | Use when |
-|---|---|---|---|
-| `stream` | None | Row per node/pair | Inspect results; top-N |
-| `stats` | None | Single aggregate row | Summary/convergence check |
-| `mutate` | Adds node property or relationship type/property to in-memory graph only | Stats row | Chain algorithms |
-| `write` | Persists node property or relationship to Neo4j DB | Stats row | Final step — make queryable |
+| Mode     | Side effect                                                              | Returns              | Use when                    |
+| -------- | ------------------------------------------------------------------------ | -------------------- | --------------------------- |
+| `stream` | None                                                                     | Row per node/pair    | Inspect results; top-N      |
+| `stats`  | None                                                                     | Single aggregate row | Summary/convergence check   |
+| `mutate` | Adds node property or relationship type/property to in-memory graph only | Stats row            | Chain algorithms            |
+| `write`  | Persists node property or relationship to Neo4j DB                       | Stats row            | Final step — make queryable |
 
 Pattern: `stream` to verify → `mutate` to chain → `write` to persist.
 
@@ -355,20 +358,20 @@ gds.v2.graph.drop(G)
 
 ## Algorithm Selection
 
-| Goal | Algorithm |
-|---|---|
-| Influence via network links | PageRank / ArticleRank |
-| Bottleneck / bridge nodes | Betweenness Centrality |
-| Direct connections | Degree Centrality |
-| Community (general, fast) | Louvain |
-| Community (higher quality) | Leiden |
-| Is graph connected? | WCC (run first) |
-| Similarity from embeddings | KNN |
-| Similarity from neighbors | Node Similarity |
-| Shortest path (positive weights) | Dijkstra / A* |
-| k alternative paths | Yen's |
-| Fast scalable embeddings | FastRP |
-| Feature-rich nodes | GraphSAGE (`gds.beta.graphSage`) |
+| Goal                             | Algorithm                        |
+| -------------------------------- | -------------------------------- |
+| Influence via network links      | PageRank / ArticleRank           |
+| Bottleneck / bridge nodes        | Betweenness Centrality           |
+| Direct connections               | Degree Centrality                |
+| Community (general, fast)        | Louvain                          |
+| Community (higher quality)       | Leiden                           |
+| Is graph connected?              | WCC (run first)                  |
+| Similarity from embeddings       | KNN                              |
+| Similarity from neighbors        | Node Similarity                  |
+| Shortest path (positive weights) | Dijkstra / A\*                   |
+| k alternative paths              | Yen's                            |
+| Fast scalable embeddings         | FastRP                           |
+| Feature-rich nodes               | GraphSAGE (`gds.beta.graphSage`) |
 
 Full algorithm catalog → [references/algorithms.md](references/algorithms.md)
 
@@ -376,15 +379,15 @@ Full algorithm catalog → [references/algorithms.md](references/algorithms.md)
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| `Unknown function 'gds.version'` | Embedded GDS plugin unavailable | AGA → `neo4j-aura-graph-analytics-skill`; self-managed/local → install plugin |
-| `Insufficient heap memory` / OOM | Graph too large for available JVM heap | Run `gds.graph.project.estimate`; increase `dbms.memory.heap.max_size` |
-| `Procedure not found: gds.leiden` | Older or incompatible GDS | Check `CALL gds.list()` for available procedures; upgrade GDS or use Louvain |
+| Error                                      | Cause                                      | Fix                                                                                  |
+| ------------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `Unknown function 'gds.version'`           | Embedded GDS plugin unavailable            | AGA → `neo4j-aura-graph-analytics-skill`; self-managed/local → install plugin        |
+| `Insufficient heap memory` / OOM           | Graph too large for available JVM heap     | Run `gds.graph.project.estimate`; increase `dbms.memory.heap.max_size`               |
+| `Procedure not found: gds.leiden`          | Older or incompatible GDS                  | Check `CALL gds.list()` for available procedures; upgrade GDS or use Louvain         |
 | `Node property 'X' not found` after mutate | Property not projected or wrong graph name | Verify `G.node_properties()` includes the property; check `mutate_property` spelling |
-| `Graph 'myGraph' already exists` | Leftover projection from failed run | `CALL gds.graph.drop('myGraph')` or `gds.v2.graph.drop(G)` |
-| `mutate_property already exists` | Re-running algorithm on same projection | Drop and re-project, or use different `mutate_property` name |
-| `No algorithm results` | Source/target node not in projection | Verify node labels/rel types match projection; check `G.node_count()` |
+| `Graph 'myGraph' already exists`           | Leftover projection from failed run        | `CALL gds.graph.drop('myGraph')` or `gds.v2.graph.drop(G)`                           |
+| `mutate_property already exists`           | Re-running algorithm on same projection    | Drop and re-project, or use different `mutate_property` name                         |
+| `No algorithm results`                     | Source/target node not in projection       | Verify node labels/rel types match projection; check `G.node_count()`                |
 
 ---
 
@@ -404,13 +407,13 @@ Built-in test datasets: `gds.v2.graph.datasets.load_cora()`, `gds.v2.graph.datas
 
 ## MCP Tool Mapping
 
-| Operation | MCP tool |
-|---|---|
-| `RETURN gds.version()` | `read-cypher` |
-| `gds.pageRank.stream(...)` | `read-cypher` |
-| `gds.pageRank.write(...)` | `write-cypher` |
-| `gds.graph.drop(...)` | `write-cypher` |
-| List available procedures | `read-cypher` → `CALL gds.list()` |
+| Operation                  | MCP tool                          |
+| -------------------------- | --------------------------------- |
+| `RETURN gds.version()`     | `read-cypher`                     |
+| `gds.pageRank.stream(...)` | `read-cypher`                     |
+| `gds.pageRank.write(...)`  | `write-cypher`                    |
+| `gds.graph.drop(...)`      | `write-cypher`                    |
+| List available procedures  | `read-cypher` → `CALL gds.list()` |
 
 Before any `write-cypher`: show exact Cypher, expected nodes/relationships affected, and ask for confirmation. For algorithm `write` mode, estimate or run `stats` first when available.
 
@@ -426,6 +429,7 @@ Before any `write-cypher`: show exact Cypher, expected nodes/relationships affec
 ---
 
 ## Checklist
+
 - [ ] Embedded GDS plugin confirmed with `gds.version()` or `gds.server_version()`
 - [ ] Graph/algorithm memory estimated before large work
 - [ ] Python examples prefer `gds.v2.*`, snake_case params, typed result attributes

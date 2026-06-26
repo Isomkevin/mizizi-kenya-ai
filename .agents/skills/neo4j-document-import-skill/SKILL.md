@@ -37,14 +37,14 @@ allowed-tools: Bash WebFetch
 
 ## Approach Decision Table
 
-| Situation | Approach |
-|---|---|
-| No code; drag-and-drop UX wanted | LLM Graph Builder web UI |
-| Programmatic pipeline; PDFs/text | `SimpleKGPipeline` (neo4j-graphrag) |
-| JSON / REST API responses | `apoc.load.json` or Python + UNWIND |
-| LangChain already in stack | `Neo4jGraph` + document loader |
-| LlamaIndex already in stack | `Neo4jQueryEngine` / `Neo4jVectorStore` |
-| Chunk-only (no entity extraction) | Manual chunking + MERGE pattern |
+| Situation                         | Approach                                |
+| --------------------------------- | --------------------------------------- |
+| No code; drag-and-drop UX wanted  | LLM Graph Builder web UI                |
+| Programmatic pipeline; PDFs/text  | `SimpleKGPipeline` (neo4j-graphrag)     |
+| JSON / REST API responses         | `apoc.load.json` or Python + UNWIND     |
+| LangChain already in stack        | `Neo4jGraph` + document loader          |
+| LlamaIndex already in stack       | `Neo4jQueryEngine` / `Neo4jVectorStore` |
+| Chunk-only (no entity extraction) | Manual chunking + MERGE pattern         |
 
 ---
 
@@ -160,6 +160,7 @@ pipeline = SimpleKGPipeline(
 ```
 
 **LLM alternatives** (same interface):
+
 - `AnthropicLLM(model_name="claude-3-5-sonnet-20241022")`
 - `VertexAILLM(model_name="gemini-2.0-flash")`
 - `OllamaLLM(model_name="llama3")` — local; no API key needed
@@ -280,6 +281,7 @@ Pipeline always produces this lexical graph layer:
 ```
 
 Entity extraction adds:
+
 ```
 (:Chunk)-[:MENTIONS]->(:Person {name, ...})
 (:Chunk)-[:MENTIONS]->(:Organization {name, ...})
@@ -287,6 +289,7 @@ Entity extraction adds:
 ```
 
 Verify after ingestion:
+
 ```cypher
 CYPHER 25
 MATCH (d:Document)-[:HAS_CHUNK]->(c:Chunk)
@@ -305,6 +308,7 @@ Use when: non-developers need to ingest docs; rapid prototyping; no Python envir
 **Hosted**: https://llm-graph-builder.neo4jlabs.com/
 
 **Local** (Docker):
+
 ```bash
 git clone https://github.com/neo4j-labs/llm-graph-builder
 cd llm-graph-builder
@@ -418,29 +422,31 @@ CREATE VECTOR INDEX chunk_embeddings IF NOT EXISTS
 ```
 
 Do not start ingestion until all indexes are ONLINE:
+
 ```cypher
 SHOW INDEXES YIELD name, state WHERE state <> 'ONLINE';
 ```
+
 If rows returned: wait, then re-run. ONLINE = safe to ingest.
 
 ---
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| LLM extracts node types not in schema | Schema too loose or `"EXTRACTED"` mode | Define explicit `entities` + `patterns`; use Option B schema |
-| `MissingEmbedderError` | `embedder=` omitted | Always pass `embedder=` even if not doing vector search — pipeline stores embeddings on Chunk nodes |
-| Zero entities extracted | LLM context overflow | Reduce `chunk_size`; switch to model with larger context |
-| Duplicate entity nodes after ingestion | Entity resolution not run | Run `SinglePropertyExactMatchResolver` after bulk ingest |
-| `apoc.load.json` permission denied | APOC allowlist not configured | Add URL to `apoc.import.file.enabled=true` and `dbms.security.allow_csv_import_from_file_urls=true` |
-| Chunking loses sentence mid-way | `approximate=False` (default) cuts at exact token count | Set `approximate=True` in `FixedSizeSplitter` |
-| `chunk_size` too large → LLM timeouts | Extraction prompt + chunk exceeds context | Keep chunk_size ≤ 512 for GPT-4o extraction; ≤ 2048 absolute max |
-| `SpaCySemanticMatchResolver` fails on Python 3.14 | spaCy not supported on 3.14+ | Use `FuzzyMatchResolver` or downgrade to Python 3.13 |
-| `neo4j-driver` package not found | Deprecated package name since 6.0 | Use `neo4j` package: `pip install neo4j>=5.17.0` |
-| `ValidationError` on `NodeType` with no properties | `NodeType` requires ≥1 property since v1.13.0 | Add at least `PropertyType(name="name", type="STRING")`; string-list labels get it automatically |
-| `from_pdf` deprecation warning | `from_pdf=True` removed in v1.15.0 | Use `from_file=True` instead |
-| `response_format` in `model_params` ignored | `SimpleKGPipeline` auto-enables structured output for OpenAI/VertexAI (v1.14.0+) | Remove `response_format` from `model_params`; the pipeline manages it |
+| Error                                              | Cause                                                                            | Fix                                                                                                 |
+| -------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| LLM extracts node types not in schema              | Schema too loose or `"EXTRACTED"` mode                                           | Define explicit `entities` + `patterns`; use Option B schema                                        |
+| `MissingEmbedderError`                             | `embedder=` omitted                                                              | Always pass `embedder=` even if not doing vector search — pipeline stores embeddings on Chunk nodes |
+| Zero entities extracted                            | LLM context overflow                                                             | Reduce `chunk_size`; switch to model with larger context                                            |
+| Duplicate entity nodes after ingestion             | Entity resolution not run                                                        | Run `SinglePropertyExactMatchResolver` after bulk ingest                                            |
+| `apoc.load.json` permission denied                 | APOC allowlist not configured                                                    | Add URL to `apoc.import.file.enabled=true` and `dbms.security.allow_csv_import_from_file_urls=true` |
+| Chunking loses sentence mid-way                    | `approximate=False` (default) cuts at exact token count                          | Set `approximate=True` in `FixedSizeSplitter`                                                       |
+| `chunk_size` too large → LLM timeouts              | Extraction prompt + chunk exceeds context                                        | Keep chunk_size ≤ 512 for GPT-4o extraction; ≤ 2048 absolute max                                    |
+| `SpaCySemanticMatchResolver` fails on Python 3.14  | spaCy not supported on 3.14+                                                     | Use `FuzzyMatchResolver` or downgrade to Python 3.13                                                |
+| `neo4j-driver` package not found                   | Deprecated package name since 6.0                                                | Use `neo4j` package: `pip install neo4j>=5.17.0`                                                    |
+| `ValidationError` on `NodeType` with no properties | `NodeType` requires ≥1 property since v1.13.0                                    | Add at least `PropertyType(name="name", type="STRING")`; string-list labels get it automatically    |
+| `from_pdf` deprecation warning                     | `from_pdf=True` removed in v1.15.0                                               | Use `from_file=True` instead                                                                        |
+| `response_format` in `model_params` ignored        | `SimpleKGPipeline` auto-enables structured output for OpenAI/VertexAI (v1.14.0+) | Remove `response_format` from `model_params`; the pipeline manages it                               |
 
 ---
 
@@ -534,6 +540,7 @@ writer = ParquetWriter(output_dir="/data/kg_export/")
 ## LexicalGraphConfig — Customize Labels
 
 Override default lexical layer labels (keep defaults unless integrating with existing graph):
+
 ```python
 from neo4j_graphrag.experimental.components.types import LexicalGraphConfig
 # All fields have sensible defaults — only override what differs from your graph's conventions
@@ -574,6 +581,7 @@ Chunking strategy by use-case and full resolver config: [references/kg-construct
 ## References
 
 Load on demand:
+
 - [neo4j-graphrag KG Builder guide](https://neo4j.com/docs/neo4j-graphrag-python/current/user_guide_kg_builder.html)
 - [neo4j-graphrag library overview](https://neo4j.com/docs/neo4j-graphrag-python/current/)
 - [LLM Graph Builder (hosted)](https://llm-graph-builder.neo4jlabs.com/)

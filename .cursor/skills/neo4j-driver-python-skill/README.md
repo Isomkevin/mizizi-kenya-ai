@@ -3,6 +3,7 @@
 Skill for writing Python applications that connect to Neo4j using the official Neo4j Python Driver.
 
 **Covers:**
+
 - Installation and driver lifecycle (singleton pattern, `verify_connectivity`)
 - URI schemes and auth options (Aura, bolt, bearer, Kerberos)
 - `execute_query` — default API with `RoutingControl`, `result_transformer_`, trailing-underscore convention
@@ -17,15 +18,18 @@ Skill for writing Python applications that connect to Neo4j using the official N
 - Causal consistency and bookmarks
 
 **Version / compatibility:**
+
 - Driver v6.x (Jan 2026+) — package name is `neo4j`, not `neo4j-driver`
 - Python ≥ 3.10 required
 
 **Not covered:**
+
 - Cypher query authoring → use `neo4j-cypher-skill`
 - Driver version upgrades / breaking changes → use `neo4j-migration-skill`
 - GraphRAG pipelines (`neo4j-graphrag` package) → use `neo4j-graphrag-skill`
 
 **Install:**
+
 ```bash
 pip install neo4j
 ```

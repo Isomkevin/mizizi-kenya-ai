@@ -4,8 +4,9 @@ Feature-level UI for the `/app` workspace (not marketing/landing).
 
 ## Layout
 
-- **Shell:** `src/routes/app.tsx` — sidebar, nav items, `<Outlet />` for child routes.
-- **Dashboard:** `src/routes/app.index.tsx` — KPIs and insights (Phase 2; migrate data to `src/lib/mock/`).
+- **Shell:** `src/routes/app.tsx` — wires `AppSidebar`, `AppHeader`, `GlobalSearch` (⌘K), `<Outlet />`.
+- **Dashboard:** `src/routes/app.index.tsx` — composes `src/components/app/dashboard/*`.
+- **Mock data:** `src/lib/mock/dashboard.ts`, `search.ts`.
 
 ## Patterns
 

@@ -67,6 +67,7 @@ pipeline = SimpleKGPipeline(..., lexical_graph_config=config)
 ```
 
 Inspect constructed graph:
+
 ```cypher
 MATCH (d:Document)<-[:FROM_DOCUMENT]-(c:Chunk)
 RETURN d.path, c.index, c.text, size(c.text)

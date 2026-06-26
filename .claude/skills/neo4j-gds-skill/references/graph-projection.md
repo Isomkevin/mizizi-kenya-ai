@@ -2,10 +2,10 @@
 
 ## Projection Types — When to Use Each
 
-| Type | Procedure | When |
-|---|---|---|
+| Type   | Procedure                                                                             | When                                                                                   |
+| ------ | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | Cypher | Python: `gds.graph.cypher.project(...)` with `RETURN gds.graph.project` clause inside | Current GDS-doc default; filtering, transformation, computed properties, heterogeneous |
-| Native | Python: `gds.v2.graph.project(...)` | Simple labels + relationship types; shortest Python-client path |
+| Native | Python: `gds.v2.graph.project(...)`                                                   | Simple labels + relationship types; shortest Python-client path                        |
 
 Prefer v2 native projection. Use v1 `gds.graph.cypher.project(...)` only for filtering, transformations, computed properties, or heterogeneous projections that v2 native projection cannot express. Avoid legacy `gds.graph.project.cypher(...)` for new work. For Aura Graph Analytics sessions, use `neo4j-aura-graph-analytics-skill`.
 
@@ -71,11 +71,11 @@ YIELD graphName, nodeCount, relationshipCount, projectMillis
 
 ### Orientation options
 
-| Orientation | Effect |
-|---|---|
-| `NATURAL` | As stored in DB (default) |
+| Orientation  | Effect                                              |
+| ------------ | --------------------------------------------------- |
+| `NATURAL`    | As stored in DB (default)                           |
 | `UNDIRECTED` | Adds reverse direction — doubles relationship count |
-| `REVERSE` | Flips direction |
+| `REVERSE`    | Flips direction                                     |
 
 Use `UNDIRECTED` for undirected algorithms: community detection, most similarity/embedding algorithms. Use `NATURAL` for directed algorithms: PageRank, Betweenness.
 

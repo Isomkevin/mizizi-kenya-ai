@@ -22,16 +22,17 @@ React: wrap `<InteractiveNvlWrapper>` or `<BasicNvlWrapper>` in a sized parent O
 
 ```javascript
 // ❌
-const res = await driver.executeQuery('MATCH (a)-[r]-(b) RETURN a,r,b LIMIT 25')
-new NVL(container, res.records, [])    // ids missing, shape wrong
+const res = await driver.executeQuery("MATCH (a)-[r]-(b) RETURN a,r,b LIMIT 25");
+new NVL(container, res.records, []); // ids missing, shape wrong
 
 // ✅
-import { nvlResultTransformer } from '@neo4j-nvl/base'
+import { nvlResultTransformer } from "@neo4j-nvl/base";
 const { nodes, relationships } = await driver.executeQuery(
-  'MATCH (a)-[r]-(b) RETURN a,r,b LIMIT 25', {},
-  { database: 'neo4j', resultTransformer: nvlResultTransformer }
-)
-new NVL(container, nodes, relationships)
+  "MATCH (a)-[r]-(b) RETURN a,r,b LIMIT 25",
+  {},
+  { database: "neo4j", resultTransformer: nvlResultTransformer },
+);
+new NVL(container, nodes, relationships);
 ```
 
 For driver setup → `neo4j-driver-javascript-skill`.
@@ -45,7 +46,7 @@ For driver setup → `neo4j-driver-javascript-skill`.
 **Fix:** Disable workers — NVL has a synchronous fallback (slower for large graphs, identical output). Applies to any build tool (Vite, Webpack, Rollup, esbuild, Parcel, etc.):
 
 ```javascript
-const nvl = new NVL(container, nodes, rels, { disableWebWorkers: true })
+const nvl = new NVL(container, nodes, rels, { disableWebWorkers: true });
 ```
 
 React:
@@ -60,19 +61,19 @@ Most modern bundlers handle worker construction natively — try the default set
 
 ## Renderer trade-off (Canvas vs WebGL)
 
-| Renderer | Practical ceiling | Captions | Hit-test |
-|---|---|---|---|
-| Canvas (default) | ~1,000 nodes | Full styling | Pixel-perfect |
-| WebGL | 100,000+ nodes | Bound by GPU max texture size | Approximate |
+| Renderer         | Practical ceiling | Captions                      | Hit-test      |
+| ---------------- | ----------------- | ----------------------------- | ------------- |
+| Canvas (default) | ~1,000 nodes      | Full styling                  | Pixel-perfect |
+| WebGL            | 100,000+ nodes    | Bound by GPU max texture size | Approximate   |
 
 NVL's WebGL renderer targets **WebGL2**. WebGL1 still loads on the current release but support is on a deprecation path — assume WebGL2 in any new deployment.
 
 ```javascript
 // At construction
-new NVL(container, nodes, rels, { renderer: 'webgl' })
+new NVL(container, nodes, rels, { renderer: "webgl" });
 
 // At runtime
-nvl.setRenderer('webgl')   // or 'canvas'
+nvl.setRenderer("webgl"); // or 'canvas'
 ```
 
 Pick based on node count and label fidelity needs. Switching at runtime triggers a re-render.
@@ -94,10 +95,13 @@ Pick based on node count and label fidelity needs. Switching at runtime triggers
 **Fix:** Implement `onWebGLContextLost` callback — call `nvl.setRenderer('canvas')` as recovery, or `nvl.restart(options, true)` to reinitialize while keeping positions:
 
 ```javascript
-const nvl = new NVL(container, nodes, rels,
-  { renderer: 'webgl' },
-  { onWebGLContextLost: () => nvl.restart({ renderer: 'canvas' }, true) }
-)
+const nvl = new NVL(
+  container,
+  nodes,
+  rels,
+  { renderer: "webgl" },
+  { onWebGLContextLost: () => nvl.restart({ renderer: "canvas" }, true) },
+);
 ```
 
 ---
@@ -109,7 +113,7 @@ const nvl = new NVL(container, nodes, rels,
 **Fix:**
 
 ```javascript
-new NVL(container, nodes, rels, { disableTelemetry: true })
+new NVL(container, nodes, rels, { disableTelemetry: true });
 ```
 
 Mandatory in regulated / air-gapped / customer-data-sensitive deployments.
@@ -124,9 +128,9 @@ Mandatory in regulated / air-gapped / customer-data-sensitive deployments.
 
 ```tsx
 useEffect(() => {
-  const nvl = new NVL(ref.current!, nodes, rels)
-  return () => nvl.destroy()
-}, [])
+  const nvl = new NVL(ref.current!, nodes, rels);
+  return () => nvl.destroy();
+}, []);
 ```
 
 `<InteractiveNvlWrapper>` / `<BasicNvlWrapper>` handle this automatically — prefer them over manual refs.
@@ -134,8 +138,8 @@ useEffect(() => {
 For vanilla, destroy all interaction handlers BEFORE the NVL instance:
 
 ```javascript
-for (const h of handlers) h.destroy()
-nvl.destroy()
+for (const h of handlers) h.destroy();
+nvl.destroy();
 ```
 
 ---
@@ -145,6 +149,7 @@ nvl.destroy()
 **Cause:** Graph has competing forces or is unsolvable; or workers disabled and synchronous fallback is throttled.
 
 **Fix options:**
+
 - Pin anchor nodes: `nvl.pinNode(id)` for known fixed positions
 - Cap iterations: `nvlOptions: { layoutTimeLimit: 3000 }` (ms)
 - Switch layout: `nvl.setLayout('hierarchical')` for DAG-like data
@@ -167,7 +172,7 @@ nvl.destroy()
 **Fix:** Widen the hit margin:
 
 ```javascript
-const { nvlTargets } = nvl.getHits(evt, ['node', 'relationship'], { hitNodeMarginWidth: 8 })
+const { nvlTargets } = nvl.getHits(evt, ["node", "relationship"], { hitNodeMarginWidth: 8 });
 ```
 
 For pan-on-relationship sensitivity, set `excludeNodeMargin: true` in `PanInteraction` options.
@@ -180,14 +185,14 @@ For pan-on-relationship sensitivity, set `excludeNodeMargin: true` in `PanIntera
 
 **Fix:** Pick the right layout up front:
 
-| Data shape | Layout |
-|---|---|
-| Generic network | `'forceDirected'` |
-| Tree / DAG | `'hierarchical'` (set `direction` in `layoutOptions`) |
-| Sorted ring | `'circular'` (provide `sortFunction`) |
-| Manual positioning | `'free'` |
-| Snapped grid | `'grid'` |
-| Force-directed via d3-force | `'d3Force'` |
+| Data shape                  | Layout                                                |
+| --------------------------- | ----------------------------------------------------- |
+| Generic network             | `'forceDirected'`                                     |
+| Tree / DAG                  | `'hierarchical'` (set `direction` in `layoutOptions`) |
+| Sorted ring                 | `'circular'` (provide `sortFunction`)                 |
+| Manual positioning          | `'free'`                                              |
+| Snapped grid                | `'grid'`                                              |
+| Force-directed via d3-force | `'d3Force'`                                           |
 
 ---
 
@@ -206,8 +211,13 @@ For pan-on-relationship sensitivity, set `excludeNodeMargin: true` in `PanIntera
 **Fix:** Trigger export from the callback:
 
 ```javascript
-const nvl = new NVL(container, nodes, rels, {},
-  { onLayoutDone: () => nvl.saveToFile({ filename: 'graph.png' }) })
+const nvl = new NVL(
+  container,
+  nodes,
+  rels,
+  {},
+  { onLayoutDone: () => nvl.saveToFile({ filename: "graph.png" }) },
+);
 ```
 
 Or `getImageDataUrl()` for in-memory data URL.
@@ -222,8 +232,8 @@ Or `getImageDataUrl()` for in-memory data URL.
 
 ```javascript
 // ❌ data update via restart — full rebuild every tick
-nvl.restart()
+nvl.restart();
 
 // ✅ diff update
-nvl.addAndUpdateElementsInGraph(newNodes, newRels)
+nvl.addAndUpdateElementsInGraph(newNodes, newRels);
 ```

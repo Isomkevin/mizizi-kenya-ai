@@ -885,53 +885,53 @@ Public
 ├── Contact
 └── Request Demo
 
------------------------------------------------------
+---
 
 Authenticated Platform
 
 ├── Dashboard
 ├── Farmer Intelligence
-│   ├── Search
-│   ├── Farmer Profile
-│   ├── Graph Explorer
-│   ├── Timeline
-│   └── Documents
+│ ├── Search
+│ ├── Farmer Profile
+│ ├── Graph Explorer
+│ ├── Timeline
+│ └── Documents
 │
 ├── Loan Decisions
-│   ├── Pending Reviews
-│   ├── Decision Workspace
-│   ├── Overrides
-│   └── Decision History
+│ ├── Pending Reviews
+│ ├── Decision Workspace
+│ ├── Overrides
+│ └── Decision History
 │
 ├── Analytics
-│   ├── Executive Dashboard
-│   ├── Portfolio
-│   ├── Geographic Insights
-│   ├── Climate Analytics
-│   └── Performance
+│ ├── Executive Dashboard
+│ ├── Portfolio
+│ ├── Geographic Insights
+│ ├── Climate Analytics
+│ └── Performance
 │
 ├── AI & Graph
-│   ├── Graph Explorer
-│   ├── Entity Resolution
-│   ├── Risk Factors
-│   ├── Community Detection
-│   ├── Explainability
-│   └── Graph Health
+│ ├── Graph Explorer
+│ ├── Entity Resolution
+│ ├── Risk Factors
+│ ├── Community Detection
+│ ├── Explainability
+│ └── Graph Health
 │
 ├── Integrations
-│   ├── Neo4j
-│   ├── Climate APIs
-│   ├── Mobile Money
-│   ├── SACCO Systems
-│   ├── USSD
-│   └── SMS
+│ ├── Neo4j
+│ ├── Climate APIs
+│ ├── Mobile Money
+│ ├── SACCO Systems
+│ ├── USSD
+│ └── SMS
 │
 ├── Administration
-│   ├── Users
-│   ├── Roles
-│   ├── Audit Logs
-│   ├── Notifications
-│   └── Settings
+│ ├── Users
+│ ├── Roles
+│ ├── Audit Logs
+│ ├── Notifications
+│ └── Settings
 
 ```
 
@@ -943,13 +943,13 @@ Every authenticated page should share one premium layout.
 
 ```
 
-------------------------------------------------------------
+---
 
 Logo
 
 Sidebar
 
-------------------------------------------------------------
+---
 
 Dashboard
 
@@ -965,7 +965,7 @@ Integrations
 
 Settings
 
-------------------------------------------------------------
+---
 
 Footer
 
@@ -977,7 +977,7 @@ API Status
 
 Notifications
 
-------------------------------------------------------------
+---
 
 Top Navigation
 
@@ -991,11 +991,11 @@ Quick Actions
 
 User Profile
 
-------------------------------------------------------------
+---
 
 Main Workspace
 
-------------------------------------------------------------
+---
 
 ```
 

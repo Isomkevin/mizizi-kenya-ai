@@ -1,6 +1,7 @@
 # Hybrid Search
 
 Hybrid search is useful when one retrieval signal is not enough:
+
 - Semantic vector search finds paraphrases; misses exact names, acronyms, codes, and domain terms.
 - Lexical fulltext search finds exact words; misses related concepts that do not share words.
 - Structural search uses graph topology, paths, communities, or GDS node embeddings; captures relationships text does not contain.
@@ -10,11 +11,13 @@ Combining ranked sources improves recall and can boost results that are supporte
 Use when the user asks for custom Cypher hybrid search, WRRF/RRF, vector + fulltext, semantic + lexical + structural search, multiple vector indexes, or combining two+ ranked/scored retrieval sources.
 
 ## When NOT to Use
+
 - `neo4j-graphrag` package `HybridRetriever` / `HybridCypherRetriever` -> use `neo4j-graphrag-skill`
 - Fulltext-only / keyword-only search -> use `neo4j-cypher-skill`
 - Single vector search -> use main `neo4j-vector-index-skill`
 
 ## Rules
+
 - Run each source independently.
 - Rank each source by `score DESC, stable_id ASC`.
 - Do not compare raw scores from different sources.
@@ -29,6 +32,7 @@ Use when the user asks for custom Cypher hybrid search, WRRF/RRF, vector + fullt
 ## Index Setup
 
 Vector index:
+
 ```cypher
 CYPHER 25
 CREATE VECTOR INDEX chunk_embedding IF NOT EXISTS
@@ -42,6 +46,7 @@ OPTIONS {
 ```
 
 Fulltext index:
+
 ```cypher
 CYPHER 25
 CREATE FULLTEXT INDEX chunk_fulltext IF NOT EXISTS
@@ -125,12 +130,14 @@ RETURN
 ```
 
 Examples:
+
 - second vector index with different embedding model -> `sourceWeights['vector_large']`
 - vector index over GDS FastRP/Node2Vec embeddings -> `sourceWeights['structural_vector']`
 - fulltext index over title fields -> `sourceWeights['title_fulltext']`
 - graph-derived candidate score converted to source rank -> `sourceWeights['graph']`
 
 ## Checklist
+
 - [ ] Vector and fulltext indexes `ONLINE`
 - [ ] Query embedding generated with same model as stored embeddings
 - [ ] Structural embeddings/scores already produced before query

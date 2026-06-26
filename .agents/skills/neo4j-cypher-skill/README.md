@@ -33,11 +33,11 @@ Defaults to 2025.01-safe features. Items new in 2025.x are annotated `[2025.01]`
 
 Loaded on demand — not bundled into the main skill context:
 
-| File | Contents |
-|---|---|
+| File                                                         | Contents                                                                                                                                                                         |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`references/cypher-syntax.md`](references/cypher-syntax.md) | Full syntax reference: clauses, patterns, functions. Items introduced in 2025.x annotated `[2025.01]`; 2026.x items `[2026.01]`; older deprecated forms annotated `[replaces X]` |
-| [`references/syntax-traps.md`](references/syntax-traps.md) | 40+ table of invalid → correct Cypher — SQL habits and pre-2025 syntax |
-| [`references/performance.md`](references/performance.md) | Anti-patterns with severity levels, text vs fulltext index comparison, Eager operator triggers and fixes |
+| [`references/syntax-traps.md`](references/syntax-traps.md)   | 40+ table of invalid → correct Cypher — SQL habits and pre-2025 syntax                                                                                                           |
+| [`references/performance.md`](references/performance.md)     | Anti-patterns with severity levels, text vs fulltext index comparison, Eager operator triggers and fixes                                                                         |
 
 ## Not covered
 
@@ -47,11 +47,11 @@ Loaded on demand — not bundled into the main skill context:
 
 ## Related skills
 
-| Skill | Purpose |
-|---|---|
-| `neo4j-getting-started-skill` | Zero-to-app: provision, model, load, explore, build |
-| `neo4j-migration-skill` | Upgrade Cypher syntax and drivers across major versions |
-| `neo4j-cli-tools-skill` | DB administration via `neo4j-admin`, `cypher-shell`, Aura CLI |
+| Skill                         | Purpose                                                       |
+| ----------------------------- | ------------------------------------------------------------- |
+| `neo4j-getting-started-skill` | Zero-to-app: provision, model, load, explore, build           |
+| `neo4j-migration-skill`       | Upgrade Cypher syntax and drivers across major versions       |
+| `neo4j-cli-tools-skill`       | DB administration via `neo4j-admin`, `cypher-shell`, Aura CLI |
 
 ## Install
 

@@ -9,50 +9,59 @@ Quality here determines routing accuracy and answer quality.
 ## System Prompt
 
 ### Purpose
+
 Defines the agent's identity, scope, and behavior constraints. Supplements — does not replace — tool descriptions.
 
 ### Rules
 
 **Role sentence** — one sentence: domain + expertise level.
+
 ```
 ✅ "You are a specialist assistant for commercial contract analysis using a knowledge graph."
 ❌ "You are a helpful AI assistant."
 ```
 
 **Supported use cases** — bullet list of what it can answer. Keeps LLM from fabricating capabilities.
+
 ```
 ✅ "You can: look up agreements by party or type, find similar clause language, identify contracts expiring within a date range."
 ❌ (omitting this — LLM will guess its own scope)
 ```
 
 **Explicit boundaries** — state what it cannot do; do not rely on tool absence alone.
+
 ```
 ✅ "You cannot modify data, generate contract drafts, or access documents outside the knowledge graph."
 ❌ (omitting this — LLM may attempt tasks outside its tools)
 ```
 
 **Tool preference order** — tell it which tool to try first for specific lookups. Without this, LLM defaults to Text2Cypher for everything.
+
 ```
 ✅ "For lookups by a known ID or property value, prefer CypherTemplate tools over the Text2Cypher tool."
 ```
 
 **Uncertainty handling** — tell it to say so when it cannot answer. Prevents hallucination.
+
 ```
 ✅ "If you cannot find an answer using the available tools, say so explicitly. Do not guess."
 ```
 
 **Output format** — specify structure when the use case demands it.
+
 ```
 ✅ "Always include the source node ID or property in your answer so users can verify."
 ✅ "For comparisons across multiple items, use a table."
 ```
 
 **Citation rule** — tell it to reference graph data, not LLM knowledge.
+
 ```
 ✅ "Base all answers on data retrieved from tools. Do not use your training knowledge about the domain."
 ```
 
 **Explain mode** — when the user asks to explain an answer, the agent should go beyond restating results. Include this block in your system prompt:
+
 ```
 ✅ "If the user asks you to explain your answer:
     1. Describe how you determined the result — which tool you used, which nodes or relationships were traversed, and why.
@@ -66,6 +75,7 @@ This pattern surfaces agent reasoning and turns every answer into an opportunity
 **Signals inventory** — include a signals section in the prompt for each key label and relationship type relevant to the use cases. Without it, the agent sees node labels and properties but must infer their semantic meaning, valid values, and routing logic from the schema alone. A signals inventory makes that knowledge explicit.
 
 Each signal entry should state:
+
 - **What** the signal measures (semantic meaning)
 - **Where** it lives in the graph (label, relationship pattern, property)
 - **Valid values** (critical for filtering — especially low-cardinality properties)
@@ -74,6 +84,7 @@ Each signal entry should state:
 Generate this section during Step 5 using the use case discussion and `schema.json`. For every label or relationship that appears in a tool or in the user's questions, write a signal block.
 
 **Template**:
+
 ```
 ## <Domain> Signals
 
@@ -84,6 +95,7 @@ Generate this section during Step 5 using the use case discussion and `schema.js
 ```
 
 **Example** — recruiting domain:
+
 ```
 ## Candidate Quality Signals
 
@@ -99,6 +111,7 @@ Generate this section during Step 5 using the use case discussion and `schema.js
 ```
 
 Rules:
+
 - Include only labels/relationships that appear in the agent's tools or the user's stated questions — do not enumerate the entire schema
 - Always include valid values for low-cardinality properties (copy from `schema.json → values`)
 - If a property has `has_fulltext_index: true`, note that in the "When to use" line: "Supports full-text search"
@@ -106,12 +119,12 @@ Rules:
 
 ### Anti-Patterns
 
-| Anti-pattern | Problem |
-|---|---|
-| "Answer any question about the graph" | No scope → LLM uses Text2Cypher for everything |
+| Anti-pattern                           | Problem                                          |
+| -------------------------------------- | ------------------------------------------------ |
+| "Answer any question about the graph"  | No scope → LLM uses Text2Cypher for everything   |
 | Prompt that restates tool descriptions | Redundant tokens; contradictions if they diverge |
-| No uncertainty clause | LLM fabricates answers when tools return nothing |
-| Very long prompt (>500 words) | Dilutes the constraints; LLM ignores later rules |
+| No uncertainty clause                  | LLM fabricates answers when tools return nothing |
+| Very long prompt (>500 words)          | Dilutes the constraints; LLM ignores later rules |
 
 ---
 
@@ -119,13 +132,13 @@ Rules:
 
 **Format**: `Verb + specific object`. Max ~5 words.
 
-| ✅ Good | ❌ Bad | Why |
-|---|---|---|
-| `Get Agreement by ID` | `Agreement Lookup` | No verb → ambiguous trigger |
-| `Find Agreements Expiring This Year` | `Date Filter` | Too vague |
-| `Count Agreements by Type` | `Aggregation Tool` | Doesn't say what it aggregates |
-| `Find Similar Clause Text` | `Semantic Search` | No domain context |
-| `Summarize Graph Statistics` | `Text2Cypher Tool` | Never name a tool after its mechanism |
+| ✅ Good                              | ❌ Bad             | Why                                   |
+| ------------------------------------ | ------------------ | ------------------------------------- |
+| `Get Agreement by ID`                | `Agreement Lookup` | No verb → ambiguous trigger           |
+| `Find Agreements Expiring This Year` | `Date Filter`      | Too vague                             |
+| `Count Agreements by Type`           | `Aggregation Tool` | Doesn't say what it aggregates        |
+| `Find Similar Clause Text`           | `Semantic Search`  | No domain context                     |
+| `Summarize Graph Statistics`         | `Text2Cypher Tool` | Never name a tool after its mechanism |
 
 Do NOT include the word "Tool" in a name — redundant and wastes the LLM's routing signal.
 
@@ -134,6 +147,7 @@ Do NOT include the word "Tool" in a name — redundant and wastes the LLM's rout
 ## Tool Descriptions
 
 The description is the primary signal the LLM uses to select a tool. It must answer three questions:
+
 1. **When** to use this tool (trigger condition)
 2. **What** it returns
 3. **When NOT** to use it (prevents wrong selection when tools overlap)
@@ -157,6 +171,7 @@ Do NOT use [exclusion condition] — use [alternative tool name] instead.
 ```
 
 Rules:
+
 - Describe the **question pattern**, not the query mechanics
 - Name the key parameter in plain language ("by its contract ID", "by city name")
 - If a filter parameter has a fixed set of valid values, state that in the description too: `"Valid filter values are: 'Type A', 'Type B', 'Type C'"`
@@ -173,6 +188,7 @@ Rules:
 ```
 
 Rules:
+
 - Say what kind of text is embedded ("full clause text", "product descriptions", "support ticket summaries")
 - Make clear this is approximate/semantic, not exact
 - State the exclusion: exact-match queries belong in CypherTemplate
@@ -193,6 +209,7 @@ Text2Cypher is the most flexible tool — and the one most likely to be overused
 ```
 
 Rules:
+
 - List 2–3 example questions it handles well — LLM uses these as routing anchors
 - Always have at least two explicit exclusions naming the alternative tool
 - Put this tool last in the `tools` array — LLM tries tools in order; Text2Cypher is the fallback
@@ -206,6 +223,7 @@ Parameter descriptions are shown to the LLM when it needs to fill in a parameter
 ### Rules
 
 **Always state what the parameter represents:**
+
 ```
 ✅ "description": "The unique contract identifier, e.g. 'CUAD-001'"
 ❌ "description": "id"
@@ -223,12 +241,14 @@ When `schema.json → node_props[Label][prop].low_cardinality` is `true`, copy t
 ```
 
 **Date parameters — include format:**
+
 ```
 ✅ "description": "Effective date to filter from. Format: YYYY-MM-DD (e.g. '2023-01-01')"
 ❌ "description": "Start date"
 ```
 
 **ID parameters — say where the user gets the value:**
+
 ```
 ✅ "description": "Contract ID from a prior 'Get Agreement' result or from the user's request"
 ❌ "description": "Contract ID"
@@ -238,12 +258,12 @@ When `schema.json → node_props[Label][prop].low_cardinality` is `true`, copy t
 
 ### Anti-Patterns
 
-| Anti-pattern | Problem |
-|---|---|
+| Anti-pattern                                          | Problem                                                |
+| ----------------------------------------------------- | ------------------------------------------------------ |
 | Description is the param name only (`"id"`, `"type"`) | LLM cannot extract correctly from varied user phrasing |
-| No valid values on low-cardinality property | LLM invents values; Cypher returns nothing |
-| Missing format on date/time param | LLM passes wrong format; Cypher fails silently |
-| Description longer than 2000 chars | API truncates; valid values may be cut |
+| No valid values on low-cardinality property           | LLM invents values; Cypher returns nothing             |
+| Missing format on date/time param                     | LLM passes wrong format; Cypher fails silently         |
+| Description longer than 2000 chars                    | API truncates; valid values may be cut                 |
 
 ---
 
@@ -252,6 +272,7 @@ When `schema.json → node_props[Label][prop].low_cardinality` is `true`, copy t
 The LLM considers tools in array order when multiple tools could answer a question.
 
 Recommended order:
+
 1. Most specific CypherTemplate tools (exact lookups)
 2. Broader CypherTemplate tools (filtered searches)
 3. SimilaritySearch (if present)

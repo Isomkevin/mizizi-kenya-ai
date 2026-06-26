@@ -34,15 +34,15 @@ version: 1.0.1
 
 ## Decision Table — Which connector strategy?
 
-| Use case | Strategy |
-|---|---|
-| Custom transformation of Kafka payload → graph | Sink: **Cypher** |
-| Mirror another Neo4j CDC source | Sink: **CDC** (schema or source-id sub-strategy) |
-| Map Kafka JSON fields to graph nodes/rels with no code | Sink: **Pattern** |
-| Consume pre-formatted CUD JSON messages | Sink: **CUD** |
-| Stream all Neo4j changes to Kafka (real-time) | Source: **CDC** (Neo4j 5.13+ EE/Aura BC/VDC) |
-| Stream specific query results on a schedule | Source: **Query** |
-| Consume CDC events in-process, no Kafka | **Native CDC API** (`db.cdc.query`) |
+| Use case                                               | Strategy                                         |
+| ------------------------------------------------------ | ------------------------------------------------ |
+| Custom transformation of Kafka payload → graph         | Sink: **Cypher**                                 |
+| Mirror another Neo4j CDC source                        | Sink: **CDC** (schema or source-id sub-strategy) |
+| Map Kafka JSON fields to graph nodes/rels with no code | Sink: **Pattern**                                |
+| Consume pre-formatted CUD JSON messages                | Sink: **CUD**                                    |
+| Stream all Neo4j changes to Kafka (real-time)          | Source: **CDC** (Neo4j 5.13+ EE/Aura BC/VDC)     |
+| Stream specific query results on a schedule            | Source: **Query**                                |
+| Consume CDC events in-process, no Kafka                | **Native CDC API** (`db.cdc.query`)              |
 
 ---
 
@@ -88,10 +88,8 @@ Connector auto-prepends `UNWIND $events AS __value` — write query using `__val
   "neo4j.authentication.type": "BASIC",
   "neo4j.authentication.basic.username": "neo4j",
   "neo4j.authentication.basic.password": "secret",
-  "neo4j.cypher.topic.person-creates":
-    "MERGE (p:Person {id: __value.id}) SET p += __value.properties",
-  "neo4j.cypher.topic.person-updates":
-    "MATCH (p:Person {id: __value.id}) SET p += __value.properties",
+  "neo4j.cypher.topic.person-creates": "MERGE (p:Person {id: __value.id}) SET p += __value.properties",
+  "neo4j.cypher.topic.person-updates": "MATCH (p:Person {id: __value.id}) SET p += __value.properties",
   "neo4j.cypher.bind-value-as": "__value",
   "neo4j.cypher.bind-key-as": "__key",
   "neo4j.cypher.bind-header-as": "__header"
@@ -99,6 +97,7 @@ Connector auto-prepends `UNWIND $events AS __value` — write query using `__val
 ```
 
 MERGE pattern — idempotent upsert:
+
 ```cypher
 MERGE (p:Person {id: __value.id})
 ON CREATE SET p.createdAt = datetime(), p += __value.properties
@@ -112,12 +111,12 @@ No Cypher needed — map message fields to graph via pattern syntax:
 ```json
 {
   "neo4j.pattern.topic.users": "(:User{!userId, name, email})",
-  "neo4j.pattern.topic.friendships":
-    "(:User{!userId: from.userId})-[:KNOWS{since}]->(:User{!userId: to.userId})"
+  "neo4j.pattern.topic.friendships": "(:User{!userId: from.userId})-[:KNOWS{since}]->(:User{!userId: to.userId})"
 }
 ```
 
 Pattern rules:
+
 - `!prop` = key property (used for MERGE)
 - `prop: field.path` = map from nested message field
 - `*` = map all message fields
@@ -132,6 +131,7 @@ Pattern rules:
 ```
 
 Or with source-id tracking (stores elementId as property):
+
 ```json
 {
   "neo4j.cdc.source-id.topics": "neo4j-cdc-events",
@@ -145,6 +145,7 @@ Or with source-id tracking (stores elementId as property):
 Requires: connector ≥ 5.3.0, Kafka broker EOS support, and a NODE KEY constraint.
 
 Step 1 — Create constraint:
+
 ```cypher
 CREATE CONSTRAINT kafka_offset_key IF NOT EXISTS
 FOR (n:__KafkaOffset)
@@ -152,6 +153,7 @@ REQUIRE (n.strategy, n.topic, n.partition) IS NODE KEY;
 ```
 
 Step 2 — Add to connector config:
+
 ```json
 {
   "neo4j.eos-offset-label": "__KafkaOffset"
@@ -204,6 +206,7 @@ Without EOS: connector provides at-least-once — write idempotent Cypher (MERGE
 `neo4j.start-from` options: `NOW` | `EARLIEST` | a specific cursor string
 
 Multiple patterns per topic — indexed 0, 1, 2...:
+
 ```json
 {
   "neo4j.cdc.topic.all-changes.patterns.0.pattern": "(:Person)",
@@ -235,9 +238,11 @@ Cursor warning: after DB restore from backup, CDC cursors are invalidated. Recon
 Requires: Neo4j 5.13+ Enterprise, AuraDB BC, or AuraDB VDC.
 
 Enable CDC first (self-managed — set in neo4j.conf):
+
 ```
 db.cdc.enabled=true
 ```
+
 On Aura: enabled by default on eligible tiers.
 
 ### Cursor Bootstrap
@@ -262,6 +267,7 @@ ORDER BY txId, seq;
 ```
 
 Filtered — nodes with label Person, CREATE only:
+
 ```cypher
 CALL db.cdc.query($cursor, [
   {select: 'n', labels: ['Person'], operation: 'c'}
@@ -271,6 +277,7 @@ ORDER BY txId, seq;
 ```
 
 Filtered — specific relationship type with property change tracking:
+
 ```cypher
 CALL db.cdc.query($cursor, [
   {select: 'r', type: 'KNOWS', changesTo: ['since', 'strength']}
@@ -280,18 +287,18 @@ RETURN id, event.state.before AS before, event.state.after AS after;
 
 ### Selector Reference
 
-| Field | Values | Applies to |
-|---|---|---|
-| `select` | `'e'` (all), `'n'` (nodes), `'r'` (rels) | both |
-| `operation` | `'c'` (create), `'u'` (update), `'d'` (delete) | both |
-| `labels` | `['Label1','Label2']` (node must have ALL) | nodes |
-| `type` | `'REL_TYPE'` | relationships |
-| `elementId` | specific element ID string | both |
-| `key` | `{propName: value}` (requires key constraint) | both |
-| `changesTo` | `['prop1','prop2']` (AND — all must change) | both |
-| `authenticatedUser` | username string | both |
-| `executingUser` | username string | both |
-| `txMetadata` | `{key: value}` | both |
+| Field               | Values                                         | Applies to    |
+| ------------------- | ---------------------------------------------- | ------------- |
+| `select`            | `'e'` (all), `'n'` (nodes), `'r'` (rels)       | both          |
+| `operation`         | `'c'` (create), `'u'` (update), `'d'` (delete) | both          |
+| `labels`            | `['Label1','Label2']` (node must have ALL)     | nodes         |
+| `type`              | `'REL_TYPE'`                                   | relationships |
+| `elementId`         | specific element ID string                     | both          |
+| `key`               | `{propName: value}` (requires key constraint)  | both          |
+| `changesTo`         | `['prop1','prop2']` (AND — all must change)    | both          |
+| `authenticatedUser` | username string                                | both          |
+| `executingUser`     | username string                                | both          |
+| `txMetadata`        | `{key: value}`                                 | both          |
 
 ### Event Structure
 
@@ -363,12 +370,14 @@ while True:
 Confluent Cloud hosts the Neo4j Sink connector as a fully managed service (no JAR upload needed).
 
 Config differences vs self-managed:
+
 - No `connector.class` field — selected in UI/API
 - Credentials via Confluent Cloud secret manager or direct JSON
 - Private endpoints supported (AWS PrivateLink, Azure Private Link, GCP PSC)
 - Managed upgrades — pin connector version explicitly if needed
 
 Required Confluent Cloud fields:
+
 ```json
 {
   "kafka.auth.mode": "KAFKA_API_KEY",
@@ -400,6 +409,7 @@ Source connector always generates messages with schema support — must configur
 ```
 
 For JSON Schema:
+
 ```json
 {
   "value.converter": "io.confluent.connect.json.JsonSchemaConverter",
@@ -413,21 +423,21 @@ Sink converter must match source — Avro sink cannot consume JSON schema source
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| `CDC is not enabled` | `db.cdc.enabled` not set / wrong tier | Enable in neo4j.conf or upgrade to EE/BC/VDC |
-| `Invalid cursor` after DB restore | Backup invalidates cursors | Reset `neo4j.start-from` to `NOW` or `EARLIEST` |
-| `Cannot merge node using null` | Key property missing in message | Validate message schema; add null check in Cypher |
-| Messages replayed after restart | No EOS configured | Add `neo4j.eos-offset-label` + NODE KEY constraint |
-| Connector stops on bad message | `errors.tolerance=none` (default) | Set `errors.tolerance=all` + DLQ topic |
-| `SchemaException` on sink | Converter mismatch source/sink | Match key/value converters on both ends |
-| Empty events from `db.cdc.query` | Cursor points to current | Use `db.cdc.earliest()` to replay; wait for new txns |
+| Error                             | Cause                                 | Fix                                                  |
+| --------------------------------- | ------------------------------------- | ---------------------------------------------------- |
+| `CDC is not enabled`              | `db.cdc.enabled` not set / wrong tier | Enable in neo4j.conf or upgrade to EE/BC/VDC         |
+| `Invalid cursor` after DB restore | Backup invalidates cursors            | Reset `neo4j.start-from` to `NOW` or `EARLIEST`      |
+| `Cannot merge node using null`    | Key property missing in message       | Validate message schema; add null check in Cypher    |
+| Messages replayed after restart   | No EOS configured                     | Add `neo4j.eos-offset-label` + NODE KEY constraint   |
+| Connector stops on bad message    | `errors.tolerance=none` (default)     | Set `errors.tolerance=all` + DLQ topic               |
+| `SchemaException` on sink         | Converter mismatch source/sink        | Match key/value converters on both ends              |
+| Empty events from `db.cdc.query`  | Cursor points to current              | Use `db.cdc.earliest()` to replay; wait for new txns |
 
 ---
 
 ## References
 
-- [Full connector config reference](references/sink-config.md) — all neo4j.* properties, defaults, types
+- [Full connector config reference](references/sink-config.md) — all neo4j.\* properties, defaults, types
 - [CDC API patterns](references/cdc-api.md) — cursor loop, selector examples, event structure detail
 - [Neo4j Connector for Kafka docs](https://neo4j.com/docs/kafka/current/)
 - [CDC docs](https://neo4j.com/docs/cdc/current/)

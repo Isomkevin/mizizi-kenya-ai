@@ -1,4 +1,5 @@
 # Stage 4 — load
+
 # Import data into the database. Always apply schema constraints first.
 
 ## Step L0 — Apply schema constraints (always, before any data)
@@ -9,6 +10,7 @@ cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USERNAME" -p "$NEO4J_PASSWORD" --file sc
 ```
 
 Or via Python if cypher-shell unavailable:
+
 ```python
 from neo4j import GraphDatabase; import os
 driver = GraphDatabase.driver(os.environ["NEO4J_URI"],
@@ -108,10 +110,12 @@ Run: `.venv/bin/python3 data/import.py`
 ### Type coercion in Cypher vs Python
 
 Prefer coercing types in Python before passing rows (faster, avoids Cypher `toFloat()`):
+
 ```python
 products["unitPrice"]    = pd.to_numeric(products["unitPrice"],    errors="coerce")
 products["unitsInStock"] = pd.to_numeric(products["unitsInStock"], errors="coerce").astype("Int64")
 ```
+
 Then use `row.unitPrice` directly in Cypher without wrapping functions.
 
 ---
@@ -230,20 +234,21 @@ Run: `.venv/bin/python3 data/import.py`
 ## Path C — CSV / tabular data (any source)
 
 Use the **Python batch loading pattern** above. Install dependencies first:
+
 ```bash
 .venv/bin/pip install neo4j-rust-ext pandas python-dotenv
 ```
 
 Adapt the DataFrame source to match:
 
-| Source | pandas call |
-|--------|-------------|
-| Local CSV | `pd.read_csv("./data/file.csv")` |
-| HTTPS CSV | `pd.read_csv("https://…/file.csv")` |
-| Parquet / S3 | `pd.read_parquet("s3://bucket/file.parquet")` |
-| PostgreSQL | `pd.read_sql("SELECT * FROM table", engine)` |
-| MongoDB | `pd.DataFrame(collection.find({}, {"_id": 0}))` |
-| Excel | `pd.read_excel("file.xlsx")` |
+| Source       | pandas call                                     |
+| ------------ | ----------------------------------------------- |
+| Local CSV    | `pd.read_csv("./data/file.csv")`                |
+| HTTPS CSV    | `pd.read_csv("https://…/file.csv")`             |
+| Parquet / S3 | `pd.read_parquet("s3://bucket/file.parquet")`   |
+| PostgreSQL   | `pd.read_sql("SELECT * FROM table", engine)`    |
+| MongoDB      | `pd.DataFrame(collection.find({}, {"_id": 0}))` |
+| Excel        | `pd.read_excel("file.xlsx")`                    |
 
 Always follow **Phase 1 (all nodes) → Phase 2 (all relationships)** regardless of source.
 
@@ -333,27 +338,30 @@ print("  ✓ Vector index 'chunk_embeddings' ready")
 
 ### Messy data — common patterns
 
-| Problem | Symptom | Fix |
-|---------|---------|-----|
-| Mixed encoding | `UnicodeDecodeError` | `open(path, errors="replace")` |
-| Very large files | Slow ingestion | OK — pipeline chunks internally; just wait |
-| Scanned PDFs (no text layer) | Empty chunks | Run OCR first (e.g. `pytesseract`) |
-| Files with boilerplate headers | Low-value entity extraction | Strip headers before passing `text=` |
-| No useful structure | LLM extracts nothing | Try `schema=None` — lets LLM infer types freely |
+| Problem                        | Symptom                     | Fix                                             |
+| ------------------------------ | --------------------------- | ----------------------------------------------- |
+| Mixed encoding                 | `UnicodeDecodeError`        | `open(path, errors="replace")`                  |
+| Very large files               | Slow ingestion              | OK — pipeline chunks internally; just wait      |
+| Scanned PDFs (no text layer)   | Empty chunks                | Run OCR first (e.g. `pytesseract`)              |
+| Files with boilerplate headers | Low-value entity extraction | Strip headers before passing `text=`            |
+| No useful structure            | LLM extracts nothing        | Try `schema=None` — lets LLM infer types freely |
 
 **Run ingestion synchronously — do NOT use `&` or background execution.**
 Script must complete and print "✓ Ingestion complete" before the next stage begins.
 LLM-based extraction is slow (minutes for large corpora) — expected, just wait.
 
 **Always inspect the actual graph schema after ingestion before writing queries:**
+
 ```cypher
 CYPHER 25
 CALL db.schema.visualization()
 ```
+
 ```cypher
 CYPHER 25
 MATCH (n) RETURN labels(n)[0] AS label, count(n) AS cnt ORDER BY cnt DESC
 ```
+
 ```cypher
 CYPHER 25
 MATCH ()-[r]->() RETURN type(r) AS rel, count(r) AS cnt ORDER BY cnt DESC
@@ -365,6 +373,7 @@ The relationship from entity to its source chunk is `FROM_CHUNK` (not `MENTIONS`
 The relationship from chunk to document is `FROM_DOCUMENT` (not `HAS_CHUNK`).
 
 Use these actual labels when writing the retrieval_query for VectorCypherRetriever:
+
 ```python
 retrieval_query = """
 OPTIONAL MATCH (entity:__KGBuilder__)-[:FROM_CHUNK]->(node)
@@ -397,6 +406,7 @@ echo "Reset script: cypher-shell ... --file schema/reset.cypher"
 ## Step L7 — HITL data preview pause
 
 Show row counts and a sample before proceeding:
+
 ```bash
 source .env
 cypher-shell -a "$NEO4J_URI" -u "$NEO4J_USERNAME" -p "$NEO4J_PASSWORD" \
@@ -427,6 +437,7 @@ Or query the DB: `MATCH (n:Person) RETURN n.id LIMIT 1`
 
 ```markdown
 ### 4-load
+
 status: done
 nodes=<e.g. "200 Person, 50 Post">
 relationships=<e.g. "1400 FOLLOWS, 300 POSTED">

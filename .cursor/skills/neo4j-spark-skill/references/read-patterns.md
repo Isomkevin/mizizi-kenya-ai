@@ -4,47 +4,49 @@ Full option reference for `.read.format("org.neo4j.spark.DataSource")`.
 
 ## Core Read Options (mutually exclusive — pick one)
 
-| Option | Value | Description |
-|--------|-------|-------------|
-| `labels` | `:Label` or `:Label1:Label2` | Read nodes with given label(s). Multiple = AND. |
-| `query` | Cypher string | Custom MATCH ... RETURN query. Aliases become column names. |
-| `relationship` | `REL_TYPE` | Read relationships of given type. Requires source/target label options. |
+| Option         | Value                        | Description                                                             |
+| -------------- | ---------------------------- | ----------------------------------------------------------------------- |
+| `labels`       | `:Label` or `:Label1:Label2` | Read nodes with given label(s). Multiple = AND.                         |
+| `query`        | Cypher string                | Custom MATCH ... RETURN query. Aliases become column names.             |
+| `relationship` | `REL_TYPE`                   | Read relationships of given type. Requires source/target label options. |
 
 ## Label Read Sub-Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `node.keys` | — | Comma-separated property names to include as match keys |
+| Option      | Default | Description                                             |
+| ----------- | ------- | ------------------------------------------------------- |
+| `node.keys` | —       | Comma-separated property names to include as match keys |
 
 ## Relationship Read Sub-Options
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `relationship.source.labels` | Yes | Colon-prefixed labels of source node `:Label` |
-| `relationship.target.labels` | Yes | Colon-prefixed labels of target node `:Label` |
+| Option                       | Required | Description                                   |
+| ---------------------------- | -------- | --------------------------------------------- |
+| `relationship.source.labels` | Yes      | Colon-prefixed labels of source node `:Label` |
+| `relationship.target.labels` | Yes      | Colon-prefixed labels of target node `:Label` |
 
 ## Query Read Sub-Options
 
-| Option | Description |
-|--------|-------------|
+| Option        | Description                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
 | `query.count` | Cypher count query for partition planning (e.g. `MATCH (n:Person) RETURN count(n)`). Avoids full count scan. |
 
 ## Partition and Performance Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `partitions` | `1` | Number of Spark partitions. Connector uses SKIP/LIMIT internally. |
-| `batch.size` | `5000` | Rows per partition batch. |
-| `schema.flatten.limit` | `10` | Rows sampled for schema inference (no APOC). Increase for heterogeneous nodes. |
+| Option                 | Default | Description                                                                    |
+| ---------------------- | ------- | ------------------------------------------------------------------------------ |
+| `partitions`           | `1`     | Number of Spark partitions. Connector uses SKIP/LIMIT internally.              |
+| `batch.size`           | `5000`  | Rows per partition batch.                                                      |
+| `schema.flatten.limit` | `10`    | Rows sampled for schema inference (no APOC). Increase for heterogeneous nodes. |
 
 ## Output Columns
 
 **Label scan result columns:**
+
 - `<id>` — internal Neo4j element ID
 - `<labels>` — array of node labels
 - One column per node property
 
 **Relationship scan result columns:**
+
 - `<rel.id>` — internal relationship ID
 - `<rel.type>` — relationship type string
 - `<source.id>`, `<source.labels>`, `source.<prop>` — source node fields

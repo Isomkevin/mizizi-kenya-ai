@@ -57,6 +57,7 @@ SET p:Director;
 ```
 
 After adding, verify:
+
 ```cypher
 MATCH (n:Actor) RETURN count(n);
 MATCH (n:Director) RETURN count(n);
@@ -67,12 +68,14 @@ MATCH (n:Director) RETURN count(n);
 Convert a property that holds category values into proper nodes + relationships.
 
 ### Step 1: Create constraint for new node type
+
 ```cypher
 CREATE CONSTRAINT genre_name IF NOT EXISTS
 FOR (g:Genre) REQUIRE g.name IS UNIQUE;
 ```
 
 ### Step 2: UNWIND list → MERGE nodes + relationships
+
 ```cypher
 MATCH (m:Movie)
 WHERE m.genres IS NOT NULL
@@ -84,6 +87,7 @@ CALL (m) {
 ```
 
 ### Step 3: Remove the now-redundant property
+
 ```cypher
 MATCH (m:Movie) WHERE m.genres IS NOT NULL
 CALL (m) { REMOVE m.genres }
@@ -91,6 +95,7 @@ IN TRANSACTIONS OF 10000 ROWS ON ERROR CONTINUE;
 ```
 
 ### Step 4: Verify schema
+
 ```cypher
 CALL db.schema.visualization();
 ```
@@ -106,6 +111,7 @@ CALL (p) {
 ```
 
 Ensure source string is ISO format (`YYYY-MM-DD`). For other formats, transform in the SET clause:
+
 ```cypher
 SET p.born = date({year: toInteger(left(p.born, 4)),
                    month: toInteger(substring(p.born, 5, 2)),

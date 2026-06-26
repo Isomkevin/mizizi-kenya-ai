@@ -13,6 +13,7 @@ allowed-tools: Bash WebFetch
 ---
 
 ## When to Use
+
 - Creating an Aura instance (CLI, REST API, Python, Terraform)
 - Pausing, resuming, resizing, or deleting an instance
 - Downloading initial credentials from creation response
@@ -21,6 +22,7 @@ allowed-tools: Bash WebFetch
 - Choosing instance tier (Free vs Professional vs Business Critical vs VDC)
 
 ## When NOT to Use
+
 - **Cypher queries against running DB** → `neo4j-cypher-skill`
 - **GDS algorithms on Aura** → `neo4j-gds-skill` (Pro with plugin) or `neo4j-aura-graph-analytics-skill` (serverless)
 - **neo4j-admin / cypher-shell** → `neo4j-cli-tools-skill`
@@ -30,14 +32,14 @@ allowed-tools: Bash WebFetch
 
 ## Instance Tier Decision Table
 
-| Tier | API type code | Memory | GDS | Replicas | Use when |
-|---|---|---|---|---|---|
-| AuraDB Free | `free-db` | 1 GB | ❌ | ❌ | Dev/demo; ≤200k nodes/400k rels |
-| AuraDB Professional | `professional-db` | 2–64 GB | plugin available | ❌ | Production workloads |
-| AuraDB Business Critical | `business-critical` | 4–384 GB | plugin available | ✅ | HA, multi-AZ, SLA |
-| AuraDB VDC | `enterprise-db` | custom | ✅ | ✅ | Dedicated infra, compliance |
-| AuraDS Professional | `professional-ds` | 2–64 GB | ✅ built-in | ❌ | Data science / GDS |
-| AuraDS Enterprise | `enterprise-ds` | custom | ✅ | ✅ | Enterprise GDS |
+| Tier                     | API type code       | Memory   | GDS              | Replicas | Use when                        |
+| ------------------------ | ------------------- | -------- | ---------------- | -------- | ------------------------------- |
+| AuraDB Free              | `free-db`           | 1 GB     | ❌               | ❌       | Dev/demo; ≤200k nodes/400k rels |
+| AuraDB Professional      | `professional-db`   | 2–64 GB  | plugin available | ❌       | Production workloads            |
+| AuraDB Business Critical | `business-critical` | 4–384 GB | plugin available | ✅       | HA, multi-AZ, SLA               |
+| AuraDB VDC               | `enterprise-db`     | custom   | ✅               | ✅       | Dedicated infra, compliance     |
+| AuraDS Professional      | `professional-ds`   | 2–64 GB  | ✅ built-in      | ❌       | Data science / GDS              |
+| AuraDS Enterprise        | `enterprise-ds`     | custom   | ✅               | ✅       | Enterprise GDS                  |
 
 **AuraDB Free limits**: 200k nodes, 400k rels; auto-pauses after 72 h inactivity; deleted if paused >30 days; no resize.
 
@@ -48,6 +50,7 @@ allowed-tools: Bash WebFetch
 ### CLI (aura-cli v1.7+)
 
 Install (binary, not pip):
+
 ```bash
 # macOS
 curl -L https://github.com/neo4j/aura-cli/releases/latest/download/aura-cli-darwin-amd64.tar.gz | tar xz
@@ -56,6 +59,7 @@ aura-cli -v          # verify
 ```
 
 Add credentials (from console.neo4j.io → Account Settings → API Credentials):
+
 ```bash
 aura-cli credential add \
   --name "my-creds" \
@@ -65,6 +69,7 @@ aura-cli credential use --name "my-creds"
 ```
 
 Verify:
+
 ```bash
 aura-cli instance list --output table
 ```
@@ -90,12 +95,14 @@ Use in all subsequent calls: `--header "Authorization: Bearer $TOKEN"`
 ## Step 1 — List Tenants (Projects)
 
 CLI:
+
 ```bash
 aura-cli tenants list --output table
 # Copy TENANT_ID for create operations
 ```
 
 REST:
+
 ```bash
 curl -s https://api.neo4j.io/v1/tenants \
   -H "Authorization: Bearer $TOKEN" | jq '.data[] | {id, name}'
@@ -146,15 +153,15 @@ PASSWORD=$(echo "$RESPONSE"   | jq -r '.data.password')
 
 Instance create request body fields:
 
-| Field | Required | Values |
-|---|---|---|
-| `name` | ✅ | any string |
-| `cloud_provider` | ✅ | `gcp` `aws` `azure` |
-| `region` | ✅ | see region table |
-| `type` | ✅ | see tier table |
-| `tenant_id` | ✅ | from tenant list |
-| `memory` | ✗ | `1GB` `2GB` `4GB` `8GB` … `384GB` |
-| `version` | ✗ | `5` (default) |
+| Field            | Required | Values                            |
+| ---------------- | -------- | --------------------------------- |
+| `name`           | ✅       | any string                        |
+| `cloud_provider` | ✅       | `gcp` `aws` `azure`               |
+| `region`         | ✅       | see region table                  |
+| `type`           | ✅       | see tier table                    |
+| `tenant_id`      | ✅       | from tenant list                  |
+| `memory`         | ✗        | `1GB` `2GB` `4GB` `8GB` … `384GB` |
+| `version`        | ✗        | `5` (default)                     |
 
 ---
 
@@ -182,6 +189,7 @@ poll_status "$INSTANCE_ID" "running" 600
 ```
 
 REST equivalent:
+
 ```bash
 while true; do
   STATUS=$(curl -s "https://api.neo4j.io/v1/instances/$INSTANCE_ID" \
@@ -192,6 +200,7 @@ done
 ```
 
 Status lifecycle:
+
 ```
 creating → running → pausing → paused → resuming → running
                   ↘ destroying → (gone)
@@ -226,21 +235,27 @@ cypher-shell -a "$CONNECTION_URI" -u neo4j -p "$PASSWORD" "RETURN 'connected' AS
 All operations require instance in the correct state. Wrong-state ops return 4xx error.
 
 ### Pause
+
 Required state: `running`
+
 ```bash
 aura-cli instance pause --instance-id "$INSTANCE_ID"
 poll_status "$INSTANCE_ID" "paused" 600
 ```
 
 ### Resume
+
 Required state: `paused`
+
 ```bash
 aura-cli instance resume --instance-id "$INSTANCE_ID"
 poll_status "$INSTANCE_ID" "running" 900   # resume can take longer
 ```
 
 ### Resize (Professional+ only — NOT Free)
+
 Required state: `running`; instance remains available during resize.
+
 ```bash
 # REST only — CLI resize not available in v1.7
 curl -s -X PATCH "https://api.neo4j.io/v1/instances/$INSTANCE_ID" \
@@ -252,13 +267,16 @@ poll_status "$INSTANCE_ID" "running" 600
 ```
 
 ### Delete
+
 IRREVERSIBLE. Export snapshots first if data needed.
+
 ```bash
 aura-cli instance delete --instance-id "$INSTANCE_ID"
 # No poll needed — immediate
 ```
 
 REST:
+
 ```bash
 curl -s -X DELETE "https://api.neo4j.io/v1/instances/$INSTANCE_ID" \
   -H "Authorization: Bearer $TOKEN"
@@ -332,44 +350,47 @@ print("Instance ready.")
 ## Region Codes
 
 ### AWS
-| Region code | Location |
-|---|---|
-| `us-east-1` | N. Virginia |
-| `us-east-2` | Ohio |
-| `us-west-2` | Oregon |
-| `eu-west-1` | Ireland |
-| `eu-west-3` | Paris |
-| `eu-central-1` | Frankfurt |
-| `ap-southeast-1` | Singapore |
-| `ap-southeast-2` | Sydney |
-| `ap-south-1` | Mumbai |
-| `sa-east-1` | São Paulo |
+
+| Region code      | Location    |
+| ---------------- | ----------- |
+| `us-east-1`      | N. Virginia |
+| `us-east-2`      | Ohio        |
+| `us-west-2`      | Oregon      |
+| `eu-west-1`      | Ireland     |
+| `eu-west-3`      | Paris       |
+| `eu-central-1`   | Frankfurt   |
+| `ap-southeast-1` | Singapore   |
+| `ap-southeast-2` | Sydney      |
+| `ap-south-1`     | Mumbai      |
+| `sa-east-1`      | São Paulo   |
 
 ### GCP
-| Region code | Location |
-|---|---|
-| `europe-west1` | Belgium |
-| `europe-west3` | Frankfurt |
-| `europe-west4` | Netherlands |
-| `us-central1` | Iowa |
-| `us-east1` | S. Carolina |
-| `us-east4` | N. Virginia |
-| `asia-east1` | Taiwan |
-| `asia-northeast1` | Tokyo |
-| `asia-southeast1` | Singapore |
-| `australia-southeast1` | Sydney |
+
+| Region code            | Location    |
+| ---------------------- | ----------- |
+| `europe-west1`         | Belgium     |
+| `europe-west3`         | Frankfurt   |
+| `europe-west4`         | Netherlands |
+| `us-central1`          | Iowa        |
+| `us-east1`             | S. Carolina |
+| `us-east4`             | N. Virginia |
+| `asia-east1`           | Taiwan      |
+| `asia-northeast1`      | Tokyo       |
+| `asia-southeast1`      | Singapore   |
+| `australia-southeast1` | Sydney      |
 
 ### Azure
-| Region code | Location |
-|---|---|
-| `eastus` | E. US |
-| `eastus2` | E. US 2 |
-| `westeurope` | Netherlands |
-| `northeurope` | Ireland |
-| `uksouth` | London |
-| `southeastasia` | Singapore |
-| `brazilsouth` | Brazil |
-| `koreacentral` | Korea |
+
+| Region code     | Location    |
+| --------------- | ----------- |
+| `eastus`        | E. US       |
+| `eastus2`       | E. US 2     |
+| `westeurope`    | Netherlands |
+| `northeurope`   | Ireland     |
+| `uksouth`       | London      |
+| `southeastasia` | Singapore   |
+| `brazilsouth`   | Brazil      |
+| `koreacentral`  | Korea       |
 
 Enterprise tiers (Business Critical, VDC) add 20+ additional regions per provider. Check console for full list.
 Free tier: GCP only; limited subset of regions.
@@ -417,26 +438,26 @@ After `terraform apply`: poll status before marking infra ready — Terraform re
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| `403 Forbidden` after working | Token expired (1 h TTL) | Re-run `get_token()` |
-| `409 Conflict` on create | Name already exists in tenant | Change name or delete existing |
-| `422` on pause | Instance not `running` | Check status; wait for ongoing op to finish |
-| `422` on resume | Instance not `paused` | Check status |
-| `422` on resize | Below current usage | Reduce data first; can't shrink below usage |
-| Region not found | Tier doesn't support that region | Use `Free` tier on GCP only; Pro/BC on all 3 clouds |
-| Credentials lost after create | Password only returned at create time | Delete + recreate — no reset exists |
-| `429 Too Many Requests` | Rate limit hit (25 req/min Free, 125 req/min Pro+) | Add `time.sleep(2)` between polling calls |
-| `instance list` returns empty | Wrong credential active | `aura-cli credential use --name <name>` |
+| Error                         | Cause                                              | Fix                                                 |
+| ----------------------------- | -------------------------------------------------- | --------------------------------------------------- |
+| `403 Forbidden` after working | Token expired (1 h TTL)                            | Re-run `get_token()`                                |
+| `409 Conflict` on create      | Name already exists in tenant                      | Change name or delete existing                      |
+| `422` on pause                | Instance not `running`                             | Check status; wait for ongoing op to finish         |
+| `422` on resume               | Instance not `paused`                              | Check status                                        |
+| `422` on resize               | Below current usage                                | Reduce data first; can't shrink below usage         |
+| Region not found              | Tier doesn't support that region                   | Use `Free` tier on GCP only; Pro/BC on all 3 clouds |
+| Credentials lost after create | Password only returned at create time              | Delete + recreate — no reset exists                 |
+| `429 Too Many Requests`       | Rate limit hit (25 req/min Free, 125 req/min Pro+) | Add `time.sleep(2)` between polling calls           |
+| `instance list` returns empty | Wrong credential active                            | `aura-cli credential use --name <name>`             |
 
 ---
 
 ## API Rate Limits
 
-| Tier | Requests/minute |
-|---|---|
-| Free / Pro Trial (no billing) | 25 |
-| Pro with billing, BC, VDC | 125 |
+| Tier                          | Requests/minute |
+| ----------------------------- | --------------- |
+| Free / Pro Trial (no billing) | 25              |
+| Pro with billing, BC, VDC     | 125             |
 
 Poll interval: ≥10 s to stay within limits on Free; 5 s safe on Pro+.
 On `Retry-After` header in 5xx response: wait that many seconds before retry.
@@ -454,17 +475,18 @@ On `Retry-After` header in 5xx response: wait that many seconds before retry.
 
 ## WebFetch — Current Docs
 
-| Need | URL |
-|---|---|
-| REST API spec (OpenAPI) | `https://neo4j.com/docs/aura/platform/api/specification/` |
-| CLI reference | `https://neo4j.com/docs/aura/aura-cli/` |
-| Region list | `https://neo4j.com/docs/aura/managing-instances/regions/` |
-| Auth details | `https://neo4j.com/docs/aura/api/authentication/` |
-| Instance actions | `https://neo4j.com/docs/aura/managing-instances/instance-actions/` |
+| Need                    | URL                                                                |
+| ----------------------- | ------------------------------------------------------------------ |
+| REST API spec (OpenAPI) | `https://neo4j.com/docs/aura/platform/api/specification/`          |
+| CLI reference           | `https://neo4j.com/docs/aura/aura-cli/`                            |
+| Region list             | `https://neo4j.com/docs/aura/managing-instances/regions/`          |
+| Auth details            | `https://neo4j.com/docs/aura/api/authentication/`                  |
+| Instance actions        | `https://neo4j.com/docs/aura/managing-instances/instance-actions/` |
 
 ---
 
 ## Checklist
+
 - [ ] `.env` created with URI/user/password; `.env` in `.gitignore`
 - [ ] Initial credentials saved to secure storage immediately after create
 - [ ] `poll_status` called after create — do NOT connect before status = `running`

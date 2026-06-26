@@ -1,4 +1,5 @@
 # Stage 5 — explore
+
 # Deliver a visual view of the graph — the "it clicks" moment. Hard success gate. Do not skip.
 
 ## Option A — Neo4j Browser standalone (always available, zero install)
@@ -92,6 +93,7 @@ RETURN e, c, d LIMIT 50;
 
 ```markdown
 ### 5-explore
+
 status: done
 browser_url=<the generated https://browser.neo4j.io/... URL>
 viz_method=<browser|notebook-neo4j-viz|vscode>

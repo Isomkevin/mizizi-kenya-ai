@@ -42,10 +42,10 @@ uv run python3 scripts/invoke_agent.py --agent-id "$AURA_AGENT_ID" "What can you
 
 ## Files
 
-| File | Purpose |
-|---|---|
-| `SKILL.md` | Agent-readable operational playbook |
-| `scripts/fetch_schema.py` | Fetch graph schema from AuraDB; save to `schema.json` |
-| `scripts/manage_agent.py` | CRUD operations (list/create/get/update/delete) |
-| `scripts/invoke_agent.py` | Send queries to a deployed agent |
+| File                      | Purpose                                                |
+| ------------------------- | ------------------------------------------------------ |
+| `SKILL.md`                | Agent-readable operational playbook                    |
+| `scripts/fetch_schema.py` | Fetch graph schema from AuraDB; save to `schema.json`  |
+| `scripts/manage_agent.py` | CRUD operations (list/create/get/update/delete)        |
+| `scripts/invoke_agent.py` | Send queries to a deployed agent                       |
 | `references/REFERENCE.md` | Full API schema, embedding providers, response formats |

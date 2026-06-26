@@ -4,45 +4,45 @@ Full option reference for `.write.format("org.neo4j.spark.DataSource")`.
 
 ## Save Modes
 
-| Mode | Cypher | Requirements |
-|------|--------|--------------|
-| `Append` | `UNWIND ... CREATE` | None |
-| `Overwrite` | `UNWIND ... MERGE` | `node.keys` or `*.node.keys` |
-| `ErrorIfExists` | `CREATE` + error on conflict | — |
+| Mode            | Cypher                       | Requirements                 |
+| --------------- | ---------------------------- | ---------------------------- |
+| `Append`        | `UNWIND ... CREATE`          | None                         |
+| `Overwrite`     | `UNWIND ... MERGE`           | `node.keys` or `*.node.keys` |
+| `ErrorIfExists` | `CREATE` + error on conflict | —                            |
 
 ## Core Write Options (mutually exclusive — pick one)
 
-| Option | Description |
-|--------|-------------|
-| `labels` | Write nodes. `:Label` or `:Label1:Label2`. |
-| `relationship` | Write relationships with source and target nodes. |
-| `query` | Custom Cypher with `CREATE`/`MERGE`. DataFrame row available as `event`. |
+| Option         | Description                                                              |
+| -------------- | ------------------------------------------------------------------------ |
+| `labels`       | Write nodes. `:Label` or `:Label1:Label2`.                               |
+| `relationship` | Write relationships with source and target nodes.                        |
+| `query`        | Custom Cypher with `CREATE`/`MERGE`. DataFrame row available as `event`. |
 
 ## Node Write Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `labels` | — | Colon-prefixed label(s): `:Person` or `:Person:Employee` |
-| `node.keys` | — | Required for Overwrite. Comma-separated `df_col` or `df_col:node_prop` pairs used in MERGE ON. |
-| `node.properties` | all columns | Subset of DataFrame columns to write as node properties. |
-| `batch.size` | `5000` | Rows per UNWIND batch. Aggressive: 20000. |
-| `schema.optimization.node.keys` | `NONE` | `UNIQUE` — adds uniqueness constraint; `NODE_KEY` — adds node key constraint. |
+| Option                          | Default     | Description                                                                                    |
+| ------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
+| `labels`                        | —           | Colon-prefixed label(s): `:Person` or `:Person:Employee`                                       |
+| `node.keys`                     | —           | Required for Overwrite. Comma-separated `df_col` or `df_col:node_prop` pairs used in MERGE ON. |
+| `node.properties`               | all columns | Subset of DataFrame columns to write as node properties.                                       |
+| `batch.size`                    | `5000`      | Rows per UNWIND batch. Aggressive: 20000.                                                      |
+| `schema.optimization.node.keys` | `NONE`      | `UNIQUE` — adds uniqueness constraint; `NODE_KEY` — adds node key constraint.                  |
 
 ## Relationship Write Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `relationship` | — | Relationship type (no colon): `BOUGHT`, `ACTED_IN` |
-| `relationship.save.strategy` | `native` | `native`: expects `rel.*`, `source.*`, `target.*` column prefixes. `keys`: explicit mapping via sub-options. |
-| `relationship.properties` | — | Comma-separated `df_col` or `df_col:rel_prop` pairs for relationship properties. |
-| `relationship.source.labels` | — | Source node label(s): `:Customer` |
-| `relationship.source.save.mode` | `Match` | `Match`, `Append`, `Overwrite` |
-| `relationship.source.node.keys` | — | Required when save.mode=Match or Overwrite. `df_col:node_prop` mapping. |
-| `relationship.source.node.properties` | — | Additional source node properties to write. |
-| `relationship.target.labels` | — | Target node label(s): `:Product` |
-| `relationship.target.save.mode` | `Match` | `Match`, `Append`, `Overwrite` |
-| `relationship.target.node.keys` | — | Required when save.mode=Match or Overwrite. `df_col:node_prop` mapping. |
-| `relationship.target.node.properties` | — | Additional target node properties to write. |
+| Option                                | Default  | Description                                                                                                  |
+| ------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `relationship`                        | —        | Relationship type (no colon): `BOUGHT`, `ACTED_IN`                                                           |
+| `relationship.save.strategy`          | `native` | `native`: expects `rel.*`, `source.*`, `target.*` column prefixes. `keys`: explicit mapping via sub-options. |
+| `relationship.properties`             | —        | Comma-separated `df_col` or `df_col:rel_prop` pairs for relationship properties.                             |
+| `relationship.source.labels`          | —        | Source node label(s): `:Customer`                                                                            |
+| `relationship.source.save.mode`       | `Match`  | `Match`, `Append`, `Overwrite`                                                                               |
+| `relationship.source.node.keys`       | —        | Required when save.mode=Match or Overwrite. `df_col:node_prop` mapping.                                      |
+| `relationship.source.node.properties` | —        | Additional source node properties to write.                                                                  |
+| `relationship.target.labels`          | —        | Target node label(s): `:Product`                                                                             |
+| `relationship.target.save.mode`       | `Match`  | `Match`, `Append`, `Overwrite`                                                                               |
+| `relationship.target.node.keys`       | —        | Required when save.mode=Match or Overwrite. `df_col:node_prop` mapping.                                      |
+| `relationship.target.node.properties` | —        | Additional target node properties to write.                                                                  |
 
 ## Node Keys Mapping Syntax
 
@@ -81,18 +81,18 @@ write_query = """
 
 ## Performance Options
 
-| Option | Default | Recommended |
-|--------|---------|-------------|
-| `batch.size` | `5000` | `10000`–`20000` for throughput; tune to Neo4j heap |
+| Option             | Default              | Recommended                                        |
+| ------------------ | -------------------- | -------------------------------------------------- |
+| `batch.size`       | `5000`               | `10000`–`20000` for throughput; tune to Neo4j heap |
 | partitions (Spark) | DataFrame partitions | `repartition(N)` for nodes; `coalesce(1)` for rels |
 
 ## Relationship Node Save Modes
 
-| Mode | Behavior | Use When |
-|------|----------|----------|
-| `Match` | MATCH existing node by keys | Nodes already exist |
-| `Append` | CREATE new node | Always create (risk duplicates) |
-| `Overwrite` | MERGE node by keys | Upsert nodes during rel write |
+| Mode        | Behavior                    | Use When                        |
+| ----------- | --------------------------- | ------------------------------- |
+| `Match`     | MATCH existing node by keys | Nodes already exist             |
+| `Append`    | CREATE new node             | Always create (risk duplicates) |
+| `Overwrite` | MERGE node by keys          | Upsert nodes during rel write   |
 
 ## Full Relationship Write Example (Scala)
 

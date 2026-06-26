@@ -26,28 +26,28 @@ MERGE compounds this: `MERGE (n:Person {email: $email})` = `MATCH` + `CREATE IF 
 
 ## Index type decision table
 
-| Query predicate | Index type | Notes |
-|---|---|---|
-| `prop = $val`, `prop > $val`, `prop < $val`, `prop >= $val`, `prop <= $val` | **RANGE** | Numbers, dates, booleans, strings |
-| `prop STARTS WITH $val` | **RANGE** | Also supported by TEXT but RANGE is faster for prefix |
-| `prop CONTAINS $val`, `prop ENDS WITH $val` | **TEXT** | Uses trigram (text-2.0); RANGE does NOT support these efficiently |
-| `prop IN [$a, $b]` (string list) | **TEXT** | Faster than RANGE for string list membership |
-| `prop IS NOT NULL` | **RANGE** | Existence check with range index |
-| `point.distance(n.loc, $pt) < $r`, `point.withinBBox(...)` | **POINT** | Spatial queries |
-| Full-text search, multiple labels/props, fuzzy, Lucene syntax | **FULLTEXT** | Returns score; not a filter index |
-| `(n:Label)` or `()-[r:TYPE]-()` without property | **LOOKUP** | Always exists; covers label/type scans |
-| `vector.similarity.*`, `SEARCH ... VECTOR INDEX` | **VECTOR** | See `neo4j-vector-index-skill` |
-| Multiple props on same label in AND | **COMPOSITE** | All composite props must appear in WHERE |
+| Query predicate                                                             | Index type    | Notes                                                             |
+| --------------------------------------------------------------------------- | ------------- | ----------------------------------------------------------------- |
+| `prop = $val`, `prop > $val`, `prop < $val`, `prop >= $val`, `prop <= $val` | **RANGE**     | Numbers, dates, booleans, strings                                 |
+| `prop STARTS WITH $val`                                                     | **RANGE**     | Also supported by TEXT but RANGE is faster for prefix             |
+| `prop CONTAINS $val`, `prop ENDS WITH $val`                                 | **TEXT**      | Uses trigram (text-2.0); RANGE does NOT support these efficiently |
+| `prop IN [$a, $b]` (string list)                                            | **TEXT**      | Faster than RANGE for string list membership                      |
+| `prop IS NOT NULL`                                                          | **RANGE**     | Existence check with range index                                  |
+| `point.distance(n.loc, $pt) < $r`, `point.withinBBox(...)`                  | **POINT**     | Spatial queries                                                   |
+| Full-text search, multiple labels/props, fuzzy, Lucene syntax               | **FULLTEXT**  | Returns score; not a filter index                                 |
+| `(n:Label)` or `()-[r:TYPE]-()` without property                            | **LOOKUP**    | Always exists; covers label/type scans                            |
+| `vector.similarity.*`, `SEARCH ... VECTOR INDEX`                            | **VECTOR**    | See `neo4j-vector-index-skill`                                    |
+| Multiple props on same label in AND                                         | **COMPOSITE** | All composite props must appear in WHERE                          |
 
 ---
 
 ## Index providers (internal implementations)
 
-| Index type | Default provider | Notes |
-|---|---|---|
-| RANGE / UNIQUE / NODE KEY / COMPOSITE | `range-1.0` | B-tree variant; all scalar types |
-| TEXT | `text-2.0` | Trigram-based — see section below |
-| FULLTEXT | `fulltext-1.0` | Apache Lucene (`lucene+native-3.0`) |
+| Index type                            | Default provider | Notes                               |
+| ------------------------------------- | ---------------- | ----------------------------------- |
+| RANGE / UNIQUE / NODE KEY / COMPOSITE | `range-1.0`      | B-tree variant; all scalar types    |
+| TEXT                                  | `text-2.0`       | Trigram-based — see section below   |
+| FULLTEXT                              | `fulltext-1.0`   | Apache Lucene (`lucene+native-3.0`) |
 
 LOOKUP indexes (auto-created, two per database) have no user-configurable provider.
 
@@ -121,12 +121,12 @@ CREATE LOOKUP INDEX rel_type_lookup  FOR ()-[r]-() ON EACH type(r)
 
 ### FULLTEXT analyzer options
 
-| Analyzer | Use case |
-|---|---|
-| `standard-no-stop-words` | Default — general purpose, removes stop words |
-| `english` | English stemming (run/runs/running → same token) |
-| `simple` | Lowercase only, no stemming |
-| Custom (Java SPI) | Implement `AnalyzerProvider` interface |
+| Analyzer                 | Use case                                         |
+| ------------------------ | ------------------------------------------------ |
+| `standard-no-stop-words` | Default — general purpose, removes stop words    |
+| `english`                | English stemming (run/runs/running → same token) |
+| `simple`                 | Lowercase only, no stemming                      |
+| Custom (Java SPI)        | Implement `AnalyzerProvider` interface           |
 
 `fulltext.eventually_consistent: true` — index updated in background. Improves write throughput at cost of slight search lag.
 
@@ -284,6 +284,7 @@ RETURN n.name, inv.name, i.location
 ```
 
 Rules:
+
 - Typed hints (`USING RANGE INDEX`, `USING TEXT INDEX`) only valid when the planner can guarantee the type doesn't change results.
 - Hints do NOT guarantee improvement — PROFILE before/after; measure elapsed ms (not db-hits for TEXT).
 - Index **not used** when predicate compares two node properties (`WHERE p.name = p2.name`) — no anchor.

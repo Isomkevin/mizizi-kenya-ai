@@ -25,17 +25,13 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
         >
           <Search className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">Search farmers, decisions…</span>
-          <kbd className="ml-auto font-mono-data text-[10px] text-muted-foreground/80">
-            ⌘K
-          </kbd>
+          <kbd className="ml-auto font-mono-data text-[10px] text-muted-foreground/80">⌘K</kbd>
         </button>
       </div>
 
       <nav className="mt-4 flex-1 space-y-0.5 px-2">
         {appNav.map((item) => {
-          const active = item.end
-            ? pathname === item.to
-            : pathname.startsWith(item.to);
+          const active = item.end ? pathname === item.to : pathname.startsWith(item.to);
           return (
             <Link
               key={item.to}
@@ -71,18 +67,10 @@ export function AppSidebar({ onSearchOpen }: AppSidebarProps) {
   );
 }
 
-function StatusPill({
-  label,
-  status,
-}: {
-  label: string;
-  status: "connected" | "healthy";
-}) {
+function StatusPill({ label, status }: { label: string; status: "connected" | "healthy" }) {
   return (
     <div className="rounded-md border border-border bg-background px-2 py-1.5">
-      <div className="font-mono-data uppercase tracking-wider text-muted-foreground">
-        {label}
-      </div>
+      <div className="font-mono-data uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-0.5 flex items-center gap-1.5 text-foreground">
         <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--moss)]" />
         <span className="capitalize">{status}</span>

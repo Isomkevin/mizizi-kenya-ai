@@ -8,11 +8,13 @@ Full dashboard: instance card → "View all metrics" button, or Operations → M
 ## Metrics Dashboard Tabs
 
 **Resources tab:**
+
 - CPU Usage — min/max/avg % of CPU capacity
 - Storage — % disk used
 - Out of Memory Errors — count; **critical metric**, monitor closely
 
 **Instance tab:**
+
 - Heap — min/max/avg heap memory for query execution
 - Page Cache — % time data found in memory (higher = better; low = disk reads hurting performance)
 - Page Cache Evictions — times/min data swapped out; frequent spikes = page cache too small
@@ -20,6 +22,7 @@ Full dashboard: instance card → "View all metrics" button, or Operations → M
 - Garbage Collection — % time freeing memory; high = memory strain
 
 **Database tab:**
+
 - Store Size, Query Metrics, Transaction counts, Checkpoint/Replan stats
 
 ## External Monitoring (Prometheus)
@@ -34,17 +37,18 @@ Authentication: OAuth2 with Client ID + Client Secret from Metrics Integration s
 Token URL: `https://api.neo4j.io/oauth/token`
 
 Prometheus config:
+
 ```yaml
-- job_name: 'aura-metrics'
+- job_name: "aura-metrics"
   scrape_timeout: 30s
-  metrics_path: '/api/v1/<project-id>/<metrics-id>/metrics'
-  scheme: 'https'
+  metrics_path: "/api/v1/<project-id>/<metrics-id>/metrics"
+  scheme: "https"
   static_configs:
-    - targets: ['customer-metrics-api.neo4j.io']
+    - targets: ["customer-metrics-api.neo4j.io"]
   oauth2:
-    client_id: '<AURA_CLIENT_ID>'
-    client_secret: '<AURA_CLIENT_SECRET>'
-    token_url: 'https://api.neo4j.io/oauth/token'
+    client_id: "<AURA_CLIENT_ID>"
+    client_secret: "<AURA_CLIENT_SECRET>"
+    token_url: "https://api.neo4j.io/oauth/token"
 ```
 
 Access: project Settings → Metrics Integration.

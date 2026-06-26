@@ -41,9 +41,7 @@ export function QuickActions() {
               </span>
               <div className="min-w-0">
                 <div className="text-sm font-medium">{action.label}</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">
-                  {action.description}
-                </div>
+                <div className="mt-0.5 text-xs text-muted-foreground">{action.description}</div>
               </div>
               <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition group-hover:opacity-100" />
             </Link>

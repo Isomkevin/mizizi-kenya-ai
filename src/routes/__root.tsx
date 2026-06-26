@@ -19,9 +19,7 @@ function NotFoundComponent() {
         <p className="font-mono-data text-xs uppercase tracking-[0.2em] text-muted-foreground">
           404 · route not found
         </p>
-        <h1 className="font-display mt-4 text-6xl text-foreground">
-          Lost in the field.
-        </h1>
+        <h1 className="font-display mt-4 text-6xl text-foreground">Lost in the field.</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved.
         </p>
@@ -48,9 +46,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="font-display text-4xl text-foreground">
-          This page didn't load
-        </h1>
+        <h1 className="font-display text-4xl text-foreground">This page didn't load</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
@@ -97,11 +93,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Mizizi" },
-      { name: "description", content: "Mizizi (\"roots\" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend" },
-      { property: "og:description", content: "Mizizi (\"roots\" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend" },
-      { name: "twitter:description", content: "Mizizi (\"roots\" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend" },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8d766a00-ef4f-4d46-b18b-666c853b8034" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8d766a00-ef4f-4d46-b18b-666c853b8034" },
+      {
+        name: "description",
+        content:
+          'Mizizi ("roots" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend',
+      },
+      {
+        property: "og:description",
+        content:
+          'Mizizi ("roots" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend',
+      },
+      {
+        name: "twitter:description",
+        content:
+          'Mizizi ("roots" in Kiswahili) is a connected farmer risk-intelligence platform that sits between fragmented agricultural data and the two decisions that depend',
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8d766a00-ef4f-4d46-b18b-666c853b8034",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/8d766a00-ef4f-4d46-b18b-666c853b8034",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

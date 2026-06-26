@@ -6,14 +6,14 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 
 ## Phase overview
 
-| Phase | Scope | Status |
-| --- | --- | --- |
-| 1 | Design system, landing page, app route scaffold | **Done** |
-| 2 | Enterprise app shell + dashboard | **Done** |
-| 3 | Farmer intelligence | Not started |
-| 4 | Graph intelligence workspace | Not started |
-| 5 | Explainability workspace | Not started |
-| 6 | Analytics platform | Not started |
+| Phase | Scope                                           | Status      |
+| ----- | ----------------------------------------------- | ----------- |
+| 1     | Design system, landing page, app route scaffold | **Done**    |
+| 2     | Enterprise app shell + dashboard                | **Done**    |
+| 3     | Farmer intelligence                             | Not started |
+| 4     | Graph intelligence workspace                    | Not started |
+| 5     | Explainability workspace                        | Not started |
+| 6     | Analytics platform                              | Not started |
 
 ## Phase 1 — Done
 

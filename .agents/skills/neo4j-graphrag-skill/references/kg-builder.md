@@ -25,12 +25,14 @@ pipeline = SimpleKGPipeline(
 ## Schema Modes
 
 **Simple string lists** (auto-generates extraction prompt):
+
 ```python
 entities=["Person", "Organization", "Location"]
 relations=["WORKS_AT", "LOCATED_IN", "KNOWS"]
 ```
 
 **Detailed dicts** (adds LLM guidance per type):
+
 ```python
 entities=[
     {"label": "Person", "description": "A human individual", "properties": [{"name": "name", "type": "str"}]},
@@ -43,6 +45,7 @@ relations=[
 ```
 
 **Schema patterns** (restrict which entity pairs a relation connects):
+
 ```python
 schema={
     "node_types": [...],
@@ -54,6 +57,7 @@ schema={
 ```
 
 **Schema modes** (set via `schema` param):
+
 - `EXTRACTED` (default) — LLM infers schema from text
 - `FREE` — unguided extraction; no schema constraint
 - Custom — pass explicit `schema` dict
@@ -92,9 +96,11 @@ When `perform_entity_resolution=True` (default): similar entity nodes are merged
 ## Structured Output
 
 Use with OpenAI or VertexAI to enforce JSON schema at API level (reduces parsing errors):
+
 ```python
 llm = OpenAILLM(model_name="gpt-4o", model_params={"use_structured_output": True})
 ```
+
 Not available for Anthropic, Ollama, Mistral (as of v1.x).
 
 ## Batch Processing Multiple Documents

@@ -13,12 +13,14 @@ allowed-tools: Bash WebFetch
 ---
 
 ## When to Use
+
 - Java/Kotlin code connecting to Neo4j (Aura or self-managed)
 - Setting up driver, sessions, transactions in Maven/Gradle projects
 - Debugging result handling, error recovery, connection pool issues
 - Async (`CompletableFuture`) or reactive (Project Reactor / RxJava) Neo4j access
 
 ## When NOT to Use
+
 - **Cypher query authoring/optimization** → `neo4j-cypher-skill`
 - **Driver version upgrades** → `neo4j-migration-skill`
 - **Spring Data Neo4j** (`@Node`, `@Relationship`, `Neo4jRepository`) → `neo4j-spring-data-skill`
@@ -28,6 +30,7 @@ allowed-tools: Bash WebFetch
 ## Dependency
 
 ### Maven
+
 ```xml
 <dependency>
     <groupId>org.neo4j.driver</groupId>
@@ -37,6 +40,7 @@ allowed-tools: Bash WebFetch
 ```
 
 ### Gradle
+
 ```groovy
 implementation 'org.neo4j.driver:neo4j-java-driver:6.1.0'
 ```
@@ -57,6 +61,7 @@ String database = System.getenv().getOrDefault("NEO4J_DATABASE",  "neo4j");
 ```
 
 Spring Boot: inject via `@Value("${spring.neo4j.uri}")` or `application.properties`:
+
 ```properties
 spring.neo4j.uri=neo4j+s://xxx.databases.neo4j.io
 spring.neo4j.authentication.username=neo4j
@@ -85,12 +90,12 @@ try (var driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password))) {
 
 URI schemes:
 
-| URI | Use |
-|---|---|
-| `neo4j://localhost` | Unencrypted, cluster routing |
+| URI                                | Use                          |
+| ---------------------------------- | ---------------------------- |
+| `neo4j://localhost`                | Unencrypted, cluster routing |
 | `neo4j+s://xxx.databases.neo4j.io` | TLS + cluster routing (Aura) |
-| `bolt://localhost:7687` | Unencrypted, single instance |
-| `bolt+s://localhost:7687` | TLS, single instance |
+| `bolt://localhost:7687`            | Unencrypted, single instance |
+| `bolt+s://localhost:7687`          | TLS, single instance         |
 
 Auth options: `AuthTokens.basic(u,p)` · `AuthTokens.bearer(token)` · `AuthTokens.kerberos(b64)` · `AuthTokens.none()`
 
@@ -98,14 +103,14 @@ Auth options: `AuthTokens.basic(u,p)` · `AuthTokens.bearer(token)` · `AuthToke
 
 ## Choosing the Right API
 
-| API | When | Auto-retry | Streaming |
-|---|---|:---:|:---:|
-| `driver.executableQuery()` | Default for most queries | ✅ | ❌ eager |
-| `session.executeRead/Write()` | Large results, callback control | ✅ | ✅ |
-| `session.beginTransaction()` | Multi-method, external coordination | ❌ | ✅ |
-| `session.run()` | Self-managing queries (`CALL IN TRANSACTIONS`) | ⚠️ one-shot [6.1+] | ✅ |
-| `driver.asyncSession()` | Non-blocking `CompletableFuture` | ✅ | ✅ |
-| `driver.rxSession()` | Reactor/RxJava backpressure | ✅ | ✅ |
+| API                           | When                                           |     Auto-retry     | Streaming |
+| ----------------------------- | ---------------------------------------------- | :----------------: | :-------: |
+| `driver.executableQuery()`    | Default for most queries                       |         ✅         | ❌ eager  |
+| `session.executeRead/Write()` | Large results, callback control                |         ✅         |    ✅     |
+| `session.beginTransaction()`  | Multi-method, external coordination            |         ❌         |    ✅     |
+| `session.run()`               | Self-managing queries (`CALL IN TRANSACTIONS`) | ⚠️ one-shot [6.1+] |    ✅     |
+| `driver.asyncSession()`       | Non-blocking `CompletableFuture`               |         ✅         |    ✅     |
+| `driver.rxSession()`          | Reactor/RxJava backpressure                    |         ✅         |    ✅     |
 
 `CALL { … } IN TRANSACTIONS` and `USING PERIODIC COMMIT` self-manage their transaction — use `session.run()` only. `executableQuery` and `executeRead/Write` will fail for these queries.
 
@@ -233,6 +238,7 @@ try (var session = driver.session(SessionConfig.builder().withDatabase("neo4j").
 **Commit uncertainty**: if `tx.commit()` throws `ServiceUnavailableException`, the commit may or may not have succeeded. Design writes as idempotent (`MERGE` + unique constraints) so retrying is safe.
 
 Choose explicit vs managed:
+
 - Auto-retry needed → `executeRead` / `executeWrite`
 - Work spans multiple methods → explicit (pass `tx` as parameter)
 - Coordinating with external I/O → explicit (commit only after I/O succeeds)
@@ -261,18 +267,18 @@ Managed transactions auto-retry `TransientException` — no catch needed.
 
 ## Data Types & Value Extraction
 
-| Cypher type | Java accessor |
-|---|---|
-| `Integer` | `value.asLong()` / `value.asInt()` |
-| `Float` | `value.asDouble()` |
-| `String` | `value.asString()` |
-| `Boolean` | `value.asBoolean()` |
-| `List` | `value.asList()` |
-| `Map` | `value.asMap()` |
-| `Node` | `value.asNode()` |
-| `Relationship` | `value.asRelationship()` |
-| `Date` | `value.asLocalDate()` |
-| `DateTime` | `value.asZonedDateTime()` |
+| Cypher type    | Java accessor                      |
+| -------------- | ---------------------------------- |
+| `Integer`      | `value.asLong()` / `value.asInt()` |
+| `Float`        | `value.asDouble()`                 |
+| `String`       | `value.asString()`                 |
+| `Boolean`      | `value.asBoolean()`                |
+| `List`         | `value.asList()`                   |
+| `Map`          | `value.asMap()`                    |
+| `Node`         | `value.asNode()`                   |
+| `Relationship` | `value.asRelationship()`           |
+| `Date`         | `value.asLocalDate()`              |
+| `DateTime`     | `value.asZonedDateTime()`          |
 
 ```java
 var record = result.records().get(0);
@@ -286,11 +292,11 @@ Map<String,Object> props = node.asMap();
 
 ### Null safety — two distinct cases
 
-| Situation | `record.get(key)` | `.asString()` |
-|---|---|---|
-| Key present, value non-null | the value | returns string |
-| Key present, value is graph null | `Value` where `.isNull()` = true | **throws** `Uncoercible` |
-| Key absent (typo / not projected) | `Value.NULL` sentinel | **throws** `NoSuchElementException` |
+| Situation                         | `record.get(key)`                | `.asString()`                       |
+| --------------------------------- | -------------------------------- | ----------------------------------- |
+| Key present, value non-null       | the value                        | returns string                      |
+| Key present, value is graph null  | `Value` where `.isNull()` = true | **throws** `Uncoercible`            |
+| Key absent (typo / not projected) | `Value.NULL` sentinel            | **throws** `NoSuchElementException` |
 
 ```java
 // Graph null — use default overload (safe only if key is always projected):
@@ -393,6 +399,7 @@ Allowed leaf types in parameter maps: `String`, `Long`/`Integer`/`Short`/`Byte`,
 **Group writes in one transaction** — one `executeWrite` with a loop, not one `executeWrite` per iteration.
 
 **Connection pool** — default 100 connections. Tune if exhausted:
+
 ```java
 Config.builder()
     .withMaxConnectionPoolSize(50)
@@ -404,40 +411,43 @@ Config.builder()
 
 ## Common Errors
 
-| Mistake | Fix |
-|---|---|
-| String-interpolate Cypher params | `.withParameters(Map.of(...))` always |
-| Omit database name | Set in `QueryConfig` / `SessionConfig` every time |
-| New `Driver` per request | Create once at startup; share everywhere |
-| Share `Session` across threads | One session per request/thread |
-| Return `Result` from tx callback | Collect to `List`/`Map` inside callback |
-| Leave `Result` open before next `tx.run()` | Consume before next call |
-| Side effects in managed tx callback | Move outside — callback may retry |
-| Pass custom objects to UNWIND params | Convert to `List<Map<String,Object>>` |
-| `asString()` on graph null | `.asString("default")` or check `.isNull()` |
-| `asString()` on absent key | `containsKey()` before optional access |
-| Naked `tx.rollback()` in catch | Wrap in try/catch; use `addSuppressed` |
-| Assume `commit()` failure = no commit | Commit uncertainty — design writes idempotent |
-| Block inside async callback (`.join()`) | Chain with `thenCompose` |
-| Skip session close in async error path | `exceptionallyCompose` to close then re-throw |
-| One transaction per write in loop | Batch with `UNWIND` or group in one callback |
-| `executeWrite` for a read | Use `executeRead` — routes to replica |
+| Mistake                                    | Fix                                               |
+| ------------------------------------------ | ------------------------------------------------- |
+| String-interpolate Cypher params           | `.withParameters(Map.of(...))` always             |
+| Omit database name                         | Set in `QueryConfig` / `SessionConfig` every time |
+| New `Driver` per request                   | Create once at startup; share everywhere          |
+| Share `Session` across threads             | One session per request/thread                    |
+| Return `Result` from tx callback           | Collect to `List`/`Map` inside callback           |
+| Leave `Result` open before next `tx.run()` | Consume before next call                          |
+| Side effects in managed tx callback        | Move outside — callback may retry                 |
+| Pass custom objects to UNWIND params       | Convert to `List<Map<String,Object>>`             |
+| `asString()` on graph null                 | `.asString("default")` or check `.isNull()`       |
+| `asString()` on absent key                 | `containsKey()` before optional access            |
+| Naked `tx.rollback()` in catch             | Wrap in try/catch; use `addSuppressed`            |
+| Assume `commit()` failure = no commit      | Commit uncertainty — design writes idempotent     |
+| Block inside async callback (`.join()`)    | Chain with `thenCompose`                          |
+| Skip session close in async error path     | `exceptionallyCompose` to close then re-throw     |
+| One transaction per write in loop          | Batch with `UNWIND` or group in one callback      |
+| `executeWrite` for a read                  | Use `executeRead` — routes to replica             |
 
 ---
 
 ## References
 
 Load on demand:
+
 - [references/async-reactive.md](references/async-reactive.md) — full async `CompletableFuture` patterns, reactive `RxSession` with `Flux.usingWhen`, deadlock avoidance
 - [references/advanced-config.md](references/advanced-config.md) — full `Config.builder()` options, TLS, notification filtering, session-level auth, user impersonation, cross-session bookmarks, spatial types (Values.point/WGS-84/Cartesian)
 
 Docs:
+
 - Java Driver manual: https://neo4j.com/docs/java-manual/current/
 - API reference: https://neo4j.com/docs/api/java-driver/current/
 
 ---
 
 ## Checklist
+
 - [ ] One `Driver` instance created at startup; closed on shutdown
 - [ ] `verifyConnectivity()` called after driver creation
 - [ ] Database name specified in every `QueryConfig` / `SessionConfig`

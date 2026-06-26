@@ -3,6 +3,7 @@
 Skill for programmatic security management in Neo4j — users, roles, privileges, and auth configuration.
 
 **Covers:**
+
 - **User management**: `CREATE USER`, `ALTER USER` (password, status, home database), `DROP USER`, `SHOW USERS`
 - **Role management**: `CREATE ROLE`, `GRANT ROLE`, `REVOKE ROLE`, `DROP ROLE`, `SHOW ROLES`
 - **Privilege grants**: GRANT/DENY/REVOKE for graph, database, and DBMS privileges
@@ -13,18 +14,22 @@ Skill for programmatic security management in Neo4j — users, roles, privileges
 - **Auth provider config reference**: native, LDAP, OIDC/SSO (operational config — not Cypher)
 
 **Edition requirements:**
+
 - Basic RBAC: Community and Enterprise
 - Property-level, sub-graph, ABAC, LDAP, SSO: Enterprise only
 
 **Not covered:**
+
 - Writing application Cypher queries → `neo4j-cypher-skill`
 - Cluster ops, backups, neo4j-admin → `neo4j-cli-tools-skill`
 - Driver connection and session management → `neo4j-driver-*-skill`
 
 **References:**
+
 - [privilege-reference.md](references/privilege-reference.md) — full GRANT/DENY/REVOKE syntax for all privilege types
 
 **Install:**
+
 ```bash
 npx skills add https://github.com/neo4j-contrib/neo4j-skills --skill neo4j-security-skill
 ```

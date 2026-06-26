@@ -1,11 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import {
-  Bell,
-  ChevronRight,
-  Plus,
-  Search,
-  User,
-} from "lucide-react";
+import { Bell, ChevronRight, Plus, Search, User } from "lucide-react";
 
 import { currentNavLabel } from "@/components/app/nav";
 import {
@@ -101,7 +95,12 @@ export function AppHeader({ pathname, onSearchOpen }: AppHeaderProps) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="relative h-8 w-8" aria-label="Notifications">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative h-8 w-8"
+            aria-label="Notifications"
+          >
             <Bell className="h-4 w-4" />
             <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[color:var(--amber)]" />
           </Button>

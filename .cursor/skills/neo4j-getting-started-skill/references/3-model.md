@@ -1,4 +1,5 @@
 # Stage 3 — model
+
 # Design or discover the graph data model for the use-case.
 
 ## Autonomous mode check — do this FIRST
@@ -29,6 +30,7 @@ Proceed to `load`.
 ## Path B — CSV-first modeling
 
 Inspect headers and sample rows before designing anything:
+
 ```bash
 for f in ./data/*.csv; do
   echo "=== $f ==="
@@ -38,6 +40,7 @@ done
 ```
 
 Derive model from structure:
+
 - Each entity-centric file → candidate node label (look for `_id` columns as primary key)
 - Foreign key column in one file referencing another → relationship
 - Normalize names: `customer_id` column → `Customer` node with `id` property
@@ -48,6 +51,7 @@ Derive model from structure:
 Use `${CLAUDE_SKILL_DIR}/references/domain-patterns.md` as starting templates. Adapt to the user's use-case.
 
 Principles:
+
 - 3–6 node labels (more for advanced users)
 - 3–8 relationship types with clear direction and semantics
 - One natural primary key per node (enables MERGE safety)
@@ -71,6 +75,7 @@ Write discovered schema to `schema.json`. Skip to `query` stage.
 **AUTONOMOUS MODE (all context provided upfront): SKIP THIS STEP ENTIRELY. Do not show the model for review. Do not ask "does this look right?". Proceed directly to Step M4.**
 
 HITL only — show the proposed model and wait for approval:
+
 ```
 Here's the graph model I'm proposing for <USE_CASE>:
 
@@ -95,11 +100,9 @@ mkdir -p schema
 ```json
 {
   "nodes": [
-    {"label": "Person", "primaryKey": "id", "properties": ["id","name","email","createdAt"]}
+    { "label": "Person", "primaryKey": "id", "properties": ["id", "name", "email", "createdAt"] }
   ],
-  "relationships": [
-    {"type": "FOLLOWS", "from": "Person", "to": "Person", "properties": []}
-  ]
+  "relationships": [{ "type": "FOLLOWS", "from": "Person", "to": "Person", "properties": [] }]
 }
 ```
 
@@ -121,6 +124,7 @@ CREATE INDEX person_name IF NOT EXISTS FOR (p:Person) ON (p.name);
 ```
 
 For vector/graphrag use-cases, add the vector index here too:
+
 ```cypher
 CYPHER 25
 CREATE VECTOR INDEX chunk_embeddings IF NOT EXISTS
@@ -132,6 +136,7 @@ CREATE VECTOR INDEX chunk_embeddings IF NOT EXISTS
 
 ```markdown
 ### 3-model
+
 status: done
 labels=<comma-separated node labels>
 relationships=<comma-separated relationship types>

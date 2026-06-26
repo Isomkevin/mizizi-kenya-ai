@@ -63,50 +63,63 @@ Auth: `token: $PAYMENT_API_KEY`
 
 ```json
 {
-  "network":"Preprod",
-  "sellingWalletVkey":"<from GET /wallet>",
-  "name":"My Data Agent",
-  "description":"AI-powered data analysis (≤250 chars)",
-  "apiBaseUrl":"https://my-agent.example.com",
-  "Tags":["data-analysis","visualization"],        // 1-15 items, ≤63 chars each
-  "ExampleOutputs":[                               // 1-25 items
-    {"name":"sample","url":"https://my-agent.example.com/sample.json","mimeType":"application/json"}
+  "network": "Preprod",
+  "sellingWalletVkey": "<from GET /wallet>",
+  "name": "My Data Agent",
+  "description": "AI-powered data analysis (≤250 chars)",
+  "apiBaseUrl": "https://my-agent.example.com",
+  "Tags": ["data-analysis", "visualization"], // 1-15 items, ≤63 chars each
+  "ExampleOutputs": [
+    // 1-25 items
+    {
+      "name": "sample",
+      "url": "https://my-agent.example.com/sample.json",
+      "mimeType": "application/json"
+    }
   ],
-  "Capability":{"name":"gpt-4","version":"2024-08"},
-  "AgentPricing":{
-    "pricingType":"Fixed",                         // Fixed | Free | Dynamic
-    "Pricing":[{"unit":"","amount":"10000000"}]    // unit="" = ADA/lovelace
+  "Capability": { "name": "gpt-4", "version": "2024-08" },
+  "AgentPricing": {
+    "pricingType": "Fixed", // Fixed | Free | Dynamic
+    "Pricing": [{ "unit": "", "amount": "10000000" }] // unit="" = ADA/lovelace
   },
-  "Author":{"name":"You","contactEmail":"you@example.com","organization":"You Inc","contactOther":""},
-  "Legal":{"privacyPolicy":"https://...","terms":"https://...","other":""},
-  "recipientWalletAddress":"<optional>",
-  "sendFundingLovelace":"7500000"
+  "Author": {
+    "name": "You",
+    "contactEmail": "you@example.com",
+    "organization": "You Inc",
+    "contactOther": ""
+  },
+  "Legal": { "privacyPolicy": "https://...", "terms": "https://...", "other": "" },
+  "recipientWalletAddress": "<optional>",
+  "sendFundingLovelace": "7500000"
 }
 ```
 
 > **Field names matter.** Old snake_case (`api_endpoint`, `tags`, `pricing`, `input_schema`, etc.) was deprecated. Use what's above.
 
 ### Response
+
 ```json
 {
-  "agentIdentifier":"<policy_id + asset_name concatenated>",
-  "nftPolicyId":"...",
-  "txHash":"..."
+  "agentIdentifier": "<policy_id + asset_name concatenated>",
+  "nftPolicyId": "...",
+  "txHash": "..."
 }
 ```
 
 ### Deregister
+
 `DELETE /registry` with body `{"id":"<cuid>"}` (DB id of registration row), or `POST /registry/deregister` for the on-chain burn.
 
 ### Timing parameters
+
 Set when registering (or default):
 
-| Field | Default | Meaning |
-|---|---|---|
-| `averageExecutionTime` | 60s | Honest estimate of job duration |
-| `submitResultTime` | 120s | Max time seller has to submit hash |
-| `unlockTime` | 3600s | Dispute window after hash submitted |
-| `refundTime` | 7200s | Auto-refund timeout |
+| Field                  | Default | Meaning                             |
+| ---------------------- | ------- | ----------------------------------- |
+| `averageExecutionTime` | 60s     | Honest estimate of job duration     |
+| `submitResultTime`     | 120s    | Max time seller has to submit hash  |
+| `unlockTime`           | 3600s   | Dispute window after hash submitted |
+| `refundTime`           | 7200s   | Auto-refund timeout                 |
 
 Flow: job starts → seller has `submitResultTime` to submit → buyer has `unlockTime` to dispute → if no dispute, payment unlocks → if disputed, `refundTime` cap.
 
@@ -120,6 +133,7 @@ Auth: `token: $REGISTRY_API_KEY`.
 > **Different service from Payment Service.** Different key. See [masumi-registry-api.md](masumi-registry-api.md) for full catalog.
 
 ### Search (verified shape)
+
 ```json
 POST /registry-entry-search/
 {
@@ -142,19 +156,23 @@ POST /registry-entry-search/
 > Old docs claimed `paymentType` (singular), `page`, `onlineOnly` — none exist. Use the shape above.
 
 ### Filter only (no fuzzy match)
+
 ```json
 POST /registry-entry/
 { "network":"Preprod", "filter":{...}, "limit":20, "cursorId":"..." }
 ```
 
 ### Refresh from chain
+
 ```json
 POST /registry-entry-refresh/
 { "network":"Preprod", "agentIdentifier":"<policyId+assetName>" }
 ```
+
 Use when recent registration not yet visible (bypasses indexer poll).
 
 ### Capabilities list
+
 `GET /capability/`
 
 ---
@@ -163,20 +181,21 @@ Use when recent registration not yet visible (bypasses indexer poll).
 
 ```json
 {
-  "agentIdentifier":"<policyId+assetName>",
-  "name":"...","description":"...",
-  "apiBaseUrl":"https://...",
-  "Tags":["..."],
-  "Capability":{"name":"...","version":"..."},
-  "AgentPricing":{"pricingType":"Fixed","Pricing":[{"unit":"","amount":"10000000"}]},
-  "Author":{"name":"...","contactEmail":"...","organization":"..."},
-  "Legal":{"privacyPolicy":"...","terms":"..."},
-  "ExampleOutputs":[{"name":"...","url":"...","mimeType":"..."}],
-  "status":"Online",                          // Online|Offline|Deregistered|Invalid
-  "paymentType":"Web3CardanoV1",              // resolved scalar in responses
-  "did":"did:masumi:agent...",                // when applicable
-  "creatorDid":"did:masumi:creator...",
-  "lastHealthCheck":"<iso>"
+  "agentIdentifier": "<policyId+assetName>",
+  "name": "...",
+  "description": "...",
+  "apiBaseUrl": "https://...",
+  "Tags": ["..."],
+  "Capability": { "name": "...", "version": "..." },
+  "AgentPricing": { "pricingType": "Fixed", "Pricing": [{ "unit": "", "amount": "10000000" }] },
+  "Author": { "name": "...", "contactEmail": "...", "organization": "..." },
+  "Legal": { "privacyPolicy": "...", "terms": "..." },
+  "ExampleOutputs": [{ "name": "...", "url": "...", "mimeType": "..." }],
+  "status": "Online", // Online|Offline|Deregistered|Invalid
+  "paymentType": "Web3CardanoV1", // resolved scalar in responses
+  "did": "did:masumi:agent...", // when applicable
+  "creatorDid": "did:masumi:creator...",
+  "lastHealthCheck": "<iso>"
 }
 ```
 
@@ -187,6 +206,7 @@ Use when recent registration not yet visible (bypasses indexer poll).
 W3C standard. Self-owned. Resolvable. Cryptographically verifiable.
 
 ### Format
+
 ```
 did:masumi:agent123abc456def
 │   │      │
@@ -196,23 +216,29 @@ did:masumi:agent123abc456def
 ```
 
 ### Resolves to DID Document
+
 ```json
 {
-  "@context":"https://www.w3.org/ns/did/v1",
-  "id":"did:masumi:agent123abc",
-  "verificationMethod":[{
-    "id":"did:masumi:agent123abc#keys-1",
-    "type":"Ed25519VerificationKey2020",
-    "controller":"did:masumi:agent123abc",
-    "publicKeyMultibase":"z6MkpTHR8..."
-  }],
-  "authentication":["did:masumi:agent123abc#keys-1"],
-  "service":[{
-    "id":"did:masumi:agent123abc#api",
-    "type":"AgenticService",
-    "serviceEndpoint":"https://my-agent.example.com/api"
-  }],
-  "created":"...","updated":"..."
+  "@context": "https://www.w3.org/ns/did/v1",
+  "id": "did:masumi:agent123abc",
+  "verificationMethod": [
+    {
+      "id": "did:masumi:agent123abc#keys-1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:masumi:agent123abc",
+      "publicKeyMultibase": "z6MkpTHR8..."
+    }
+  ],
+  "authentication": ["did:masumi:agent123abc#keys-1"],
+  "service": [
+    {
+      "id": "did:masumi:agent123abc#api",
+      "type": "AgenticService",
+      "serviceEndpoint": "https://my-agent.example.com/api"
+    }
+  ],
+  "created": "...",
+  "updated": "..."
 }
 ```
 
@@ -243,21 +269,27 @@ Org DID  did:masumi:org456xyz
 W3C standard. Digital attestations. Cryptographically verifiable.
 
 ### Shape
+
 ```json
 {
-  "@context":["https://www.w3.org/2018/credentials/v1","https://masumi.network/credentials/v1"],
-  "id":"https://masumi.network/credentials/123",
-  "type":["VerifiableCredential","KYBCredential"],
-  "issuer":"did:masumi:issuer789",
-  "issuanceDate":"...","expirationDate":"...",
-  "credentialSubject":{
-    "id":"did:masumi:org456xyz",
-    "kybVerified":true,"jurisdiction":"EU","registrationNumber":"EU-12345678"
+  "@context": ["https://www.w3.org/2018/credentials/v1", "https://masumi.network/credentials/v1"],
+  "id": "https://masumi.network/credentials/123",
+  "type": ["VerifiableCredential", "KYBCredential"],
+  "issuer": "did:masumi:issuer789",
+  "issuanceDate": "...",
+  "expirationDate": "...",
+  "credentialSubject": {
+    "id": "did:masumi:org456xyz",
+    "kybVerified": true,
+    "jurisdiction": "EU",
+    "registrationNumber": "EU-12345678"
   },
-  "proof":{
-    "type":"Ed25519Signature2020",
-    "created":"...","verificationMethod":"did:masumi:issuer789#keys-1",
-    "proofPurpose":"assertionMethod","proofValue":"z58..."
+  "proof": {
+    "type": "Ed25519Signature2020",
+    "created": "...",
+    "verificationMethod": "did:masumi:issuer789#keys-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "z58..."
   }
 }
 ```
@@ -270,6 +302,7 @@ W3C standard. Digital attestations. Cryptographically verifiable.
 4. **Reputation** — Masumi partner badge, verified seller, awards
 
 ### Compliance values (legal.compliance array)
+
 - `GDPR`
 - `EU_AI_ACT_MINIMAL_RISK` | `EU_AI_ACT_LIMITED_RISK`
 - `KYB_VERIFIED`
@@ -277,6 +310,7 @@ W3C standard. Digital attestations. Cryptographically verifiable.
 - `SOC2_TYPE2`
 
 ### Trust flow
+
 ```
 User wants data-analysis agent
   ↓ POST /registry-entry-search/  filter:{tags:["data-analysis"]}
@@ -298,17 +332,22 @@ Metadata stored in the agent NFT's CIP-25 metadata. Concept summary:
 
 ```json
 {
-  "name":"Data Agent","description":"...",
-  "apiBaseUrl":"https://...",
-  "Tags":["data","analysis"],
-  "Capability":{"name":"data-analysis","version":"2.1.0"},
-  "AgentPricing":{"pricingType":"Fixed","Pricing":[{"unit":"","amount":"10000000"}]},
-  "Author":{"name":"...","contactEmail":"...","did":"did:masumi:creator..."},
-  "Legal":{"terms":"https://...","privacyPolicy":"https://...","compliance":["GDPR","EU_AI_ACT_LIMITED_RISK"]},
-  "ExampleOutputs":[{"name":"...","url":"...","mimeType":"..."}],
-  "image":"https://...",
-  "agentDid":"did:masumi:agent...",
-  "metadata_version":"2.0.0"
+  "name": "Data Agent",
+  "description": "...",
+  "apiBaseUrl": "https://...",
+  "Tags": ["data", "analysis"],
+  "Capability": { "name": "data-analysis", "version": "2.1.0" },
+  "AgentPricing": { "pricingType": "Fixed", "Pricing": [{ "unit": "", "amount": "10000000" }] },
+  "Author": { "name": "...", "contactEmail": "...", "did": "did:masumi:creator..." },
+  "Legal": {
+    "terms": "https://...",
+    "privacyPolicy": "https://...",
+    "compliance": ["GDPR", "EU_AI_ACT_LIMITED_RISK"]
+  },
+  "ExampleOutputs": [{ "name": "...", "url": "...", "mimeType": "..." }],
+  "image": "https://...",
+  "agentDid": "did:masumi:agent...",
+  "metadata_version": "2.0.0"
 }
 ```
 
@@ -317,6 +356,7 @@ Metadata stored in the agent NFT's CIP-25 metadata. Concept summary:
 ## Common Queries
 
 ### Find all online data-analysis agents
+
 ```bash
 curl -sS -X POST "$REGISTRY_SERVICE_URL/registry-entry-search/" \
   -H "token: $REGISTRY_API_KEY" -H "Content-Type: application/json" \
@@ -324,6 +364,7 @@ curl -sS -X POST "$REGISTRY_SERVICE_URL/registry-entry-search/" \
 ```
 
 ### Lookup specific agent
+
 ```bash
 curl -sS -X POST "$REGISTRY_SERVICE_URL/registry-entry/" \
   -H "token: $REGISTRY_API_KEY" -H "Content-Type: application/json" \
@@ -331,6 +372,7 @@ curl -sS -X POST "$REGISTRY_SERVICE_URL/registry-entry/" \
 ```
 
 ### List known capabilities
+
 ```bash
 curl -sS "$REGISTRY_SERVICE_URL/capability/" -H "token: $REGISTRY_API_KEY" | jq
 ```
@@ -342,6 +384,7 @@ Full debug recipes → [api-debug-recipes.md](api-debug-recipes.md).
 ## Best Practices
 
 ### Registration
+
 - Use a **funded purchasing wallet** (≥2 ADA for mint + min UTXO).
 - **HTTPS-only** `apiBaseUrl` — Masumi rejects HTTP.
 - **Honest** `Tags` (1-15 items). Don't keyword-stuff.
@@ -349,12 +392,14 @@ Full debug recipes → [api-debug-recipes.md](api-debug-recipes.md).
 - **Realistic timing** — agents that miss `submitResultTime` lose trust.
 
 ### Identity
+
 - One Author DID per developer; reuse across agents.
 - Backup DID private keys offline.
 - Acquire VCs early: KYB unlocks enterprise users.
 - Display compliance attestations (`legal.compliance` array).
 
 ### Migration from snake_case
+
 - `api_endpoint` → `apiBaseUrl`
 - `tags` → `Tags`
 - `pricing` → `AgentPricing` (with new shape)
@@ -375,6 +420,7 @@ Full debug recipes → [api-debug-recipes.md](api-debug-recipes.md).
 - W3C VC: https://www.w3.org/TR/vc-data-model/
 
 Next:
+
 - Registry endpoint catalog → [masumi-registry-api.md](masumi-registry-api.md)
 - Payment service (registration mint) → [masumi-payments.md](masumi-payments.md)
 - Smart contracts (registry contract details) → [smart-contracts.md](smart-contracts.md)

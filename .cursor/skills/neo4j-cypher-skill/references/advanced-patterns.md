@@ -10,6 +10,7 @@ Version markers: `[Neo4j 5]` = Neo4j 5.x, `[2025.x]` = Neo4j 2025.x / Cypher 25,
 
 Default: `DIFFERENT RELATIONSHIPS` — each relationship traversed at most once per path.
 Use `REPEATABLE ELEMENTS` when:
+
 - Nodes have limited connectivity (single in/out relationship) and weight-optimized paths are needed
 - Problem requires backtracking through already-visited nodes (circular routes, constrained path search)
 - Path must revisit waypoints (multi-stop routes, recurring visits)
@@ -132,6 +133,7 @@ RETURN p, [(event)-[r:WITH]->(x) | [r, x]] AS with_things
 ```
 
 **Scaling with GDS WCC** — process independent components in parallel:
+
 ```cypher
 CYPHER 25
 CALL gds.wcc.stream('wcc_graph') YIELD nodeId, componentId
@@ -153,6 +155,7 @@ CALL (events) {
 ```
 
 **Avoid O(n²) clique projection** — use linear path through shared entity instead:
+
 ```cypher
 CYPHER 25
 MATCH (thing:Thing|User)
@@ -196,13 +199,13 @@ RETURN count(path) AS validPaths
 
 ## Path Selector Reference [2025.x]
 
-| Selector | Returns | Use case |
-|---|---|---|
-| `SHORTEST 1` | One shortest path | Existence + distance |
-| `ALL SHORTEST` | All equal-minimum-length paths | Parallel routing |
-| `ANY` | Any path (no length guarantee) | Fast existence check |
-| `SHORTEST k` | k shortest paths | Top-k routing |
-| `SHORTEST k GROUPS` | All paths grouped by length up to k distinct lengths | Tier-based routing |
+| Selector            | Returns                                              | Use case             |
+| ------------------- | ---------------------------------------------------- | -------------------- |
+| `SHORTEST 1`        | One shortest path                                    | Existence + distance |
+| `ALL SHORTEST`      | All equal-minimum-length paths                       | Parallel routing     |
+| `ANY`               | Any path (no length guarantee)                       | Fast existence check |
+| `SHORTEST k`        | k shortest paths                                     | Top-k routing        |
+| `SHORTEST k GROUPS` | All paths grouped by length up to k distinct lengths | Tier-based routing   |
 
 ```cypher
 // k-shortest paths with cost

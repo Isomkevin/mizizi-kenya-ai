@@ -24,12 +24,12 @@ No Cypher required — visual drag-and-drop CSV-to-graph mapping.
 
 ## Common Mistakes
 
-| Mistake | Consequence | Fix |
-|---|---|---|
-| No unique identifier set | Duplicates on re-import; can't create relationships | Always set key icon before importing |
-| Keeping FK columns as node properties | Graph has no relationships | Map FK columns to relationship definitions |
-| Wrong data type | Properties silently missing | Check column types; verify node counts post-import |
-| Nodes before constraints | Constraint creation fails on existing duplicates | Unique ID in Data Importer creates constraint first automatically |
+| Mistake                               | Consequence                                         | Fix                                                               |
+| ------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------- |
+| No unique identifier set              | Duplicates on re-import; can't create relationships | Always set key icon before importing                              |
+| Keeping FK columns as node properties | Graph has no relationships                          | Map FK columns to relationship definitions                        |
+| Wrong data type                       | Properties silently missing                         | Check column types; verify node counts post-import                |
+| Nodes before constraints              | Constraint creation fails on existing duplicates    | Unique ID in Data Importer creates constraint first automatically |
 
 ## Verify After Import
 

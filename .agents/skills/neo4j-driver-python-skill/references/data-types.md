@@ -2,19 +2,19 @@
 
 ## Parameter Types (allowed)
 
-| Python type | Cypher type |
-|---|---|
-| `str` | String |
-| `int` | Integer |
-| `float` | Float |
-| `bool` | Boolean |
-| `list` / `tuple` | List |
-| `dict` | Map |
-| `None` | null |
-| `datetime.date` | Date |
-| `datetime.datetime` | DateTime |
-| `datetime.time` | Time |
-| `datetime.timedelta` | Duration |
+| Python type          | Cypher type                   |
+| -------------------- | ----------------------------- |
+| `str`                | String                        |
+| `int`                | Integer                       |
+| `float`              | Float                         |
+| `bool`               | Boolean                       |
+| `list` / `tuple`     | List                          |
+| `dict`               | Map                           |
+| `None`               | null                          |
+| `datetime.date`      | Date                          |
+| `datetime.datetime`  | DateTime                      |
+| `datetime.time`      | Time                          |
+| `datetime.timedelta` | Duration                      |
 | `neo4j.time.*` types | Corresponding Cypher temporal |
 
 Custom classes, dataclasses, Pydantic models, and enums are **not** auto-serialized — convert to `dict` or primitives first.
@@ -128,11 +128,11 @@ Pass points as parameters — serialized automatically. Read back via destructur
 
 ## Null Safety
 
-| Situation | `record["key"]` | `record.get("key")` |
-|---|---|---|
-| Key present, value non-null | value | value |
-| Key present, value is graph null | `None` | `None` |
-| Key absent (typo / not in RETURN) | `KeyError` | `None` |
+| Situation                         | `record["key"]` | `record.get("key")` |
+| --------------------------------- | --------------- | ------------------- |
+| Key present, value non-null       | value           | value               |
+| Key present, value is graph null  | `None`          | `None`              |
+| Key absent (typo / not in RETURN) | `KeyError`      | `None`              |
 
 `.get()` cannot distinguish absent key from graph null — use `"key" in record.keys()` when the distinction matters.
 

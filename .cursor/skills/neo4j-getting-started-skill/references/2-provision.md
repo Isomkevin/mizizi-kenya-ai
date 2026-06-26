@@ -1,4 +1,5 @@
 # Stage 2 — provision
+
 # Provision a running Neo4j database and save credentials to .env.
 
 ## Local DB path — handle DB_TARGET first
@@ -70,8 +71,10 @@ echo "✓ .env written"
 ```
 
 On Completion for local-docker — write to progress.md:
+
 ```markdown
 ### 2-provision
+
 status: done
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USERNAME=neo4j
@@ -82,10 +85,12 @@ CONTAINER_NAME=neo4j-dev
 ### DB_TARGET=local-desktop — Neo4j Desktop flow
 
 Tell the user:
+
 > "Please open Neo4j Desktop and start your local database. Once it's running, share the
 > password you set and confirm it's on the default port (bolt://localhost:7687)."
 
 Once confirmed, write `.env`:
+
 ```
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USERNAME=neo4j
@@ -94,8 +99,10 @@ NEO4J_DATABASE=neo4j
 ```
 
 On Completion for local-desktop — write to progress.md:
+
 ```markdown
 ### 2-provision
+
 status: done
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USERNAME=neo4j
@@ -116,6 +123,7 @@ Use these three endpoints directly — no extra tooling needed. For other operat
 Keep separate so writing `.env` never overwrites the API key.
 
 Check in order:
+
 1. `aura.env` exists → load it with Python (see Step P0) → proceed
 2. Environment variables `CLIENT_ID` / `CLIENT_SECRET` (or `AURA_CLIENT_ID` / `AURA_CLIENT_SECRET`) already set → proceed
 3. Neither found → **ask the user**:
@@ -125,6 +133,7 @@ Check in order:
 > create a new client, and paste the **Client ID** and **Client Secret** here."
 
 Once received, save to `aura.env` (never `.env`):
+
 ```bash
 cat > aura.env << EOF
 CLIENT_ID=<value>
@@ -421,6 +430,7 @@ Write to `scripts/provision_aura.py`. Do **not** run directly — use the recomm
 ## Aura CLI Quick Reference
 
 ### Installation
+
 ```bash
 # macOS
 brew install neo4j/tap/aura-cli   # if homebrew tap exists
@@ -432,6 +442,7 @@ aura-cli --version
 ```
 
 ### Credential setup
+
 ```bash
 # Generate Client ID + Secret at https://console.neo4j.io → Account Settings → API credentials
 aura-cli credential add \
@@ -441,6 +452,7 @@ aura-cli credential add \
 ```
 
 ### Instance lifecycle
+
 ```bash
 # Create Free instance (512MB, GCP)
 aura-cli instance create \
@@ -474,13 +486,15 @@ aura-cli instance delete <INSTANCE_ID>
 ```
 
 ### Regions by cloud provider
-| Provider | Available Regions |
-|----------|------------------|
-| GCP | us-central1, us-east1, europe-west1, europe-west3, asia-east1, asia-southeast1 |
-| AWS | us-east-1, us-west-2, eu-west-1, eu-central-1, ap-southeast-1 |
-| Azure | eastus, westeurope, southeastasia |
+
+| Provider | Available Regions                                                              |
+| -------- | ------------------------------------------------------------------------------ |
+| GCP      | us-central1, us-east1, europe-west1, europe-west3, asia-east1, asia-southeast1 |
+| AWS      | us-east-1, us-west-2, eu-west-1, eu-central-1, ap-southeast-1                  |
+| Azure    | eastus, westeurope, southeastasia                                              |
 
 ### Poll for running status (bash)
+
 ```bash
 INSTANCE_ID="<id>"
 for i in $(seq 1 24); do
@@ -544,6 +558,7 @@ docker stop neo4j-dev && docker rm neo4j-dev
 ## Connectivity Verification
 
 ### cypher-shell
+
 ```bash
 cypher-shell -a "neo4j+s://xxxxx.databases.neo4j.io" \
              -u neo4j -p "<password>" \
@@ -551,6 +566,7 @@ cypher-shell -a "neo4j+s://xxxxx.databases.neo4j.io" \
 ```
 
 ### Python
+
 ```python
 from neo4j import GraphDatabase
 driver = GraphDatabase.driver(
@@ -563,14 +579,15 @@ driver.close()
 ```
 
 ### Node.js
+
 ```javascript
-const neo4j = require('neo4j-driver');
+const neo4j = require("neo4j-driver");
 const driver = neo4j.driver(
-  'neo4j+s://xxxxx.databases.neo4j.io',
-  neo4j.auth.basic('neo4j', '<password>')
+  "neo4j+s://xxxxx.databases.neo4j.io",
+  neo4j.auth.basic("neo4j", "<password>"),
 );
 await driver.verifyConnectivity();
-console.log('Connected');
+console.log("Connected");
 await driver.close();
 ```
 
@@ -600,12 +617,12 @@ curl -s -X POST "http://localhost:7474/db/neo4j/query/v2" \
 
 ## URI Schemes
 
-| Scheme | Use case |
-|--------|----------|
-| `neo4j+s://` | Aura (TLS required) |
-| `bolt+s://` | Self-hosted with TLS |
-| `bolt://` | Local development (no TLS) |
-| `neo4j://` | Cluster routing, no TLS |
+| Scheme       | Use case                   |
+| ------------ | -------------------------- |
+| `neo4j+s://` | Aura (TLS required)        |
+| `bolt+s://`  | Self-hosted with TLS       |
+| `bolt://`    | Local development (no TLS) |
+| `neo4j://`   | Cluster routing, no TLS    |
 
 ---
 
@@ -614,11 +631,13 @@ curl -s -X POST "http://localhost:7474/db/neo4j/query/v2" \
 Aura provisioning takes 2–4 minutes. Everything that doesn't touch the database can run during that wait.
 
 **What can be done before the DB is running (no connection needed):**
+
 - Stage 3: design the model, write `schema/schema.json` + `schema/schema.cypher`
 - Stage 4: write `data/generate.py`, run it (pure Python → CSVs), write `data/import.py`
 - Stage 6: write `queries/queries.cypher` (text only — validation runs later)
 
 **What must wait for the DB:**
+
 - Apply `schema/schema.cypher` (constraints + indexes)
 - Run `data/import.py` (loads CSVs into Neo4j)
 - Run `validate_queries.py` (executes queries against live DB)
@@ -644,6 +663,7 @@ echo "✓ DB ready" && tail -5 scripts/provision.log
 ```
 
 **IMPORTANT — never kill or re-run the provision process:**
+
 - `PYTHONUNBUFFERED=1` ensures output appears immediately in the log
 - If the log appears empty after 5s, check `ps aux | grep provision` — if the process is running, it is working; just wait
 - **Never `kill` a running provision process** — this releases the lock and allows a duplicate to start
@@ -657,6 +677,7 @@ Write the provision script to `scripts/provision_aura.py` (not the project root)
 
 ```markdown
 ### 2-provision
+
 status: done
 NEO4J_URI=<value from .env>
 NEO4J_USERNAME=<value from .env>
@@ -666,6 +687,7 @@ files=scripts/provision_aura.py
 ```
 
 ## .env File Template
+
 ```
 NEO4J_URI=neo4j+s://xxxxx.databases.neo4j.io
 NEO4J_USERNAME=neo4j

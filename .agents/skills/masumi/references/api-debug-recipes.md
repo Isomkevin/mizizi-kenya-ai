@@ -58,6 +58,7 @@ Template: `.env.example` at skill root.
 ## Load `.env` Safely
 
 **Python**
+
 ```python
 import os
 from dotenv import load_dotenv
@@ -77,22 +78,27 @@ print(f"SOKOSUMI_API_URL: {URL}")
 ```
 
 **Node / TS**
+
 ```ts
-import 'dotenv/config';
+import "dotenv/config";
 
 function require(name: string): string {
   const v = process.env[name];
-  if (!v) { console.error(`Missing ${name}. Add to .env.`); process.exit(1); }
+  if (!v) {
+    console.error(`Missing ${name}. Add to .env.`);
+    process.exit(1);
+  }
   return v;
 }
 
-const KEY = require('SOKOSUMI_API_KEY');
-const URL = process.env.SOKOSUMI_API_URL ?? 'https://api.preprod.sokosumi.com/v1';
+const KEY = require("SOKOSUMI_API_KEY");
+const URL = process.env.SOKOSUMI_API_URL ?? "https://api.preprod.sokosumi.com/v1";
 console.log(`SOKOSUMI_API_KEY: set (${KEY.length} chars)`);
 console.log(`SOKOSUMI_API_URL: ${URL}`);
 ```
 
 **Shell**
+
 ```bash
 set -a; . ./.env; set +a   # exports every assignment
 
@@ -110,6 +116,7 @@ Need to show request → redact: `-H "Authorization: Bearer ***REDACTED***"`.
 Base URL: `$SOKOSUMI_API_URL`. Auth: `Authorization: Bearer $SOKOSUMI_API_KEY`.
 
 ### Sanity check — list agents
+
 ```bash
 curl -sS "$SOKOSUMI_API_URL/agents?limit=5" \
   -H "Authorization: Bearer $SOKOSUMI_API_KEY" | jq '.data[] | {id,name,credits}'
@@ -128,6 +135,7 @@ for a in r.json()["data"]:
 ```
 
 ### Inspect agent + input schema
+
 ```bash
 AGENT_ID=agent_abc123
 curl -sS "$SOKOSUMI_API_URL/agents/$AGENT_ID"              -H "Authorization: Bearer $SOKOSUMI_API_KEY" | jq
@@ -135,6 +143,7 @@ curl -sS "$SOKOSUMI_API_URL/agents/$AGENT_ID/input-schema" -H "Authorization: Be
 ```
 
 ### Submit job + poll until terminal
+
 Both `inputSchema` and `inputData` are required. `inputSchema.input_data[].data` holds form metadata (placeholder, description, options), not user value.
 
 ```python
@@ -164,6 +173,7 @@ while True:
 ```
 
 ### Credit balance
+
 ```bash
 # Find user id (active workspace)
 curl -sS "$SOKOSUMI_API_URL/users/registered" \
@@ -175,24 +185,27 @@ curl -sS "$SOKOSUMI_API_URL/users/$USER_ID/credits" \
 ```
 
 ### List + filter jobs
+
 ```bash
 curl -sS "$SOKOSUMI_API_URL/jobs?limit=20" \
   -H "Authorization: Bearer $SOKOSUMI_API_KEY" | jq '.data[] | {id,status,agentId}'
 ```
 
 ### Refund job (when eligible)
+
 ```bash
 JOB_ID=job_xyz
 curl -sS -X POST "$SOKOSUMI_API_URL/jobs/$JOB_ID/refund" \
   -H "Authorization: Bearer $SOKOSUMI_API_KEY" | jq
 ```
+
 Eligibility = certain statuses (`payment_failed`, timeouts). 400 → read reason, don't retry blindly.
 
 ### Optional headers
 
-| Header | When |
-|---|---|
-| `X-Organization-Slug` | Switch workspace for one call. |
+| Header                                                  | When                                        |
+| ------------------------------------------------------- | ------------------------------------------- |
+| `X-Organization-Slug`                                   | Switch workspace for one call.              |
 | `X-Delegation-User-Id` + `X-Delegation-Organization-Id` | Coworker keys only. Skip for personal keys. |
 
 ---
@@ -204,18 +217,21 @@ Base: `$PAYMENT_SERVICE_URL`. Auth: `token: $PAYMENT_API_KEY` (admin key).
 > Paths singular: `/payment`, `/purchase`, `/registry`. Old plural form wrong. Live spec → `${PAYMENT_SERVICE_URL%/api/v1}/docs`.
 
 ### Health + key status
+
 ```bash
 curl -sS "$PAYMENT_SERVICE_URL/health" | jq
 curl -sS "$PAYMENT_SERVICE_URL/api-key-status" -H "token: $PAYMENT_API_KEY" | jq
 ```
 
 ### List wallets
+
 ```bash
 curl -sS "$PAYMENT_SERVICE_URL/wallet?network=$NETWORK" \
   -H "token: $PAYMENT_API_KEY" | jq '.data[] | {type,address,balance}'
 ```
 
 ### Look up payment by blockchainIdentifier
+
 ```bash
 BLOCKCHAIN_ID=...
 curl -sS -X POST "$PAYMENT_SERVICE_URL/payment/resolve-blockchain-identifier" \
@@ -224,6 +240,7 @@ curl -sS -X POST "$PAYMENT_SERVICE_URL/payment/resolve-blockchain-identifier" \
 ```
 
 ### Submit job result (seller)
+
 ```python
 import os, requests
 r = requests.post(
@@ -265,6 +282,7 @@ curl -sS -X POST "$PAYMENT_SERVICE_URL/registry" \
 Pricing units: `unit:""` = ADA/lovelace (smallest unit); for USDM use policyId+assetName concatenated. `pricingType` ∈ `Fixed | Free | Dynamic`.
 
 ### Stuck payment? Check next action
+
 ```bash
 curl -sS "$PAYMENT_SERVICE_URL/payment/diff/next-action?network=$NETWORK" \
   -H "token: $PAYMENT_API_KEY" | jq
@@ -294,11 +312,13 @@ curl -sS -X POST "$REGISTRY_SERVICE_URL/registry-entry-search/" \
 ```
 
 ### List capabilities
+
 ```bash
 curl -sS "$REGISTRY_SERVICE_URL/capability/" -H "token: $REGISTRY_API_KEY" | jq
 ```
 
 ### Refresh entry from chain
+
 ```bash
 curl -sS -X POST "$REGISTRY_SERVICE_URL/registry-entry-refresh/" \
   -H "token: $REGISTRY_API_KEY" -H "Content-Type: application/json" \
@@ -309,23 +329,25 @@ curl -sS -X POST "$REGISTRY_SERVICE_URL/registry-entry-refresh/" \
 
 ## Common Failures
 
-| Symptom | Cause | First check |
-|---|---|---|
-| Sokosumi 401 | Wrong host (`app.sokosumi.com`), or mainnet key vs preprod | `$SOKOSUMI_API_URL` + key origin match. |
-| Payment 404 on `/payments` | Path singular: `/payment` | `/docs` swagger. |
-| Job stuck `payment_pending` >10min | Chain not confirming, or wrong PAYMENT_UNIT | `payment/diff/next-action`; verify policy ID matches network. |
-| curl empty body, exit 0 | Gzipped, or `-o /dev/null` used | Add `-i`, drop `-o`. |
-| Logs contain key | Something echoed the header | Rotate key NOW, scrub logs, fix script. |
+| Symptom                            | Cause                                                      | First check                                                   |
+| ---------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------- |
+| Sokosumi 401                       | Wrong host (`app.sokosumi.com`), or mainnet key vs preprod | `$SOKOSUMI_API_URL` + key origin match.                       |
+| Payment 404 on `/payments`         | Path singular: `/payment`                                  | `/docs` swagger.                                              |
+| Job stuck `payment_pending` >10min | Chain not confirming, or wrong PAYMENT_UNIT                | `payment/diff/next-action`; verify policy ID matches network. |
+| curl empty body, exit 0            | Gzipped, or `-o /dev/null` used                            | Add `-i`, drop `-o`.                                          |
+| Logs contain key                   | Something echoed the header                                | Rotate key NOW, scrub logs, fix script.                       |
 
 ---
 
 ## What "Safe" Means
 
 **Allowed:**
+
 - Read keys from `.env` in CWD.
 - Hit live endpoints to **read** state only (`GET` / lookup calls).
 
 **Ask first:**
+
 - Any `POST`, `PUT`, `PATCH`, or `DELETE`, including preprod/testnet.
 - Submit job, satisfy job input, request refund, or change sharing/workspace.
 - Registry ops: register, refresh, deregister, mint, burn.
@@ -335,6 +357,7 @@ curl -sS -X POST "$REGISTRY_SERVICE_URL/registry-entry-refresh/" \
 - Generate, rotate, revoke key.
 
 **Never:**
+
 - Print, log, copy, transmit key.
 - Hard-code key in source.
 - Prompt user to paste key in chat.

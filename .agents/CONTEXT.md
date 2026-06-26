@@ -16,13 +16,13 @@ Mizizi — enterprise agricultural risk intelligence (Kenya AI Challenge 2026). 
 
 ## Stack
 
-| Layer | Choice |
-| --- | --- |
-| Framework | TanStack Start (`src/routes/`) |
-| UI | React 19, shadcn/ui |
-| Styling | Tailwind v4 — `src/styles.css` |
-| Data | Typed mocks in `src/lib/mock/` (no backend yet) |
-| Runtime | Bun |
+| Layer     | Choice                                          |
+| --------- | ----------------------------------------------- |
+| Framework | TanStack Start (`src/routes/`)                  |
+| UI        | React 19, shadcn/ui                             |
+| Styling   | Tailwind v4 — `src/styles.css`                  |
+| Data      | Typed mocks in `src/lib/mock/` (no backend yet) |
+| Runtime   | Bun                                             |
 
 ## Commands
 

@@ -55,17 +55,17 @@ LLM should route between retrievers? → ToolsRetriever
 Vectors stored in external DB?      → WeaviateNeo4jRetriever / PineconeNeo4jRetriever / QdrantNeo4jRetriever
 ```
 
-| Retriever | Vector | Fulltext | Graph | Best For |
-|---|:---:|:---:|:---:|---|
-| `VectorRetriever` | ✓ | — | — | Baseline semantic search |
-| `HybridRetriever` | ✓ | ✓ | — | Better recall, no graph expansion |
-| `VectorCypherRetriever` | ✓ | — | ✓ | GraphRAG without fulltext |
-| `HybridCypherRetriever` | ✓ | ✓ | ✓ | **Production GraphRAG — default** |
-| `Text2CypherRetriever` | — | — | ✓ | NL→Cypher, no embedder |
-| `ToolsRetriever` | varies | varies | varies | LLM-routed multi-retriever |
-| `WeaviateNeo4jRetriever` | ✓ | — | ✓ | Vectors in Weaviate |
-| `PineconeNeo4jRetriever` | ✓ | — | ✓ | Vectors in Pinecone |
-| `QdrantNeo4jRetriever` | ✓ | — | ✓ | Vectors in Qdrant |
+| Retriever                | Vector | Fulltext | Graph  | Best For                          |
+| ------------------------ | :----: | :------: | :----: | --------------------------------- |
+| `VectorRetriever`        |   ✓    |    —     |   —    | Baseline semantic search          |
+| `HybridRetriever`        |   ✓    |    ✓     |   —    | Better recall, no graph expansion |
+| `VectorCypherRetriever`  |   ✓    |    —     |   ✓    | GraphRAG without fulltext         |
+| `HybridCypherRetriever`  |   ✓    |    ✓     |   ✓    | **Production GraphRAG — default** |
+| `Text2CypherRetriever`   |   —    |    —     |   ✓    | NL→Cypher, no embedder            |
+| `ToolsRetriever`         | varies |  varies  | varies | LLM-routed multi-retriever        |
+| `WeaviateNeo4jRetriever` |   ✓    |    —     |   ✓    | Vectors in Weaviate               |
+| `PineconeNeo4jRetriever` |   ✓    |    —     |   ✓    | Vectors in Pinecone               |
+| `QdrantNeo4jRetriever`   |   ✓    |    —     |   ✓    | Vectors in Qdrant                 |
 
 ---
 
@@ -102,14 +102,14 @@ For multi-tool LLM routing?     → ToolsRetriever
 Using external vector DB?       → WeaviateNeo4jRetriever / PineconeNeo4jRetriever / QdrantNeo4jRetriever
 ```
 
-| Retriever | Vector | Fulltext | Graph | When to use |
-|---|:---:|:---:|:---:|---|
-| `VectorRetriever` | ✓ | — | — | Baseline; quick start |
-| `HybridRetriever` | ✓ | ✓ | — | Better recall; no graph context |
-| `VectorCypherRetriever` | ✓ | — | ✓ | GraphRAG without fulltext |
-| `HybridCypherRetriever` | ✓ | ✓ | ✓ | **Production GraphRAG — default choice** |
-| `Text2CypherRetriever` | — | — | ✓ | LLM generates Cypher; no embedder |
-| `ToolsRetriever` | varies | varies | varies | Multi-retriever LLM routing |
+| Retriever               | Vector | Fulltext | Graph  | When to use                              |
+| ----------------------- | :----: | :------: | :----: | ---------------------------------------- |
+| `VectorRetriever`       |   ✓    |    —     |   —    | Baseline; quick start                    |
+| `HybridRetriever`       |   ✓    |    ✓     |   —    | Better recall; no graph context          |
+| `VectorCypherRetriever` |   ✓    |    —     |   ✓    | GraphRAG without fulltext                |
+| `HybridCypherRetriever` |   ✓    |    ✓     |   ✓    | **Production GraphRAG — default choice** |
+| `Text2CypherRetriever`  |   —    |    —     |   ✓    | LLM generates Cypher; no embedder        |
+| `ToolsRetriever`        | varies |  varies  | varies | Multi-retriever LLM routing              |
 
 For custom Cypher hybrid search outside the `neo4j-graphrag` retriever APIs, use `neo4j-vector-index-skill`.
 
@@ -321,7 +321,6 @@ If `neo4j_schema=None`: retriever fetches schema automatically. For large schema
 
 **Destructive-query guard [v1.16+]**: `Text2CypherRetriever` runs `EXPLAIN` on the generated Cypher before execution and rejects queries that produce writes (`CREATE`, `MERGE`, `DELETE`, `SET`, `REMOVE`, etc.). LLM-generated writes are never executed against the graph.
 
-
 ---
 
 ## Custom Prompt Template
@@ -421,16 +420,16 @@ retriever = QdrantNeo4jRetriever(
 
 All implement `LLMBase`. All support sync + async, tool calling, and automatic rate limiting.
 
-| Class | Extra | Notes |
-|---|---|---|
-| `OpenAILLM` | `openai` | Structured output; tool calling |
-| `AzureOpenAILLM` | `openai` | Azure-hosted OpenAI |
-| `AnthropicLLM` | `anthropic` | Tool calling |
-| `VertexAILLM` | `google` | Structured output; tool calling |
-| `MistralAILLM` | `mistralai` | Tool calling |
-| `CohereLLM` | `cohere` | |
-| `OllamaLLM` | `ollama` | Local; tool calling |
-| `BedrockLLM` | `bedrock` | Boto3 Converse API; added v1.15.0 |
+| Class            | Extra       | Notes                             |
+| ---------------- | ----------- | --------------------------------- |
+| `OpenAILLM`      | `openai`    | Structured output; tool calling   |
+| `AzureOpenAILLM` | `openai`    | Azure-hosted OpenAI               |
+| `AnthropicLLM`   | `anthropic` | Tool calling                      |
+| `VertexAILLM`    | `google`    | Structured output; tool calling   |
+| `MistralAILLM`   | `mistralai` | Tool calling                      |
+| `CohereLLM`      | `cohere`    |                                   |
+| `OllamaLLM`      | `ollama`    | Local; tool calling               |
+| `BedrockLLM`     | `bedrock`   | Boto3 Converse API; added v1.15.0 |
 
 ```python
 from neo4j_graphrag.llm import (
@@ -459,16 +458,16 @@ await llm.aclose()  # async
 
 All include automatic rate limiting with tenacity exponential backoff.
 
-| Class | Extra | Dims |
-|---|---|---|
-| `OpenAIEmbeddings` | `openai` | 3072 / 1536 |
-| `AzureOpenAIEmbeddings` | `openai` | varies |
-| `VertexAIEmbeddings` | `google` | 768 |
-| `MistralAIEmbeddings` | `mistralai` | 1024 |
-| `CohereEmbeddings` | `cohere` | 1024 |
-| `OllamaEmbeddings` | `ollama` | varies |
-| `SentenceTransformerEmbeddings` | `sentence-transformers` | 384+ |
-| `BedrockEmbeddings` | `bedrock` | varies; added v1.15.0 |
+| Class                           | Extra                   | Dims                  |
+| ------------------------------- | ----------------------- | --------------------- |
+| `OpenAIEmbeddings`              | `openai`                | 3072 / 1536           |
+| `AzureOpenAIEmbeddings`         | `openai`                | varies                |
+| `VertexAIEmbeddings`            | `google`                | 768                   |
+| `MistralAIEmbeddings`           | `mistralai`             | 1024                  |
+| `CohereEmbeddings`              | `cohere`                | 1024                  |
+| `OllamaEmbeddings`              | `ollama`                | varies                |
+| `SentenceTransformerEmbeddings` | `sentence-transformers` | 384+                  |
+| `BedrockEmbeddings`             | `bedrock`               | varies; added v1.15.0 |
 
 ```python
 from neo4j_graphrag.embeddings import (
@@ -519,16 +518,16 @@ schema_dict = get_structured_schema(driver, sample=1000)  # dict with labels/rel
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|---|---|---|
-| `ModuleNotFoundError: neo4j_genai` | Old package name | `pip uninstall neo4j-genai && pip install neo4j-graphrag` |
-| `retrieval_query` returns 0 rows | Missing `MATCH` or wrong rel direction | `EXPLAIN` the fragment; check `CALL db.schema.visualization()` |
-| `KeyError: 'score'` in results | `retrieval_query` RETURN missing `score` | Add `score` to every `retrieval_query` RETURN clause |
-| `score` variable not found | `score` re-declared in `retrieval_query` | Do **not** re-declare `score` — it is auto-injected |
-| `Text2CypherRetrievalError` | LLM generated a write statement | Expected security behavior (v1.16.0+); refine prompt or schema |
-| `TypeError: coroutine` | Missing `await` / `asyncio.run()` | Wrap async calls: `asyncio.run(pipeline.run_async(...))` |
-| Empty results from HybridRetriever | Fulltext index not ONLINE | `SHOW INDEXES YIELD name, state WHERE state <> 'ONLINE'` |
-| Embedding dimension mismatch | Index dims ≠ model dims | Recreate index with correct `dimensions=` value |
+| Error                              | Cause                                    | Fix                                                            |
+| ---------------------------------- | ---------------------------------------- | -------------------------------------------------------------- |
+| `ModuleNotFoundError: neo4j_genai` | Old package name                         | `pip uninstall neo4j-genai && pip install neo4j-graphrag`      |
+| `retrieval_query` returns 0 rows   | Missing `MATCH` or wrong rel direction   | `EXPLAIN` the fragment; check `CALL db.schema.visualization()` |
+| `KeyError: 'score'` in results     | `retrieval_query` RETURN missing `score` | Add `score` to every `retrieval_query` RETURN clause           |
+| `score` variable not found         | `score` re-declared in `retrieval_query` | Do **not** re-declare `score` — it is auto-injected            |
+| `Text2CypherRetrievalError`        | LLM generated a write statement          | Expected security behavior (v1.16.0+); refine prompt or schema |
+| `TypeError: coroutine`             | Missing `await` / `asyncio.run()`        | Wrap async calls: `asyncio.run(pipeline.run_async(...))`       |
+| Empty results from HybridRetriever | Fulltext index not ONLINE                | `SHOW INDEXES YIELD name, state WHERE state <> 'ONLINE'`       |
+| Embedding dimension mismatch       | Index dims ≠ model dims                  | Recreate index with correct `dimensions=` value                |
 
 ---
 
@@ -548,6 +547,7 @@ schema_dict = get_structured_schema(driver, sample=1000)  # dict with labels/rel
 ## References
 
 Load on demand:
+
 - [neo4j-graphrag package docs](https://neo4j.com/docs/neo4j-graphrag-python/current/)
 - [RAG & GraphRAG user guide](https://neo4j.com/docs/neo4j-graphrag-python/current/user_guide_rag.html)
 - [KG Builder user guide](https://neo4j.com/docs/neo4j-graphrag-python/current/user_guide_kg_builder.html)

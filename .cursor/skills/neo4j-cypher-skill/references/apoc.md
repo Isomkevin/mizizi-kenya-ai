@@ -359,23 +359,23 @@ CALL apoc.export.cypher.query(
 
 ## Deprecation Summary (Cypher 25)
 
-| Deprecated | Replacement |
-|---|---|
-| `apoc.trigger.add` / `.remove` / `.pause` | `apoc.trigger.install` / `.drop` / `.pause` (system db) |
-| `apoc.do.when` / `apoc.do.case` | Native `CASE` + conditional `CALL {}` |
-| `apoc.coll.flatten` (simple) | `[x IN nested | x]` list comprehension |
-| `apoc.coll.toSet` | `apoc.coll.toSet` still works; or `DISTINCT` in collect |
-| `apoc.date.parse` / `.format` / `.convert` | `datetime()`, `date()`, `duration()` native functions |
-| `apoc.periodic.iterate` | `CALL { ... } IN TRANSACTIONS OF N ROWS` |
+| Deprecated                                 | Replacement                                             |
+| ------------------------------------------ | ------------------------------------------------------- | ---------------------- |
+| `apoc.trigger.add` / `.remove` / `.pause`  | `apoc.trigger.install` / `.drop` / `.pause` (system db) |
+| `apoc.do.when` / `apoc.do.case`            | Native `CASE` + conditional `CALL {}`                   |
+| `apoc.coll.flatten` (simple)               | `[x IN nested                                           | x]` list comprehension |
+| `apoc.coll.toSet`                          | `apoc.coll.toSet` still works; or `DISTINCT` in collect |
+| `apoc.date.parse` / `.format` / `.convert` | `datetime()`, `date()`, `duration()` native functions   |
+| `apoc.periodic.iterate`                    | `CALL { ... } IN TRANSACTIONS OF N ROWS`                |
 
 ---
 
 ## WebFetch
 
-| Need | URL |
-|---|---|
-| Full procedure list | `https://neo4j.com/docs/apoc/current/overview/` |
-| Path expander config | `https://neo4j.com/docs/apoc/current/graph-querying/path-expander/` |
-| Trigger reference | `https://neo4j.com/docs/apoc/current/background-operations/triggers/` |
-| Refactoring ops | `https://neo4j.com/docs/apoc/current/graph-refactoring/` |
-| Export config | `https://neo4j.com/docs/apoc/current/export-import/` |
+| Need                 | URL                                                                   |
+| -------------------- | --------------------------------------------------------------------- |
+| Full procedure list  | `https://neo4j.com/docs/apoc/current/overview/`                       |
+| Path expander config | `https://neo4j.com/docs/apoc/current/graph-querying/path-expander/`   |
+| Trigger reference    | `https://neo4j.com/docs/apoc/current/background-operations/triggers/` |
+| Refactoring ops      | `https://neo4j.com/docs/apoc/current/graph-refactoring/`              |
+| Export config        | `https://neo4j.com/docs/apoc/current/export-import/`                  |

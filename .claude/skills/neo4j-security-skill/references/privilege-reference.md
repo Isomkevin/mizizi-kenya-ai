@@ -26,13 +26,13 @@ REVOKE [IMMUTABLE] [GRANT | DENY] <privilege>
 
 ### Entity scope
 
-| Entity | Meaning |
-|---|---|
-| `NODES Label` | Nodes with label (can list: `NODES Person, Company`) |
-| `RELATIONSHIPS Type` | Relationships of type |
-| `ELEMENTS Label` | Both nodes and relationships |
-| `FOR (n:Label) WHERE n.prop = val` | Pattern-matched nodes (read only) |
-| *(omit)* | Defaults to `ELEMENTS *` |
+| Entity                             | Meaning                                              |
+| ---------------------------------- | ---------------------------------------------------- |
+| `NODES Label`                      | Nodes with label (can list: `NODES Person, Company`) |
+| `RELATIONSHIPS Type`               | Relationships of type                                |
+| `ELEMENTS Label`                   | Both nodes and relationships                         |
+| `FOR (n:Label) WHERE n.prop = val` | Pattern-matched nodes (read only)                    |
+| _(omit)_                           | Defaults to `ELEMENTS *`                             |
 
 ### Read privileges
 
@@ -193,13 +193,13 @@ WHERE action = 'read';
 
 ## Edition Notes
 
-| Feature | Community | Enterprise |
-|---|---|---|
-| RBAC (users/roles/privileges) | Basic | Full |
-| Sub-graph / label-based access | No | Yes |
-| Property-level READ/DENY | No | Yes |
-| Property-based pattern (`FOR`) | No | Yes |
-| ABAC / `CREATE AUTH RULE` | No | Yes |
-| LDAP integration | No | Yes |
-| OIDC/SSO | No | Yes |
-| `IMMUTABLE` privileges | No | Yes |
+| Feature                        | Community | Enterprise |
+| ------------------------------ | --------- | ---------- |
+| RBAC (users/roles/privileges)  | Basic     | Full       |
+| Sub-graph / label-based access | No        | Yes        |
+| Property-level READ/DENY       | No        | Yes        |
+| Property-based pattern (`FOR`) | No        | Yes        |
+| ABAC / `CREATE AUTH RULE`      | No        | Yes        |
+| LDAP integration               | No        | Yes        |
+| OIDC/SSO                       | No        | Yes        |
+| `IMMUTABLE` privileges         | No        | Yes        |

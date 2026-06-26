@@ -76,9 +76,7 @@ function Logo({ className = "" }: { className?: string }) {
       <span className="grid h-7 w-7 place-items-center rounded-md bg-primary text-primary-foreground">
         <Sprout className="h-4 w-4" />
       </span>
-      <span className="font-display text-2xl leading-none tracking-tight">
-        Mizizi
-      </span>
+      <span className="font-display text-2xl leading-none tracking-tight">Mizizi</span>
     </Link>
   );
 }
@@ -89,10 +87,18 @@ function Nav() {
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6">
         <Logo />
         <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-          <a className="hover:text-foreground" href="#problem">Problem</a>
-          <a className="hover:text-foreground" href="#platform">Platform</a>
-          <a className="hover:text-foreground" href="#ecosystem">Ecosystem</a>
-          <a className="hover:text-foreground" href="#vision">Vision</a>
+          <a className="hover:text-foreground" href="#problem">
+            Problem
+          </a>
+          <a className="hover:text-foreground" href="#platform">
+            Platform
+          </a>
+          <a className="hover:text-foreground" href="#ecosystem">
+            Ecosystem
+          </a>
+          <a className="hover:text-foreground" href="#vision">
+            Vision
+          </a>
         </nav>
         <div className="flex items-center gap-2">
           <Link
@@ -144,9 +150,8 @@ function Hero() {
 
         <Reveal delay={160}>
           <p className="max-w-2xl text-balance text-lg text-muted-foreground md:text-xl">
-            Millions of smallholder farmers generate trustworthy financial
-            signals every day. Current systems simply cannot connect them.
-            Mizizi can.
+            Millions of smallholder farmers generate trustworthy financial signals every day.
+            Current systems simply cannot connect them. Mizizi can.
           </p>
         </Reveal>
 
@@ -200,14 +205,12 @@ function InvisibleFarmer() {
           <h2 className="font-display mt-4 text-balance text-4xl leading-[1.05] md:text-6xl">
             One farmer. <br />
             Seven systems. <br />
-            <span className="italic text-muted-foreground">
-              Zero shared intelligence.
-            </span>
+            <span className="italic text-muted-foreground">Zero shared intelligence.</span>
           </h2>
           <p className="mt-6 max-w-md text-muted-foreground">
-            A single farmer's financial life is fragmented across cooperatives,
-            mobile wallets, input dealers, climate feeds and NGO records. Every
-            system holds a fragment — none of them see the farmer.
+            A single farmer's financial life is fragmented across cooperatives, mobile wallets,
+            input dealers, climate feeds and NGO records. Every system holds a fragment — none of
+            them see the farmer.
           </p>
         </Reveal>
 
@@ -315,13 +318,7 @@ function CostOfFragmentation() {
                     {i + 1}
                   </span>
                   <div className="rounded-lg border border-border bg-background px-4 py-3 text-sm">
-                    <span
-                      className={
-                        i >= 4
-                          ? "text-[color:var(--crimson)]"
-                          : "text-foreground"
-                      }
-                    >
+                    <span className={i >= 4 ? "text-[color:var(--crimson)]" : "text-foreground"}>
                       {step}
                     </span>
                   </div>
@@ -341,9 +338,7 @@ function CostOfFragmentation() {
                   Connected
                 </span>
               </div>
-              <h3 className="font-display mt-3 text-3xl">
-                The same journey, with sight.
-              </h3>
+              <h3 className="font-display mt-3 text-3xl">The same journey, with sight.</h3>
               <ol className="mt-8 space-y-2">
                 {miziziJourney.map((step, i) => (
                   <li
@@ -355,9 +350,7 @@ function CostOfFragmentation() {
                     </span>
                     <div>
                       <div className="text-sm font-medium">{step.label}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {step.note}
-                      </div>
+                      <div className="text-xs text-muted-foreground">{step.note}</div>
                     </div>
                     <ArrowRight className="h-3.5 w-3.5 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" />
                   </li>
@@ -409,9 +402,7 @@ function Statistics() {
       <div className="absolute inset-0 bg-grid opacity-[0.08]" />
       <div className="relative mx-auto max-w-7xl px-6 py-28">
         <Reveal>
-          <SectionLabel className="text-white/60">
-            05 · The scale of invisibility
-          </SectionLabel>
+          <SectionLabel className="text-white/60">05 · The scale of invisibility</SectionLabel>
           <h2 className="font-display mt-4 max-w-3xl text-balance text-4xl leading-[1.05] md:text-6xl">
             A continent of farmers the system cannot see.
           </h2>
@@ -422,15 +413,9 @@ function Statistics() {
             <Reveal key={i} delay={i * 80}>
               <div className="flex h-full flex-col justify-between bg-[color:var(--moss-deep)] p-6">
                 <div className="font-display text-5xl text-white md:text-6xl">
-                  <Counter
-                    to={s.value}
-                    prefix={s.prefix ?? ""}
-                    suffix={s.suffix ?? ""}
-                  />
+                  <Counter to={s.value} prefix={s.prefix ?? ""} suffix={s.suffix ?? ""} />
                 </div>
-                <p className="mt-6 text-sm leading-snug text-white/70">
-                  {s.label}
-                </p>
+                <p className="mt-6 text-sm leading-snug text-white/70">{s.label}</p>
               </div>
             </Reveal>
           ))}
@@ -466,9 +451,7 @@ function Cell({ v }: { v: boolean | "partial" }) {
         <CircleDot className="h-3 w-3" /> Partial
       </span>
     );
-  return (
-    <span className="font-mono-data text-xs text-muted-foreground/70">—</span>
-  );
+  return <span className="font-mono-data text-xs text-muted-foreground/70">—</span>;
 }
 
 function WhyExistingFail() {
@@ -507,9 +490,7 @@ function WhyExistingFail() {
                   <tr
                     key={label as string}
                     className={
-                      i % 2
-                        ? "border-b border-border/60"
-                        : "border-b border-border/60 bg-muted/20"
+                      i % 2 ? "border-b border-border/60" : "border-b border-border/60 bg-muted/20"
                     }
                   >
                     <td className="px-6 py-4 font-medium">{label}</td>
@@ -552,9 +533,8 @@ function PlatformPreview() {
             Built for the people who actually approve loans.
           </h2>
           <p className="mt-6 max-w-2xl text-muted-foreground">
-            Every surface is engineered around a single question:{" "}
-            <em>why this decision?</em> Loan officers see signals, farmers see
-            reasons, executives see portfolios.
+            Every surface is engineered around a single question: <em>why this decision?</em> Loan
+            officers see signals, farmers see reasons, executives see portfolios.
           </p>
         </Reveal>
 
@@ -581,9 +561,7 @@ function PlatformPreview() {
                       key={t.id}
                       className={[
                         "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm",
-                        i === 1
-                          ? "bg-primary/10 text-foreground"
-                          : "text-muted-foreground",
+                        i === 1 ? "bg-primary/10 text-foreground" : "text-muted-foreground",
                       ].join(" ")}
                     >
                       <t.icon className="h-4 w-4" />
@@ -598,9 +576,7 @@ function PlatformPreview() {
                     <div className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
                       Farmer · F-10384 · Nyandarua
                     </div>
-                    <h3 className="font-display mt-1 text-3xl">
-                      Wanjiru Kamau
-                    </h3>
+                    <h3 className="font-display mt-1 text-3xl">Wanjiru Kamau</h3>
                   </div>
                   <RiskBadge level="low" score={78} />
                 </div>
@@ -614,10 +590,7 @@ function PlatformPreview() {
                     { k: "Input purchase trend", v: "+9" },
                     { k: "Peer repayment", v: "+13" },
                   ].map((f) => (
-                    <div
-                      key={f.k}
-                      className="rounded-xl border border-border bg-background p-4"
-                    >
+                    <div key={f.k} className="rounded-xl border border-border bg-background p-4">
                       <div className="text-xs text-muted-foreground">{f.k}</div>
                       <div
                         className={[
@@ -640,11 +613,9 @@ function PlatformPreview() {
                       Decision summary
                     </div>
                     <p className="mt-2 text-sm">
-                      Recommend approval at{" "}
-                      <span className="font-medium">KES 84,000</span> over 9
-                      months. Repayment confidence{" "}
-                      <span className="font-medium">92%</span>. Climate buffer
-                      advised due to upcoming short-rains variability.
+                      Recommend approval at <span className="font-medium">KES 84,000</span> over 9
+                      months. Repayment confidence <span className="font-medium">92%</span>. Climate
+                      buffer advised due to upcoming short-rains variability.
                     </p>
                   </div>
                   <div className="rounded-xl border border-border bg-background p-4">
@@ -652,12 +623,7 @@ function PlatformPreview() {
                       Graph path
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                      {[
-                        "Farmer",
-                        "Mwea Coop",
-                        "12 peers",
-                        "On-time",
-                      ].map((n, i, arr) => (
+                      {["Farmer", "Mwea Coop", "12 peers", "On-time"].map((n, i, arr) => (
                         <span key={n} className="flex items-center gap-2">
                           <span className="rounded-md border border-border bg-muted px-2 py-1">
                             {n}
@@ -730,16 +696,66 @@ function RiskBadge({
 /* ---------------- Ecosystem ---------------- */
 
 const personas = [
-  { label: "Banks", icon: Landmark, challenge: "Lack farm-level visibility", help: "Connected risk picture" },
-  { label: "SACCOs", icon: Users, challenge: "Manual member assessment", help: "Automated cooperative graph" },
-  { label: "Microfinance", icon: Wallet, challenge: "Limited collateral signals", help: "Behavioural credit signals" },
-  { label: "Loan officers", icon: Compass, challenge: "Decision opacity", help: "Explainable workspace" },
-  { label: "Insurance", icon: ShieldCheck, challenge: "Hard to verify risk", help: "Verified climate + farm data" },
-  { label: "Cooperatives", icon: Sprout, challenge: "Repayment volatility", help: "Peer-level intelligence" },
-  { label: "Governments", icon: Building2, challenge: "Subsidy targeting", help: "Population-level analytics" },
-  { label: "NGOs", icon: Leaf, challenge: "Programme attribution", help: "Outcome-linked tracking" },
-  { label: "Climate orgs", icon: CloudSun, challenge: "Smallholder reach", help: "Direct climate signal pipeline" },
-  { label: "Farmers", icon: Wheat, challenge: "No explanation, no path", help: "Actionable feedback" },
+  {
+    label: "Banks",
+    icon: Landmark,
+    challenge: "Lack farm-level visibility",
+    help: "Connected risk picture",
+  },
+  {
+    label: "SACCOs",
+    icon: Users,
+    challenge: "Manual member assessment",
+    help: "Automated cooperative graph",
+  },
+  {
+    label: "Microfinance",
+    icon: Wallet,
+    challenge: "Limited collateral signals",
+    help: "Behavioural credit signals",
+  },
+  {
+    label: "Loan officers",
+    icon: Compass,
+    challenge: "Decision opacity",
+    help: "Explainable workspace",
+  },
+  {
+    label: "Insurance",
+    icon: ShieldCheck,
+    challenge: "Hard to verify risk",
+    help: "Verified climate + farm data",
+  },
+  {
+    label: "Cooperatives",
+    icon: Sprout,
+    challenge: "Repayment volatility",
+    help: "Peer-level intelligence",
+  },
+  {
+    label: "Governments",
+    icon: Building2,
+    challenge: "Subsidy targeting",
+    help: "Population-level analytics",
+  },
+  {
+    label: "NGOs",
+    icon: Leaf,
+    challenge: "Programme attribution",
+    help: "Outcome-linked tracking",
+  },
+  {
+    label: "Climate orgs",
+    icon: CloudSun,
+    challenge: "Smallholder reach",
+    help: "Direct climate signal pipeline",
+  },
+  {
+    label: "Farmers",
+    icon: Wheat,
+    challenge: "No explanation, no path",
+    help: "Actionable feedback",
+  },
 ];
 
 function Ecosystem() {
@@ -801,24 +817,18 @@ const futureIntegrations = [
 
 function FutureVision() {
   return (
-    <section
-      id="vision"
-      className="relative overflow-hidden border-b border-border/60 bg-canvas"
-    >
+    <section id="vision" className="relative overflow-hidden border-b border-border/60 bg-canvas">
       <div className="absolute inset-0 bg-grid opacity-[0.4]" />
       <div className="relative mx-auto grid max-w-7xl gap-12 px-6 py-28 lg:grid-cols-2 lg:items-center">
         <Reveal>
           <SectionLabel>09 · Future vision</SectionLabel>
           <h2 className="font-display mt-4 text-balance text-4xl leading-[1.05] md:text-6xl">
             One connected intelligence layer. <br />
-            <span className="italic text-muted-foreground">
-              Unlimited financial possibilities.
-            </span>
+            <span className="italic text-muted-foreground">Unlimited financial possibilities.</span>
           </h2>
           <p className="mt-6 max-w-md text-muted-foreground">
-            Mizizi is positioned as infrastructure, not a product. Every new
-            signal — identity, carbon, satellite, payments — strengthens every
-            decision already in the system.
+            Mizizi is positioned as infrastructure, not a product. Every new signal — identity,
+            carbon, satellite, payments — strengthens every decision already in the system.
           </p>
         </Reveal>
 
@@ -842,8 +852,7 @@ function FutureVision() {
                     />
                     {futureIntegrations.map((_, j) => {
                       if (j <= i) return null;
-                      const a2 =
-                        (j / futureIntegrations.length) * Math.PI * 2;
+                      const a2 = (j / futureIntegrations.length) * Math.PI * 2;
                       const x2 = 200 + Math.cos(a2) * 160;
                       const y2 = 200 + Math.sin(a2) * 160;
                       return (
@@ -875,8 +884,7 @@ function FutureVision() {
               </text>
             </svg>
             {futureIntegrations.map((label, i) => {
-              const angle =
-                (i / futureIntegrations.length) * Math.PI * 2;
+              const angle = (i / futureIntegrations.length) * Math.PI * 2;
               const left = `${50 + Math.cos(angle) * 40}%`;
               const top = `${50 + Math.sin(angle) * 40}%`;
               return (
@@ -911,8 +919,8 @@ function FinalCTA() {
             </span>
           </h2>
           <p className="mt-8 text-balance text-lg text-muted-foreground">
-            Transparent lending begins with connected intelligence. Build trust.
-            Reduce risk. Increase financial inclusion.
+            Transparent lending begins with connected intelligence. Build trust. Reduce risk.
+            Increase financial inclusion.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <a

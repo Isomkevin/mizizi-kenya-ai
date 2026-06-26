@@ -6,21 +6,24 @@ Overflow from `SKILL.md` — load when detailed chunking strategy or entity reso
 
 ## Chunking Strategy Comparison
 
-| Strategy | How it splits | Best for | neo4j-graphrag class |
-|---|---|---|---|
-| Fixed-size | Token count with optional boundary respect | Dense technical docs; most use-cases | `FixedSizeSplitter(chunk_size, chunk_overlap)` |
-| Sentence/paragraph | Natural language boundaries (`\n\n`, `.`) | Narrative text, news articles, course content | LangChain `CharacterTextSplitter(separator="\n\n")` |
-| Semantic | Embedding similarity between adjacent sentences | Long-form documents with topic shifts | LangChain `SemanticChunker` (requires embedder) |
-| N-gram | Overlapping windows of n words | Short snippets, keyword-dense text | Custom — not built into neo4j-graphrag |
-| Structural | By section/heading/method (doc-specific) | API docs, legal contracts, structured PDFs | Custom — parse structure then chunk |
+| Strategy           | How it splits                                   | Best for                                      | neo4j-graphrag class                                |
+| ------------------ | ----------------------------------------------- | --------------------------------------------- | --------------------------------------------------- |
+| Fixed-size         | Token count with optional boundary respect      | Dense technical docs; most use-cases          | `FixedSizeSplitter(chunk_size, chunk_overlap)`      |
+| Sentence/paragraph | Natural language boundaries (`\n\n`, `.`)       | Narrative text, news articles, course content | LangChain `CharacterTextSplitter(separator="\n\n")` |
+| Semantic           | Embedding similarity between adjacent sentences | Long-form documents with topic shifts         | LangChain `SemanticChunker` (requires embedder)     |
+| N-gram             | Overlapping windows of n words                  | Short snippets, keyword-dense text            | Custom — not built into neo4j-graphrag              |
+| Structural         | By section/heading/method (doc-specific)        | API docs, legal contracts, structured PDFs    | Custom — parse structure then chunk                 |
 
 **Rule**: Start with `FixedSizeSplitter(chunk_size=512, chunk_overlap=50)`. Switch to paragraph-based when sentences must not break (courses, articles). Switch to semantic chunking only when topic coherence within chunks is critical and embedder calls during ingestion are affordable.
 
 **Combination pattern** (course content model from GraphAcademy course):
+
 ```
 Course → Module → Lesson → Paragraph
 ```
+
 Split doc into structural units (Module/Lesson), then chunk each Lesson into Paragraphs (`\n\n`). Store both levels; query at Paragraph for vector search, traverse to Lesson for context. Pattern:
+
 ```python
 from langchain_text_splitters import CharacterTextSplitter
 splitter = CharacterTextSplitter(separator="\n\n", chunk_size=1500, chunk_overlap=200)
@@ -28,6 +31,7 @@ paragraphs = splitter.split_documents(lesson_docs)
 ```
 
 LangChain `CharacterTextSplitter` behavior:
+
 1. Split by `separator` (paragraph breaks)
 2. Combine paragraphs up to `chunk_size` chars
 3. If single paragraph > `chunk_size`: keep as-is (no mid-paragraph cut)
@@ -111,17 +115,17 @@ Run resolvers after all ingest batches complete — running inline per-batch is 
 
 All fields have defaults — only override as needed:
 
-| Field | Default | Controls |
-|---|---|---|
-| `document_node_label` | `"Document"` | Label of the document node |
-| `chunk_node_label` | `"Chunk"` | Label of the chunk node |
-| `chunk_to_document_relationship_type` | `"FROM_DOCUMENT"` | Chunk→Document relationship |
-| `next_chunk_relationship_type` | `"NEXT_CHUNK"` | Chunk→next Chunk (linked list) |
-| `node_to_chunk_relationship_type` | `"MENTIONS"` | Entity→Chunk relationship |
-| `chunk_id_property` | `"id"` | Property storing chunk UUID |
-| `chunk_index_property` | `"index"` | Property storing chunk position |
-| `chunk_text_property` | `"text"` | Property storing chunk text |
-| `chunk_embedding_property` | `"embedding"` | Property storing chunk vector |
+| Field                                 | Default           | Controls                        |
+| ------------------------------------- | ----------------- | ------------------------------- |
+| `document_node_label`                 | `"Document"`      | Label of the document node      |
+| `chunk_node_label`                    | `"Chunk"`         | Label of the chunk node         |
+| `chunk_to_document_relationship_type` | `"FROM_DOCUMENT"` | Chunk→Document relationship     |
+| `next_chunk_relationship_type`        | `"NEXT_CHUNK"`    | Chunk→next Chunk (linked list)  |
+| `node_to_chunk_relationship_type`     | `"MENTIONS"`      | Entity→Chunk relationship       |
+| `chunk_id_property`                   | `"id"`            | Property storing chunk UUID     |
+| `chunk_index_property`                | `"index"`         | Property storing chunk position |
+| `chunk_text_property`                 | `"text"`          | Property storing chunk text     |
+| `chunk_embedding_property`            | `"embedding"`     | Property storing chunk vector   |
 
 ---
 
@@ -220,6 +224,7 @@ Pass custom loader: `SimpleKGPipeline(..., file_loader=WebPageLoader(), from_fil
 ## LLM Graph Builder — Chunking Strategy Options
 
 Via Graph Enhancement UI → Entity Extraction Settings:
+
 - **Token-based**: fixed size (default)
 - **Page-based**: one chunk per PDF page
 - **Semantic**: embedding similarity boundaries

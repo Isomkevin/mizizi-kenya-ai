@@ -6,25 +6,25 @@ Load this when optimizing a slow query or reviewing a query before production us
 
 Severity: **[ALWAYS]** fix unconditionally. **[USUALLY]** fix unless confirmed reason not to. **[SITUATIONAL]** profile first.
 
-| Anti-Pattern | Severity | Problem | Fix |
-|---|---|---|---|
-| `MATCH (n)` label-free | [ALWAYS] | AllNodesScan | Add label: `MATCH (n:Person)` — indexes require a label |
-| `MATCH ()-[r]->()` label-free rel | [ALWAYS] | Full rel scan | `MATCH (n:User)-[r:POSTS]->()` |
-| Assumed stored GDS props (`n.pageRank`) | [ALWAYS] | Property doesn't exist unless `.write` ran | Stream via `.stream` procedure |
-| `CONTAINS`/`ENDS WITH` without a text index | [ALWAYS] | Range index does not support these; causes full label scan | `CREATE TEXT INDEX idx FOR (n:Label) ON (n.prop)` |
-| `MATCH (u)-[:R]->(t1), (u)-[:R]->(t2) WHERE t1 <> t2` | [USUALLY] | O(n²) pairs | `collect(t) AS items WHERE size(items) >= 2` |
-| `UNWIND list AS a UNWIND list AS b WHERE a <> b` | [USUALLY] | O(n²) pairs | `LIMIT` before pairing, or sample `list[0..10]` |
-| Chained `OPTIONAL MATCH` for nested optional data | [USUALLY] | Fan-out multiplies row count | `COLLECT { MATCH (a)-[:R]->(b) RETURN b }` |
-| `LIMIT` only at final `RETURN` | [USUALLY] | Full traversal runs before limit | Push `WITH n LIMIT 100` before expensive joins |
-| Cartesian product (two MATCHes, no join) | [USUALLY] | Multiplies all rows | Add join predicate in `WHERE` |
+| Anti-Pattern                                          | Severity  | Problem                                                    | Fix                                                     |
+| ----------------------------------------------------- | --------- | ---------------------------------------------------------- | ------------------------------------------------------- |
+| `MATCH (n)` label-free                                | [ALWAYS]  | AllNodesScan                                               | Add label: `MATCH (n:Person)` — indexes require a label |
+| `MATCH ()-[r]->()` label-free rel                     | [ALWAYS]  | Full rel scan                                              | `MATCH (n:User)-[r:POSTS]->()`                          |
+| Assumed stored GDS props (`n.pageRank`)               | [ALWAYS]  | Property doesn't exist unless `.write` ran                 | Stream via `.stream` procedure                          |
+| `CONTAINS`/`ENDS WITH` without a text index           | [ALWAYS]  | Range index does not support these; causes full label scan | `CREATE TEXT INDEX idx FOR (n:Label) ON (n.prop)`       |
+| `MATCH (u)-[:R]->(t1), (u)-[:R]->(t2) WHERE t1 <> t2` | [USUALLY] | O(n²) pairs                                                | `collect(t) AS items WHERE size(items) >= 2`            |
+| `UNWIND list AS a UNWIND list AS b WHERE a <> b`      | [USUALLY] | O(n²) pairs                                                | `LIMIT` before pairing, or sample `list[0..10]`         |
+| Chained `OPTIONAL MATCH` for nested optional data     | [USUALLY] | Fan-out multiplies row count                               | `COLLECT { MATCH (a)-[:R]->(b) RETURN b }`              |
+| `LIMIT` only at final `RETURN`                        | [USUALLY] | Full traversal runs before limit                           | Push `WITH n LIMIT 100` before expensive joins          |
+| Cartesian product (two MATCHes, no join)              | [USUALLY] | Multiplies all rows                                        | Add join predicate in `WHERE`                           |
 
 → See [indexes.md](indexes.md) for index type selection, MERGE lock semantics, hints, and `SHOW INDEXES YIELD *`.
 
 ## Text indexes vs fulltext indexes
 
-| Index type | Supports | Created with | Queried with |
-|---|---|---|---|
-| Text index | `CONTAINS`, `ENDS WITH` | `CREATE TEXT INDEX idx FOR (n:Label) ON (n.prop)` | Standard `WHERE` + optional hint |
+| Index type     | Supports                             | Created with                                                                  | Queried with                                       |
+| -------------- | ------------------------------------ | ----------------------------------------------------------------------------- | -------------------------------------------------- |
+| Text index     | `CONTAINS`, `ENDS WITH`              | `CREATE TEXT INDEX idx FOR (n:Label) ON (n.prop)`                             | Standard `WHERE` + optional hint                   |
 | Fulltext index | Lucene tokenized search with scoring | `CREATE FULLTEXT INDEX idx FOR (n:Label1\|Label2) ON EACH [n.prop1, n.prop2]` | `CALL db.index.fulltext.queryNodes('idx', $query)` |
 
 ```cypher
@@ -41,6 +41,7 @@ RETURN node.name, score ORDER BY score DESC LIMIT 20
 EXPLAIN / PROFILE red flags: `AllNodesScan`, `CartesianProduct`, `NodeByLabelScan`, `Eager`.
 
 For analytics over large sets:
+
 ```cypher
 CYPHER 25 runtime=parallel
 MATCH (n:Article)
@@ -55,15 +56,16 @@ Confirm with EXPLAIN — header must show `Runtime PARALLEL`. Only for large ana
 
 **Common triggers:**
 
-| Pattern | Why Eager appears | Fix |
-|---|---|---|
-| `MATCH (n:A) ... MERGE (:A {...})` | MERGE on same label as MATCH | collect first, then UNWIND+write |
-| `UNWIND list MERGE (a:X) MERGE (b:X)` | Two MERGEs on same label in one row | `CALL IN TRANSACTIONS` |
-| `MATCH (n:A) CREATE (m:A)` | CREATE on same label as MATCH | collect first |
-| `FOREACH (x IN list \| CREATE (:A))` | Write inside FOREACH visible to outer read | `UNWIND` + write |
-| `MATCH (n:A)-[]-(m) MERGE (:A {name:'London'})` | Ambiguous label scope | Add specific label to MATCH nodes |
+| Pattern                                         | Why Eager appears                          | Fix                               |
+| ----------------------------------------------- | ------------------------------------------ | --------------------------------- |
+| `MATCH (n:A) ... MERGE (:A {...})`              | MERGE on same label as MATCH               | collect first, then UNWIND+write  |
+| `UNWIND list MERGE (a:X) MERGE (b:X)`           | Two MERGEs on same label in one row        | `CALL IN TRANSACTIONS`            |
+| `MATCH (n:A) CREATE (m:A)`                      | CREATE on same label as MATCH              | collect first                     |
+| `FOREACH (x IN list \| CREATE (:A))`            | Write inside FOREACH visible to outer read | `UNWIND` + write                  |
+| `MATCH (n:A)-[]-(m) MERGE (:A {name:'London'})` | Ambiguous label scope                      | Add specific label to MATCH nodes |
 
 **Fix 1: Add specific labels to disambiguate** [official — LP Eagerness planner]
+
 ```cypher
 // BEFORE -- Eager: planner can't tell if new :City hits :LondonGroup MATCH
 MATCH (station:LondonGroup)<-[:CALLS_AT]-(london_calling)
@@ -75,6 +77,7 @@ MERGE (london_calling)-[:CALLS_AT_CITY]->(city:City {name: 'London'})
 ```
 
 **Fix 2: collect first, then write**
+
 ```cypher
 // BEFORE -- triggers Eager
 MATCH (u:User {status: 'active'})
@@ -89,6 +92,7 @@ MERGE (u)-[:HAS_SESSION]->(s:Session {id: randomUUID()})
 ```
 
 **Fix 3: CALL IN TRANSACTIONS** — isolates each batch; each transaction is independent
+
 ```cypher
 // BEFORE -- double Eager from two MERGEs on same label
 CYPHER 25

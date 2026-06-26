@@ -3,6 +3,7 @@
 Skill for building graph-native agent memory backed by Neo4j using the `neo4j-agent-memory` Python package and the hosted Neo4j Agent Memory Service (NAMS) at memory.neo4jlabs.com.
 
 **Covers:**
+
 - `MemoryClient` / `MemorySettings` — core API for storing and retrieving memories
 - Short-term memory — conversation history stored as `:Message` nodes
 - Long-term memory — structured knowledge using the POLE+O entity model (Person, Object, Location, Event + Organisation)
@@ -14,15 +15,18 @@ Skill for building graph-native agent memory backed by Neo4j using the `neo4j-ag
 - Comparing graph-native memory vs vector-only approaches
 
 **Version / compatibility:**
+
 - `neo4j-agent-memory` Python package (latest)
 - Neo4j 5.x / 2025.x or NAMS hosted service
 
 **Not covered:**
+
 - General Neo4j vector search → `neo4j-vector-index-skill`
 - GraphRAG pipelines → `neo4j-graphrag-skill`
 - MCP server setup (general) → `neo4j-mcp-skill`
 
 **Install:**
+
 ```bash
 pip install neo4j-agent-memory
 ```

@@ -9,6 +9,7 @@ Pre-built graph model templates for common domains. Adapt to the user's use-case
 **Use-cases**: Friend recommendations, community detection, influence analysis, feed ranking
 
 ### Model
+
 ```
 (Person {id, name, email, joinedAt})
 (Post {id, content, createdAt, likes})
@@ -23,6 +24,7 @@ Pre-built graph model templates for common domains. Adapt to the user's use-case
 ```
 
 ### DDL
+
 ```cypher
 CYPHER 25
 CREATE CONSTRAINT person_id IF NOT EXISTS FOR (p:Person) REQUIRE p.id IS UNIQUE;
@@ -33,6 +35,7 @@ CREATE INDEX post_created IF NOT EXISTS FOR (p:Post) ON (p.createdAt);
 ```
 
 ### Key queries
+
 ```cypher
 // Friends of friends (recommendations)
 CYPHER 25
@@ -56,6 +59,7 @@ ORDER BY followers DESC LIMIT 20;
 **Use-cases**: Product recommendations, purchase history, inventory, customer segmentation
 
 ### Model
+
 ```
 (Customer {id, name, email, joinedAt, segment})
 (Product {id, name, sku, price, category, stock})
@@ -72,6 +76,7 @@ ORDER BY followers DESC LIMIT 20;
 ```
 
 ### DDL
+
 ```cypher
 CYPHER 25
 CREATE CONSTRAINT customer_id IF NOT EXISTS FOR (c:Customer) REQUIRE c.id IS UNIQUE;
@@ -82,6 +87,7 @@ CREATE INDEX order_date IF NOT EXISTS FOR (o:Order) ON (o.orderedAt);
 ```
 
 ### Key queries
+
 ```cypher
 // Co-purchased products (collaborative filtering)
 CYPHER 25
@@ -106,6 +112,7 @@ ORDER BY revenue DESC LIMIT 20;
 ### Model
 
 Account-centric model (preferred for ring detection — cycles traverse Account→Transaction→Account):
+
 ```
 (Account {accountId, owner, type, balance, createdAt, status})
 (Transaction {txId, amount, currency, timestamp, status})
@@ -115,6 +122,7 @@ Account-centric model (preferred for ring detection — cycles traverse Account�
 ```
 
 Extended model (add as needed):
+
 ```
 (Account)-[:USES_PHONE]->(Phone {number})
 (Account)-[:USES_EMAIL]->(Email {address})
@@ -124,6 +132,7 @@ Extended model (add as needed):
 **Why PERFORMS/BENEFITS_TO (not FROM/TO on Transaction):** `(a)-[:PERFORMS]->()-[:BENEFITS_TO]->(b)` creates a direct Account→Account traversal path chainable as variable-length paths for cycle detection. Transaction-centric models `(tx)-[:FROM]->(a)` require more complex patterns and are harder to chain.
 
 ### DDL
+
 ```cypher
 CYPHER 25
 CREATE CONSTRAINT account_id IF NOT EXISTS FOR (a:Account) REQUIRE a.accountId IS UNIQUE;
@@ -134,6 +143,7 @@ CREATE INDEX transaction_amount IF NOT EXISTS FOR (t:Transaction) ON (t.amount);
 ```
 
 ### Key queries
+
 ```cypher
 // Transaction rings — accounts cycling funds (3–6 hops back to origin)
 // This is the canonical fraud ring query; SQL cannot do this efficiently
@@ -142,7 +152,7 @@ MATCH path = (start:Account)-[:PERFORMS]->(:Transaction)-[:BENEFITS_TO*1..5]->(s
 WHERE ALL(n IN nodes(path) WHERE n:Account OR n:Transaction)
 WITH start, length(path) AS ringLength, path
 ORDER BY ringLength
-RETURN start.accountId AS originAccount, ringLength, 
+RETURN start.accountId AS originAccount, ringLength,
        [n IN nodes(path) WHERE n:Account | n.accountId] AS ring
 LIMIT 20;
 
@@ -194,6 +204,7 @@ for ring in rings:
 **Use-cases**: Document Q&A, GraphRAG, entity extraction, knowledge base
 
 ### Model
+
 ```
 (Document {id, title, url, source, publishedAt})
 (Chunk {id, text, position, tokenCount})
@@ -208,6 +219,7 @@ for ring in rings:
 ```
 
 ### DDL + Vector Index
+
 ```cypher
 CYPHER 25
 CREATE CONSTRAINT document_id IF NOT EXISTS FOR (d:Document) REQUIRE d.id IS UNIQUE;
@@ -225,6 +237,7 @@ CREATE FULLTEXT INDEX entity_search IF NOT EXISTS
 ```
 
 ### Key queries
+
 ```cypher
 // GraphRAG: semantic search + graph expansion
 CYPHER 25
@@ -255,6 +268,7 @@ ORDER BY coMentions DESC LIMIT 20;
 **Use-cases**: Patient care pathways, drug interactions, clinical trial matching, medical knowledge graph
 
 ### Model
+
 ```
 (Patient {id, age, gender, bloodType})
 (Condition {icd10, name, category})
@@ -274,6 +288,7 @@ ORDER BY coMentions DESC LIMIT 20;
 ```
 
 ### DDL
+
 ```cypher
 CYPHER 25
 CREATE CONSTRAINT patient_id IF NOT EXISTS FOR (p:Patient) REQUIRE p.id IS UNIQUE;
@@ -289,6 +304,7 @@ CREATE INDEX visit_date IF NOT EXISTS FOR (v:Visit) ON (v.date);
 **Use-cases**: Root cause analysis, topology mapping, anomaly detection, capacity planning
 
 ### Model
+
 ```
 (Device {id, name, type, ip, location, status})
 (Service {id, name, version, port})
@@ -305,6 +321,7 @@ CREATE INDEX visit_date IF NOT EXISTS FOR (v:Visit) ON (v.date);
 ```
 
 ### Key queries
+
 ```cypher
 // Find blast radius (devices depending on a failing service)
 CYPHER 25

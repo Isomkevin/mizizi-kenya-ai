@@ -63,11 +63,11 @@ var session = driver.session(SessionConfig.builder()
 
 ## Connection pool diagnosis
 
-| Error message | Cause | Fix |
-|---|---|---|
-| `Unable to acquire connection from the pool within configured maximum time` | Pool exhausted | Increase `maxConnectionPoolSize` or fix session leaks |
-| `Connection to the database terminated` / `ServiceUnavailableException` | Network/server issue | Check server health, firewall, TLS |
-| Session hangs with no error | Session leak — connection never returned | Add try-with-resources; audit all code paths |
+| Error message                                                               | Cause                                    | Fix                                                   |
+| --------------------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------- |
+| `Unable to acquire connection from the pool within configured maximum time` | Pool exhausted                           | Increase `maxConnectionPoolSize` or fix session leaks |
+| `Connection to the database terminated` / `ServiceUnavailableException`     | Network/server issue                     | Check server health, firewall, TLS                    |
+| Session hangs with no error                                                 | Session leak — connection never returned | Add try-with-resources; audit all code paths          |
 
 ## Spatial Types
 

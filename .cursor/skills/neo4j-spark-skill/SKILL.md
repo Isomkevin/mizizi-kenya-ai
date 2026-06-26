@@ -32,16 +32,18 @@ allowed-tools: Bash WebFetch
 
 ## Version Matrix
 
-| Connector | Spark | Scala | Databricks Runtime | Neo4j |
-|-----------|-------|-------|--------------------|-------|
-| 5.4.x | 3.3, 3.4, 3.5 | 2.12, 2.13 | 12.2, 13.3, 14.3 LTS | 4.4, 5.x, 2025.x |
+| Connector | Spark         | Scala      | Databricks Runtime   | Neo4j            |
+| --------- | ------------- | ---------- | -------------------- | ---------------- |
+| 5.4.x     | 3.3, 3.4, 3.5 | 2.12, 2.13 | 12.2, 13.3, 14.3 LTS | 4.4, 5.x, 2025.x |
 
 Maven artifact (Scala 2.12, Spark 3):
+
 ```
 org.neo4j:neo4j-connector-apache-spark_2.12:5.4.2_for_spark_3
 ```
 
 Scala 2.13 variant:
+
 ```
 org.neo4j:neo4j-connector-apache-spark_2.13:5.4.2_for_spark_3
 ```
@@ -116,16 +118,16 @@ spark.conf.set("neo4j.authentication.basic.password", neo4j_pass)
 
 ## Key Configuration Options
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `neo4j.url` | Bolt/Neo4j URI | — (required) |
-| `neo4j.authentication.type` | `none`, `basic`, `kerberos`, `bearer` | `basic` |
-| `neo4j.authentication.basic.username` | Username | driver default |
-| `neo4j.authentication.basic.password` | Password | driver default |
-| `neo4j.authentication.bearer.token` | Bearer token | — |
-| `neo4j.database` | Target database | driver default |
-| `neo4j.access.mode` | `read` or `write` | `read` |
-| `neo4j.encryption.enabled` | TLS (ignored with `+s`/`+ssc` URI) | `false` |
+| Option                                | Description                           | Default        |
+| ------------------------------------- | ------------------------------------- | -------------- |
+| `neo4j.url`                           | Bolt/Neo4j URI                        | — (required)   |
+| `neo4j.authentication.type`           | `none`, `basic`, `kerberos`, `bearer` | `basic`        |
+| `neo4j.authentication.basic.username` | Username                              | driver default |
+| `neo4j.authentication.basic.password` | Password                              | driver default |
+| `neo4j.authentication.bearer.token`   | Bearer token                          | —              |
+| `neo4j.database`                      | Target database                       | driver default |
+| `neo4j.access.mode`                   | `read` or `write`                     | `read`         |
+| `neo4j.encryption.enabled`            | TLS (ignored with `+s`/`+ssc` URI)    | `false`        |
 
 ---
 
@@ -197,11 +199,11 @@ Full read options reference: [references/read-patterns.md](references/read-patte
 
 ### SaveMode
 
-| SaveMode | Cypher | Requires |
-|----------|--------|----------|
-| `Append` | `CREATE` | nothing extra |
-| `Overwrite` | `MERGE` | `node.keys` (nodes) or `*.node.keys` (rels) |
-| `ErrorIfExists` | `CREATE` + error if exists | — |
+| SaveMode        | Cypher                     | Requires                                    |
+| --------------- | -------------------------- | ------------------------------------------- |
+| `Append`        | `CREATE`                   | nothing extra                               |
+| `Overwrite`     | `MERGE`                    | `node.keys` (nodes) or `*.node.keys` (rels) |
+| `ErrorIfExists` | `CREATE` + error if exists | —                                           |
 
 Always create uniqueness constraints on `node.keys` properties before writing in `Overwrite` mode.
 
@@ -272,6 +274,7 @@ rel_df = spark.createDataFrame([
 ```
 
 `relationship.source.save.mode` / `relationship.target.save.mode`:
+
 - `Match` — find existing nodes (fail if missing)
 - `Append` — always CREATE new nodes
 - `Overwrite` — MERGE nodes
@@ -325,12 +328,12 @@ orders_df.coalesce(1).write.format("org.neo4j.spark.DataSource").mode("Append") 
 
 ## Write Performance Tuning
 
-| Scenario | Recommendation |
-|----------|---------------|
-| Node writes (no lock contention) | `repartition(N)` where N ≤ Neo4j CPU cores |
-| Relationship writes (lock risk) | `coalesce(1)` — single partition |
-| Large datasets | `batch.size` 10000–20000 (adjust to heap) |
-| MERGE-heavy loads | Add uniqueness constraint on `node.keys` properties first |
+| Scenario                         | Recommendation                                            |
+| -------------------------------- | --------------------------------------------------------- |
+| Node writes (no lock contention) | `repartition(N)` where N ≤ Neo4j CPU cores                |
+| Relationship writes (lock risk)  | `coalesce(1)` — single partition                          |
+| Large datasets                   | `batch.size` 10000–20000 (adjust to heap)                 |
+| MERGE-heavy loads                | Add uniqueness constraint on `node.keys` properties first |
 
 ```python
 # Aggressive batch — monitor Neo4j heap; OOM risk above 50k
@@ -347,15 +350,15 @@ orders_df.coalesce(1).write.format("org.neo4j.spark.DataSource").mode("Append") 
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `ClassNotFoundException: org.neo4j.spark.DataSource` | JAR not on classpath | Add `spark.jars.packages` or attach library |
-| Deadlock on relationship write | Multiple partitions locking nodes | `coalesce(1)` before write |
-| Duplicate nodes on Overwrite | No uniqueness constraint on keys | `CREATE CONSTRAINT ON (n:Label) ASSERT n.prop IS UNIQUE` |
-| OOM on Neo4j side | `batch.size` too large | Reduce to 5000–10000; check heap |
-| Schema all `string` columns | No APOC, schema not sampled | Set `schema.flatten.limit` higher; or use `query` mode with explicit types |
-| `Access mode is read` error on write | Session opened in read mode | Remove `neo4j.access.mode` or set to `write` |
-| Databricks Shared cluster fails | Unity Catalog shared mode unsupported | Switch to Single User access mode |
+| Error                                                | Cause                                 | Fix                                                                        |
+| ---------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------- |
+| `ClassNotFoundException: org.neo4j.spark.DataSource` | JAR not on classpath                  | Add `spark.jars.packages` or attach library                                |
+| Deadlock on relationship write                       | Multiple partitions locking nodes     | `coalesce(1)` before write                                                 |
+| Duplicate nodes on Overwrite                         | No uniqueness constraint on keys      | `CREATE CONSTRAINT ON (n:Label) ASSERT n.prop IS UNIQUE`                   |
+| OOM on Neo4j side                                    | `batch.size` too large                | Reduce to 5000–10000; check heap                                           |
+| Schema all `string` columns                          | No APOC, schema not sampled           | Set `schema.flatten.limit` higher; or use `query` mode with explicit types |
+| `Access mode is read` error on write                 | Session opened in read mode           | Remove `neo4j.access.mode` or set to `write`                               |
+| Databricks Shared cluster fails                      | Unity Catalog shared mode unsupported | Switch to Single User access mode                                          |
 
 ---
 
