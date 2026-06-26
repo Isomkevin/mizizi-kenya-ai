@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies & build output
 node_modules
 dist
 dist-ssr
@@ -14,19 +15,59 @@ dist-ssr
 .vinxi
 .tanstack/**
 .nitro
-*.local
+build
+*.tsbuildinfo
+
+# Environment & secrets (keep committed examples)
+.env
+.env.*
+!.env.example
+!**/.env.example
+aura.env
 
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
 
+# Neo4j / agent tooling (see neo4j-getting-started-skill)
+neo4j-mcp
+mcp-*.json
+.provision.lock
+neo4j-data/
+*-schema.json
+schema.json
+
+# Python (Neo4j skills, scripts)
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Test & coverage
+coverage/
+*.lcov
+
+# Cache
+.cache/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Local overrides
+*.local
