@@ -14,4 +14,4 @@ Use when starting a new session or switching from another AI tool.
 3. Run `bun run lint` and `bun run build` if routes/components changed.
 4. Update `docs/phase-status.md` when done.
 
-See also: `.agents/skills/continue-build/SKILL.md` (Antigravity), `AGENTS.md` (all tools).
+See also: `.agents/skills/continue-build/SKILL.md` (Antigravity), `.lovable/skills.md` (Lovable), `AGENTS.md` (all tools).

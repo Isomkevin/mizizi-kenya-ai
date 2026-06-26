@@ -16,9 +16,11 @@ Read `docs/phase-status.md` and follow the next unchecked items. Do not restart 
 
 ## References
 
-- `AGENTS.md` — conventions for all tools
+- `AGENTS.md` — conventions for all tools (includes agent skills protocol)
 - `docs/product-spec.md` — full PRD
 - `.lovable/plan.md` — phased roadmap
+- `.lovable/skills.md` — Lovable skill discovery (Neo4j, Masumi, continue-build)
+- `.agents/skills/README.md` — full skill index
 - `src/routes/README.md` — routing rules
 
 ## Quality bar

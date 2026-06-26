@@ -40,6 +40,8 @@ Quality bar: intentional, editorial, infrastructure-grade UI — not generic Saa
 | [docs/product-spec.md](docs/product-spec.md) | Full PRD (~3,800 lines) — product vision, IA, design system, engineering standards |
 | [docs/phase-status.md](docs/phase-status.md) | What's shipped vs. next — **read this before picking up work** |
 | [.lovable/plan.md](.lovable/plan.md) | Phased build roadmap (Lovable + agents) |
+| [.lovable/skills.md](.lovable/skills.md) | How Lovable uses repo agent skills |
+| [.agents/skills/README.md](.agents/skills/README.md) | Skill index (Neo4j, Masumi, continue-build, …) |
 | [src/routes/README.md](src/routes/README.md) | TanStack Start routing conventions |
 | [src/components/app/README.md](src/components/app/README.md) | App shell and feature component patterns |
 | [src/lib/mock/README.md](src/lib/mock/README.md) | Mock data conventions |
@@ -61,6 +63,20 @@ See [docs/phase-status.md](docs/phase-status.md). At a glance:
 5. **Fonts** — Load via `<link>` in `src/routes/__root.tsx` head (template rule).
 6. **Scope** — Backend, auth, and real ML are out of scope until explicitly requested. The PRD's "no mock data" rule applies to production; phased builds use mocks first per `.lovable/plan.md`.
 
+## Agent skills
+
+Project skills live in **`.agents/skills/<name>/SKILL.md`** (mirrored under `.cursor/skills/` for Cursor). Each skill has YAML frontmatter with `name` and `description`; the agent loads the full file only when the task matches the description.
+
+**All agents (including Lovable):** read [.agents/skills/README.md](.agents/skills/README.md) when the task may match a skill. Then open the relevant `SKILL.md` before implementing.
+
+| Domain | Key skills |
+| --- | --- |
+| Phased UI build | `continue-build`, `add-app-route` |
+| Neo4j / graph (Phase 4+) | `neo4j-modeling-skill`, `neo4j-cypher-skill`, `neo4j-gds-skill`, `neo4j-getting-started-skill` |
+| Masumi / payments | `masumi` |
+
+Neo4j bundle: `npx skills add neo4j-contrib/neo4j-skills` (see `skills-lock.json`). **Lovable:** also read [.lovable/skills.md](.lovable/skills.md).
+
 ## Multi-tool handoff
 
 This repo is set up so different AI coding tools can continue the same work. **Always read [docs/phase-status.md](docs/phase-status.md) first** — it is the shared “where we left off” file every agent should update after milestones.
@@ -70,9 +86,9 @@ This repo is set up so different AI coding tools can continue the same work. **A
 | **Any agent** | `AGENTS.md` (this file) |
 | **Cursor** | `.cursor/rules/`, `.cursor/skills/` |
 | **Claude Code** | `CLAUDE.md`, `.claude/rules/` |
-| **VS Code Copilot** | `.github/copilot-instructions.md`, `.github/instructions/` |
+| **VS Code Copilot** | `.github/copilot-instructions.md`, `.github/skills/` |
 | **Google Antigravity** | `.agents/CONTEXT.md`, `.agents/agents.md`, `.agents/skills/` |
-| **Lovable** | `.lovable/plan.md` |
+| **Lovable** | `.lovable/plan.md`, `.lovable/skills.md`, `.agents/skills/` |
 
 Canonical docs: [docs/product-spec.md](docs/product-spec.md) (PRD), [docs/phase-status.md](docs/phase-status.md) (progress).
 

@@ -2,7 +2,7 @@
 
 **Start here:** Read `docs/phase-status.md` before implementing. Update it when you finish a milestone.
 
-Full guide: `AGENTS.md`. PRD: `docs/product-spec.md`. Roadmap: `.lovable/plan.md`.
+Full guide: `AGENTS.md`. PRD: `docs/product-spec.md`. Roadmap: `.lovable/plan.md`. Skills: `.agents/skills/README.md`.
 
 ## Commands
 
