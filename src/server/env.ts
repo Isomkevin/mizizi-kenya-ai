@@ -16,6 +16,18 @@ export const serverEnv = {
   neo4jUri: () => env("NEO4J_URI"),
   neo4jUser: () => env("NEO4J_USER") ?? "neo4j",
   neo4jPassword: () => env("NEO4J_PASSWORD"),
+  neo4jDatabase: () => env("NEO4J_DATABASE") ?? "neo4j",
+  neo4jProfile: () => {
+    const explicit = env("NEO4J_PROFILE");
+    if (explicit === "local" || explicit === "aura" || explicit === "custom") return explicit;
+    const uri = env("NEO4J_URI")?.toLowerCase() ?? "";
+    if (uri.includes("databases.neo4j.io") || uri.startsWith("neo4j+s://")) return "aura";
+    if (uri.includes("localhost") || uri.includes("127.0.0.1") || uri.startsWith("bolt://")) {
+      return "local";
+    }
+    return uri ? "custom" : undefined;
+  },
+  neo4jGdsEnabled: () => env("NEO4J_GDS") === "true" || env("NEO4J_GDS") === "1",
   openAiKey: () => env("OPENAI_API_KEY"),
   featherlessApiKey: () => env("FEATHERLESS_API_KEY"),
   featherlessBaseUrl: () => env("FEATHERLESS_BASE_URL") ?? "https://api.featherless.ai/v1",

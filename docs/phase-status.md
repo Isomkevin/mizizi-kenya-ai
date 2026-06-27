@@ -88,6 +88,9 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] Graph workspace depth control (1–3) and data-source badge
 - [x] Extended constraints for Document, FarmParcel, DataSource
 - [x] Optional GDS PageRank script + seed-time refresh when plugin available
+- [x] Local Docker Neo4j (`docker-compose.neo4j.yml`, `bun run neo4j:local`)
+- [x] Aura setup path (`bun run neo4j:setup`, `.env.neo4j.aura.example`)
+- [x] `docs/neo4j.md` — local + Aura runbooks
 
 ## Technical debt / notes
 

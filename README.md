@@ -116,7 +116,27 @@ Dev server: `http://localhost:5173` (hot reload).
 | `bun run dev`    | Local dev server                                  |
 | `bun run build`  | Production build (regenerates `routeTree.gen.ts`) |
 | `bun run lint`   | ESLint                                            |
+| `bun run seed`   | Reset local DB and sync graph to Neo4j when configured |
+| `bun run neo4j:up` | Start local Neo4j (Docker) |
+| `bun run neo4j:setup` | Apply constraints and verify Neo4j |
+| `bun run neo4j:local` | Local Neo4j bootstrap: up + setup + seed |
 | `bun run format` | Prettier                                          |
+
+### Neo4j (graph intelligence)
+
+Local Docker or Neo4j Aura — full guide: **[docs/neo4j.md](docs/neo4j.md)**
+
+```bash
+# Option A — local (after copying .env.neo4j.local.example into .env)
+bun run neo4j:local
+bun run dev
+
+# Option C — Aura (after copying .env.neo4j.aura.example into .env)
+bun run neo4j:setup && bun run seed
+bun run dev
+```
+
+Verify: `bun run neo4j:verify` · Graph UI: `/app/graph` (look for **Source neo4j**).
 
 Before opening a PR that touches routes or components, run `bun run lint` and `bun run build`.
 

@@ -1,6 +1,6 @@
 import type { DecisionFactor, FarmerProfile, GraphEvidenceStep, GraphPayload } from "@/api/types";
 import { mapNeo4jGraph } from "@/server/services/neo4j-mapper";
-import { getNeo4jDriver } from "@/server/services/neo4j";
+import { getNeo4jDriver, openNeo4jSession } from "@/server/services/neo4j";
 import { getPersistence } from "@/server/services/persistence";
 
 export interface FarmerGraphMetrics {
@@ -51,7 +51,7 @@ export async function fetchFarmerSubgraphFromNeo4j(
   if (!driver) return null;
 
   const safeDepth = clampDepth(depth);
-  const session = driver.session();
+  const session = openNeo4jSession(driver);
   try {
     const result = await session.run(
       `
@@ -125,7 +125,7 @@ async function resolveNeo4jEvidenceStep(
   const driver = getNeo4jDriver();
   if (!driver) return null;
 
-  const session = driver.session();
+  const session = openNeo4jSession(driver);
   try {
     const result = await session.run(query, { farmerId });
     const record = result.records[0];
@@ -224,7 +224,7 @@ export async function getFarmerGraphMetrics(
   const driver = getNeo4jDriver();
   if (!driver) return getLocalGraphMetrics(farmerId, farmer);
 
-  const session = driver.session();
+  const session = openNeo4jSession(driver);
   try {
     const result = await session.run(
       `
@@ -275,7 +275,7 @@ export async function tryRefreshGdsTrustScores(): Promise<{
   const driver = getNeo4jDriver();
   if (!driver) return { updated: 0, gdsAvailable: false };
 
-  const session = driver.session();
+  const session = openNeo4jSession(driver);
   try {
     await session.run(`CALL gds.version() YIELD gdsVersion RETURN gdsVersion`);
   } catch {

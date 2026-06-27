@@ -1,4 +1,4 @@
-import neo4j, { type Driver } from "neo4j-driver";
+import neo4j, { type Driver, type Session } from "neo4j-driver";
 
 import type {
   DocumentExtractionResult,
@@ -23,6 +23,19 @@ export function getNeo4jDriver(): Driver | null {
   }
   driver = neo4j.driver(uri, neo4j.auth.basic(serverEnv.neo4jUser(), password));
   return driver;
+}
+
+export function openNeo4jSession(activeDriver: Driver): Session {
+  return activeDriver.session({ database: serverEnv.neo4jDatabase() });
+}
+
+export interface Neo4jStatus {
+  connected: boolean;
+  message: string;
+  profile?: "local" | "aura" | "custom";
+  database?: string;
+  farmerNodes?: number;
+  relationshipCount?: number;
 }
 
 function buildFallbackGraph(farmer: FarmerProfile): GraphPayload {
@@ -84,7 +97,7 @@ export async function syncFarmerToGraph(
     return { synced: true, source: "local" };
   }
 
-  const session = activeDriver.session();
+  const session = openNeo4jSession(activeDriver);
   try {
     await session.executeWrite((tx) =>
       tx.run(
@@ -205,7 +218,7 @@ export async function syncDocumentToGraph(
     return { synced: true, source: "local" };
   }
 
-  const session = activeDriver.session();
+  const session = openNeo4jSession(activeDriver);
   try {
     await session.executeWrite(async (tx) => {
       await tx.run(
@@ -293,22 +306,36 @@ export async function getSubgraph(rootId: string, depth = 1): Promise<GraphPaylo
   return { ...local, meta: { source: "local", depth } };
 }
 
-export async function verifyNeo4jConnectivity(): Promise<{
-  connected: boolean;
-  message: string;
-}> {
+export async function verifyNeo4jConnectivity(): Promise<Neo4jStatus> {
   const activeDriver = getNeo4jDriver();
+  const profile = serverEnv.neo4jProfile();
+  const database = serverEnv.neo4jDatabase();
+
   if (!activeDriver) {
     return { connected: false, message: "Neo4j credentials are not configured." };
   }
 
-  const session = activeDriver.session();
+  const session = openNeo4jSession(activeDriver);
   try {
     await session.run("RETURN 1 AS ok");
-    return { connected: true, message: "Neo4j connection verified." };
+    const stats = await session.run(`
+      OPTIONAL MATCH (f:Farmer)
+      WITH count(f) AS farmers
+      OPTIONAL MATCH ()-[r]->()
+      RETURN farmers, count(r) AS relationships
+    `);
+    const record = stats.records[0];
+    return {
+      connected: true,
+      message: "Neo4j connection verified.",
+      profile,
+      database,
+      farmerNodes: Number(record?.get("farmers") ?? 0),
+      relationshipCount: Number(record?.get("relationships") ?? 0),
+    };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Neo4j connectivity check failed.";
-    return { connected: false, message };
+    return { connected: false, message, profile, database };
   } finally {
     await session.close();
   }

@@ -9,6 +9,7 @@ Phase 0 introduces a server-side foundation that runs fully local first, while k
 - **Persistence adapter**: `src/server/services/persistence.ts` selects local or Supabase-backed adapter using environment configuration.
 - **Climate integration**: `src/server/services/climate.ts` fetches county climate observations from Open-Meteo with in-memory cache.
 - **Graph integration**: `src/server/services/neo4j.ts` syncs to Neo4j when configured, otherwise falls back to local graph payloads.
+- **Neo4j ops**: `docker-compose.neo4j.yml`, `scripts/neo4j/setup.ts`, `docs/neo4j.md` (local Docker + Aura).
 - **Server functions**: `src/server/functions/*` expose typed read/write operations for TanStack Start clients.
 
 ## Runtime modes
@@ -29,6 +30,8 @@ Phase 0 introduces a server-side foundation that runs fully local first, while k
 
 - SQL baseline: `supabase/migrations/001_initial_schema.sql`
 - Neo4j constraints: `scripts/neo4j/001_constraints.cypher`
+- Neo4j setup guide: `docs/neo4j.md`
+- Local Neo4j: `docker-compose.neo4j.yml` + `bun run neo4j:local`
 - Seed command: `scripts/seed/index.ts`
 
 ## Environment

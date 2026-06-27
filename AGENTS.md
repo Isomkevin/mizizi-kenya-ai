@@ -74,6 +74,7 @@ Project skills live in **`.agents/skills/<name>/SKILL.md`** (mirrored under `.cu
 | ------------------------ | ---------------------------------------------------------------------------------------------- |
 | Phased UI build          | `continue-build`, `add-app-route`                                                              |
 | Neo4j / graph (Phase 4+) | `neo4j-modeling-skill`, `neo4j-cypher-skill`, `neo4j-gds-skill`, `neo4j-getting-started-skill` |
+| Neo4j local + Aura setup | [docs/neo4j.md](docs/neo4j.md) — `bun run neo4j:local` or `bun run neo4j:setup`                |
 | Masumi / payments        | `masumi`                                                                                       |
 
 Neo4j bundle: `npx skills add neo4j-contrib/neo4j-skills` (see `skills-lock.json`). **Lovable:** also read [.lovable/skills.md](.lovable/skills.md).
