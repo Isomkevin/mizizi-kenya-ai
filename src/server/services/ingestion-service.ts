@@ -35,7 +35,8 @@ function applyExtractionToFarmer(
   farmer: FarmerProfile,
   extraction: DocumentExtractionResult,
 ): FarmerProfile {
-  const cooperativeName = extraction.extractedFields.cooperativeName ?? extraction.extractedFields.cooperative;
+  const cooperativeName =
+    extraction.extractedFields.cooperativeName ?? extraction.extractedFields.cooperative;
   const parcelHa = extraction.extractedFields.parcelHa;
 
   const updated: FarmerProfile = {
@@ -44,11 +45,11 @@ function applyExtractionToFarmer(
       typeof cooperativeName === "string" && cooperativeName.trim()
         ? cooperativeName
         : farmer.cooperative,
-    parcelHa:
-      typeof parcelHa === "number" && parcelHa > 0 ? parcelHa : farmer.parcelHa,
+    parcelHa: typeof parcelHa === "number" && parcelHa > 0 ? parcelHa : farmer.parcelHa,
     dataCompleteness: Math.min(100, farmer.dataCompleteness + 8),
     sourceFreshness: "Just now",
-    graphConnections: farmer.graphConnections + extraction.entities.filter((e) => e.confidence >= 0.6).length,
+    graphConnections:
+      farmer.graphConnections + extraction.entities.filter((e) => e.confidence >= 0.6).length,
     trustIndicators: Array.from(
       new Set([...farmer.trustIndicators, `${extraction.documentType} document ingested`]),
     ),
@@ -59,7 +60,9 @@ function applyExtractionToFarmer(
     ...updated,
     risk: assessment.risk,
     confidence: assessment.confidence,
-    contributingFactors: assessment.factors.length ? assessment.factors : updated.contributingFactors,
+    contributingFactors: assessment.factors.length
+      ? assessment.factors
+      : updated.contributingFactors,
   };
 }
 
@@ -78,12 +81,7 @@ export async function stageDocumentUpload(
 
   const buffer = decodeUploadContent(input.contentBase64);
   const documentId = newDocumentId(farmer.id);
-  const storagePath = await saveFarmerDocumentFile(
-    farmer.id,
-    documentId,
-    input.fileName,
-    buffer,
-  );
+  const storagePath = await saveFarmerDocumentFile(farmer.id, documentId, input.fileName, buffer);
 
   const now = new Date().toISOString();
   const document: DocumentRecord = {
@@ -163,7 +161,7 @@ export async function processDocumentIngestion(
       graphSyncStatus: "pending",
     };
 
-    let updatedFarmer = applyExtractionToFarmer(farmer, extraction);
+    const updatedFarmer = applyExtractionToFarmer(farmer, extraction);
     updatedFarmer.documents[index] = completed;
     updatedFarmer.timeline = [
       {

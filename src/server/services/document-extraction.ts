@@ -110,7 +110,10 @@ Use ONLY evidence from the document content or metadata. Do not invent national 
       {
         role: "user",
         content: [
-          { type: "text", text: `Extract document facts from this upload.\n${JSON.stringify(context)}` },
+          {
+            type: "text",
+            text: `Extract document facts from this upload.\n${JSON.stringify(context)}`,
+          },
           { type: "image_url", image_url: { url: imageDataUrl } },
         ],
       },

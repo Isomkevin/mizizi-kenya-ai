@@ -74,7 +74,10 @@ export function DocumentDropZone({ farmerId, className }: DocumentDropZoneProps)
           <Label htmlFor="doc-type" className="text-xs text-muted-foreground">
             Default document type
           </Label>
-          <Select value={docType} onValueChange={(value) => setDocType(value as FarmerDocumentType)}>
+          <Select
+            value={docType}
+            onValueChange={(value) => setDocType(value as FarmerDocumentType)}
+          >
             <SelectTrigger id="doc-type" className="mt-1 h-9">
               <SelectValue />
             </SelectTrigger>
@@ -127,7 +130,9 @@ export function DocumentDropZone({ farmerId, className }: DocumentDropZoneProps)
         <p className="mt-3 text-sm font-medium">
           {upload.isPending ? "Uploading…" : "Drag and drop documents here"}
         </p>
-        <p className="mt-1 text-xs text-muted-foreground">PDF, JPG, PNG, WEBP, CSV, TXT · max 10MB</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          PDF, JPG, PNG, WEBP, CSV, TXT · max 10MB
+        </p>
         <Button type="button" variant="outline" size="sm" className="mt-4" tabIndex={-1}>
           Browse files
         </Button>

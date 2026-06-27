@@ -18,7 +18,7 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 
 ## Phase 0 — Done
 
-- [x] `.env.example` documents Supabase, Neo4j, tenant and AI runtime variables
+- [x] `.env.example` documents Supabase, Neo4j, Featherless, OpenRouter, tenant and AI runtime variables
 - [x] Supabase migration with tenant RLS in `supabase/migrations/001_initial_schema.sql`
 - [x] Neo4j constraints in `scripts/neo4j/001_constraints.cypher`
 - [x] BFF server-function surface in `src/api/functions/*`
@@ -46,6 +46,8 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 
 - [x] Farmer search at `/app/farmers` with filters, result cards, `useFarmers`
 - [x] Farmer profile at `/app/farmers/$farmerId` with tabs (overview, financial, climate, applications, decisions, documents, activity)
+- [x] Create farmer flow + profile routing (`CreateFarmerDialog`, nested `/app/farmers` routes)
+- [x] Document ingestion on profile Documents tab: drag-and-drop upload, Featherless → OpenRouter → rules extraction, background Neo4j/local graph sync (`ingestion-service`, `DocumentDropZone`)
 - [x] Components in `src/components/app/farmers/`
 
 ## Phase 4 — Done

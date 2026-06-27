@@ -1,10 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import type { UploadFarmerDocumentInput } from "@/api/types";
-import {
-  processDocumentIngestion,
-  stageDocumentUpload,
-} from "@/server/services/ingestion-service";
+import { processDocumentIngestion, stageDocumentUpload } from "@/server/services/ingestion-service";
 
 export const uploadFarmerDocumentFn = createServerFn({ method: "POST" })
   .validator((data: UploadFarmerDocumentInput) => data)

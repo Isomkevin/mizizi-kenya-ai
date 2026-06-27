@@ -1,6 +1,11 @@
 import neo4j, { type Driver } from "neo4j-driver";
 
-import type { DocumentExtractionResult, DocumentRecord, FarmerProfile, GraphPayload } from "@/api/types";
+import type {
+  DocumentExtractionResult,
+  DocumentRecord,
+  FarmerProfile,
+  GraphPayload,
+} from "@/api/types";
 import { getDb } from "@/server/db/local-store";
 import { serverEnv } from "@/server/env";
 import { getPersistence } from "@/server/services/persistence";
@@ -123,7 +128,10 @@ export async function syncFarmerToGraph(
 }
 
 function slugify(value: string): string {
-  return value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+  return value
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
 }
 
 export async function appendDocumentToLocalGraph(
@@ -228,8 +236,11 @@ export async function syncDocumentToGraph(
       );
 
       const cooperativeName =
-        String(extraction.extractedFields.cooperativeName ?? extraction.extractedFields.cooperative ?? "") ||
-        farmer.cooperative;
+        String(
+          extraction.extractedFields.cooperativeName ??
+            extraction.extractedFields.cooperative ??
+            "",
+        ) || farmer.cooperative;
       if (cooperativeName) {
         const coopId = `coop-${slugify(cooperativeName)}`;
         await tx.run(
