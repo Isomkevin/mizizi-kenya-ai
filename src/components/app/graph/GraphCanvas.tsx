@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ForceGraphMethods, NodeObject } from "react-force-graph-2d";
+import type { ForceGraphMethods, LinkObject, NodeObject } from "react-force-graph-2d";
 
 import type { GraphNode, GraphPayload } from "@/api/types";
-import { graphNodeCanvasColor, resolveCssVar } from "@/components/app/graph/graph-colors";
+import {
+  formatGraphLinkType,
+  graphLinkCanvasColor,
+  graphLinkCanvasDash,
+  graphLinkCanvasWidth,
+  graphNodeCanvasColor,
+  resolveCssVar,
+} from "@/components/app/graph/graph-colors";
 
 interface GraphCanvasProps {
   graph: GraphPayload;
@@ -11,6 +18,12 @@ interface GraphCanvasProps {
 }
 
 type ForceGraphNode = GraphNode & { val?: number; color?: string };
+type ForceGraphLink = LinkObject & { type?: string };
+
+const CANVAS_HEIGHT = 540;
+const NODE_REL_SIZE = 3.5;
+const NODE_VAL = 4;
+const NODE_VAL_SELECTED = 6;
 
 function toGraphNode(node: NodeObject): GraphNode {
   const data = node as ForceGraphNode;
@@ -25,7 +38,17 @@ function toGraphNode(node: NodeObject): GraphNode {
   };
 }
 
-const CANVAS_HEIGHT = 540;
+function linkEndpointId(endpoint: LinkObject["source"] | LinkObject["target"]): string {
+  if (typeof endpoint === "object" && endpoint !== null && "id" in endpoint) {
+    return String(endpoint.id);
+  }
+  return String(endpoint);
+}
+
+function isLinkConnectedToNode(link: ForceGraphLink, nodeId: string | undefined): boolean {
+  if (!nodeId) return false;
+  return linkEndpointId(link.source) === nodeId || linkEndpointId(link.target) === nodeId;
+}
 
 export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -73,7 +96,7 @@ export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasPr
     () => ({
       nodes: graph.nodes.map((node) => ({
         ...node,
-        val: 6,
+        val: NODE_VAL,
         color: graphNodeCanvasColor(node.type),
       })),
       links: graph.edges.map((edge) => ({
@@ -86,8 +109,8 @@ export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasPr
     [graph.nodes, graph.edges],
   );
 
-  const linkColor = useMemo(() => resolveCssVar("--border"), []);
   const primaryColor = useMemo(() => resolveCssVar("--primary"), []);
+  const mutedLinkColor = useMemo(() => resolveCssVar("--border"), []);
 
   useEffect(() => {
     if (!fgRef.current || graph.nodes.length === 0) return;
@@ -118,10 +141,43 @@ export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasPr
   const nodeVal = useCallback(
     (node: NodeObject) => {
       const data = node as ForceGraphNode;
-      return selectedNode?.id === data.id ? 10 : 6;
+      return selectedNode?.id === data.id ? NODE_VAL_SELECTED : NODE_VAL;
     },
     [selectedNode?.id],
   );
+
+  const linkColor = useCallback(
+    (link: LinkObject) => {
+      const data = link as ForceGraphLink;
+      const type = data.type ?? "";
+      if (!selectedNode?.id) return graphLinkCanvasColor(type);
+      if (isLinkConnectedToNode(data, selectedNode.id)) return graphLinkCanvasColor(type);
+      return mutedLinkColor;
+    },
+    [mutedLinkColor, selectedNode?.id],
+  );
+
+  const linkWidth = useCallback(
+    (link: LinkObject) => {
+      const data = link as ForceGraphLink;
+      const type = data.type ?? "";
+      const base = graphLinkCanvasWidth(type);
+      if (!selectedNode?.id) return base;
+      if (isLinkConnectedToNode(data, selectedNode.id)) return base + 1.25;
+      return Math.max(base * 0.55, 1.25);
+    },
+    [selectedNode?.id],
+  );
+
+  const linkLineDash = useCallback((link: LinkObject) => {
+    const data = link as ForceGraphLink;
+    return graphLinkCanvasDash(data.type ?? "");
+  }, []);
+
+  const linkLabel = useCallback((link: LinkObject) => {
+    const data = link as ForceGraphLink;
+    return formatGraphLinkType(data.type ?? "relationship");
+  }, []);
 
   const containerClassName =
     "relative h-[540px] w-full min-w-0 max-w-full overflow-hidden rounded-xl border border-border bg-card";
@@ -146,15 +202,21 @@ export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasPr
             width={dimensions.width}
             height={dimensions.height}
             graphData={graphData}
-            nodeRelSize={6}
+            nodeRelSize={NODE_REL_SIZE}
             nodeColor={nodeColor}
             nodeVal={nodeVal}
-            linkWidth={1.4}
-            linkColor={() => linkColor}
+            linkWidth={linkWidth}
+            linkColor={linkColor}
+            linkLineDash={linkLineDash}
+            linkCurvature={0.12}
+            linkDirectionalArrowLength={5}
+            linkDirectionalArrowRelPos={1}
+            linkLabel={linkLabel}
+            linkLabelSize={0.65}
             backgroundColor="transparent"
             warmupTicks={80}
             cooldownTicks={100}
-            nodePointerArea={14}
+            nodePointerArea={10}
             enableNodeDrag
             onNodeClick={handleNodeClick}
             onBackgroundClick={handleBackgroundClick}

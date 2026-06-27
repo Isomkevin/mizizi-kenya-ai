@@ -1,4 +1,5 @@
 import type { GraphEdge, GraphNode } from "@/api/types";
+import { formatGraphLinkType } from "@/components/app/graph/graph-colors";
 
 interface PathViewerProps {
   node: GraphNode | null;
@@ -21,7 +22,9 @@ export function PathViewer({ node, edges }: PathViewerProps) {
             relatedEdges.map((edge) => (
               <li key={edge.id} className="rounded-md border border-border bg-background p-2.5">
                 {edge.source} → {edge.target}
-                <div className="text-xs text-muted-foreground">{edge.type}</div>
+                <div className="text-xs capitalize text-muted-foreground">
+                  {formatGraphLinkType(edge.type)}
+                </div>
               </li>
             ))
           ) : (
