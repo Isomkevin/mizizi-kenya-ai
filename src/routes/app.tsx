@@ -37,7 +37,7 @@ function AppLayout() {
       <AppSidebar onSearchOpen={openSearch} />
       <div className="flex min-h-screen flex-col">
         <AppHeader pathname={pathname} onSearchOpen={openSearch} />
-        <main className="flex-1">
+        <main className="min-w-0 flex-1 overflow-x-hidden">
           <Outlet />
         </main>
       </div>

@@ -40,7 +40,7 @@ function GraphWorkspace() {
   }, [graph, query]);
 
   return (
-    <div className="mx-auto max-w-7xl space-y-4 px-4 py-8 sm:px-6 sm:py-10">
+    <div className="mx-auto max-w-7xl space-y-4 overflow-x-hidden px-4 py-8 sm:px-6 sm:py-10">
       <section className="space-y-2">
         <p className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
           Graph workspace
@@ -57,8 +57,8 @@ function GraphWorkspace() {
         onReset={() => setQuery("")}
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-4">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-4">
           {filteredGraph ? (
             <>
               <GraphCanvas
@@ -74,7 +74,7 @@ function GraphWorkspace() {
             </div>
           )}
         </div>
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <GraphLegend />
           <GraphSidebar selectedNode={selectedNode} />
         </div>
