@@ -38,7 +38,7 @@ export function DashboardWelcome() {
         />
         <SnapshotCard
           icon={Sparkles}
-          label="AI jobs today"
+          label="Cases screened today"
           value={`${w.aiJobsToday} completed · ${w.recentAlerts} alerts`}
         />
       </div>

@@ -18,13 +18,13 @@ export function GraphToolbar({ farmerId, query, onQueryChange, onReset }: GraphT
         <Input
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="Search graph nodes..."
+          placeholder="Search cooperatives, borrowers, loans..."
           className="h-9 pl-10"
         />
       </div>
       {farmerId ? (
-        <span className="rounded-md border border-border bg-background px-2 py-1 font-mono-data text-[10px] uppercase tracking-wider text-muted-foreground">
-          Farmer focus: {farmerId}
+        <span className="rounded-md border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+          Focused borrower
         </span>
       ) : null}
       <Button type="button" variant="outline" size="sm" onClick={onReset}>

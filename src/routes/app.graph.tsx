@@ -14,7 +14,7 @@ export const Route = createFileRoute("/app/graph")({
     farmerId: typeof search.farmerId === "string" ? search.farmerId : undefined,
   }),
   head: () => ({
-    meta: [{ title: "Mizizi · Graph Workspace" }],
+    meta: [{ title: "Mizizi · Connections" }],
   }),
   component: GraphWorkspace,
 });
@@ -42,12 +42,15 @@ function GraphWorkspace() {
   return (
     <div className="mx-auto max-w-7xl space-y-4 overflow-x-hidden px-4 py-8 sm:px-6 sm:py-10">
       <section className="space-y-2">
-        <p className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
-          Graph workspace
+        <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
+          Connection map
         </p>
         <h1 className="font-display text-4xl leading-tight md:text-5xl">
-          Graph Intelligence Workspace
+          Borrower & cooperative links
         </h1>
+        <p className="max-w-2xl text-muted-foreground">
+          See how borrowers connect to cooperatives, suppliers, loans, and climate zones.
+        </p>
       </section>
 
       <GraphToolbar
@@ -70,7 +73,7 @@ function GraphWorkspace() {
             </>
           ) : (
             <div className="rounded-xl border border-border bg-card p-8 text-sm text-muted-foreground">
-              Loading graph workspace...
+              Loading connection map...
             </div>
           )}
         </div>

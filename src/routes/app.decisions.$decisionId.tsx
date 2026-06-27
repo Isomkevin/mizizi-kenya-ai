@@ -12,7 +12,7 @@ import { FarmerDataGapsPanel } from "@/components/app/farmers/FarmerDataGapsPane
 
 export const Route = createFileRoute("/app/decisions/$decisionId")({
   head: () => ({
-    meta: [{ title: "Mizizi · Decision Workspace" }],
+    meta: [{ title: "Mizizi · Application Review" }],
   }),
   component: DecisionWorkspacePage,
 });
@@ -37,7 +37,7 @@ function DecisionWorkspacePage() {
         className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to decisions queue
+        Back to applications queue
       </Link>
 
       <DecisionSummary decision={decision} />

@@ -106,7 +106,7 @@ function buildTimeline(seed: FarmerSeed): TimelineEvent[] {
       timestamp: "2026-06-12T10:10:00Z",
       category: "decision",
       title: "Credit recommendation generated",
-      description: `Model generated ${seed.decisionStatus.toLowerCase()} recommendation with explainability.`,
+      description: `Credit recommendation prepared for ${farmer.name}.`,
     },
   ];
 }
@@ -192,7 +192,7 @@ function buildProfile(seed: FarmerSeed, index: number): FarmerProfile {
     trustIndicators: seed.trustIndicators,
     contributingFactors: [
       factor(`${seed.id}-f1`, "Repayment consistency", 0.33, "positive", "loan_history", 0.95),
-      factor(`${seed.id}-f2`, "Cooperative centrality", 0.24, "positive", "graph_score", 0.9),
+      factor(`${seed.id}-f2`, "Cooperative standing", 0.24, "positive", "graph_topology", 0.9),
       factor(`${seed.id}-f3`, "Climate volatility", 0.21, "negative", "climate_signal", 0.88),
       factor(
         `${seed.id}-f4`,
@@ -396,7 +396,7 @@ const farmerSeeds: FarmerSeed[] = [
     officerRecommendation: "Fast-track approval",
     trustIndicators: [
       "Excellent repayment score",
-      "High graph confidence",
+      "Strong peer network",
       "Stable climate signal",
     ],
     dataCompleteness: 98,
@@ -635,13 +635,13 @@ function buildDecisions(farmers: FarmerProfile[]): DecisionDetail[] {
       positiveSignals: [
         "Verified identity and cooperative membership",
         "Recent repayment consistency",
-        "Complete explainability trace",
+        "Full decision audit trail",
       ],
       negativeSignals: [
         "Climate volatility on county baseline",
         "Input dealer dependency concentration",
       ],
-      officerExplanation: `Decision prepared for ${farmer.name} using risk, climate, and graph evidence.`,
+      officerExplanation: `Decision prepared for ${farmer.name} using risk, climate, and relationship evidence.`,
       farmerExplanation:
         "Your application outcome is based on repayment behavior, farm profile, and current climate expectations.",
       overrideReason:

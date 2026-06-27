@@ -13,8 +13,8 @@ export function PathViewer({ node, edges }: PathViewerProps) {
 
   return (
     <section className="rounded-xl border border-border bg-card p-4">
-      <div className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
-        Path viewer
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+        Direct connections
       </div>
       {node ? (
         <ul className="mt-3 space-y-2 text-sm">
@@ -28,12 +28,12 @@ export function PathViewer({ node, edges }: PathViewerProps) {
               </li>
             ))
           ) : (
-            <li className="text-muted-foreground">No direct path entries for this node.</li>
+            <li className="text-muted-foreground">No direct links for this entity.</li>
           )}
         </ul>
       ) : (
         <p className="mt-3 text-sm text-muted-foreground">
-          Select a node on the graph to inspect its immediate relationship paths.
+          Select an entity on the map to see its immediate connections.
         </p>
       )}
     </section>

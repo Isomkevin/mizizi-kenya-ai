@@ -51,10 +51,10 @@ export function DocumentDropZone({ farmerId, className }: DocumentDropZoneProps)
   return (
     <section className={cn("space-y-4 rounded-xl border border-border bg-card p-5", className)}>
       <div>
-        <h3 className="font-display text-xl">Document ingestion</h3>
+        <h3 className="font-display text-xl">Upload documents</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Drop any farmer files here — Mizizi will classify them automatically, then you confirm
-          before they are linked to the graph.
+          Drop borrower files here — Mizizi will classify them automatically. You confirm before they
+          are linked to the profile.
         </p>
       </div>
 

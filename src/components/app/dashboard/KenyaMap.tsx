@@ -53,8 +53,8 @@ export function KenyaMap() {
     <div className="rounded-2xl border border-border bg-card p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
-            Geographic intelligence
+          <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
+            Regional exposure
           </div>
           <h2 className="font-display mt-1 text-2xl">Kenya portfolio map</h2>
         </div>
@@ -141,13 +141,13 @@ export function KenyaMap() {
               <Stat label="Climate exposure" value={`${selected.climateExposure}%`} />
             </dl>
             <p className="text-xs text-muted-foreground">
-              Zooming reveals cooperatives, farmers, and in-flight applications for this county —
-              open geographic analytics for full drill-down.
+              Zooming reveals cooperatives, borrowers, and in-flight applications for this county —
+              open geographic reports for full drill-down.
             </p>
           </div>
         ) : (
           <div className="flex items-center justify-center rounded-xl border border-dashed border-border p-8 text-sm text-muted-foreground">
-            Select a county to inspect portfolio signals
+            Select a county to inspect portfolio risk
           </div>
         )}
       </div>

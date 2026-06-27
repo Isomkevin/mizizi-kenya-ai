@@ -30,15 +30,15 @@ export function OfficerDecisionPanel({ decision }: { decision: DecisionDetail })
 
   return (
     <section className="rounded-xl border border-border bg-card p-5">
-      <h2 className="font-display text-2xl">Officer decision panel</h2>
+      <h2 className="font-display text-2xl">Your decision</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Add a decision rationale to keep the audit trail explainable.
+        Mizizi recommends — you decide. Add notes for the audit trail.
       </p>
       <Textarea
         value={note}
         onChange={(event) => setNote(event.target.value)}
         className="mt-3 min-h-28"
-        placeholder="Write officer rationale..."
+        placeholder="Add your rationale for this decision..."
       />
       <div className="mt-3 flex flex-wrap gap-2">
         <Button

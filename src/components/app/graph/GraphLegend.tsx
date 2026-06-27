@@ -16,8 +16,8 @@ export function GraphLegend() {
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-border bg-card p-4">
-        <div className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
-          Node types
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          Entity types
         </div>
         <ul className="mt-3 space-y-2 text-sm">
           {legendTypes.map((type) => (
@@ -33,8 +33,8 @@ export function GraphLegend() {
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4">
-        <div className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
-          Relationships
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          Link types
         </div>
         <ul className="mt-3 space-y-2.5 text-sm">
           {graphLinkLegendTypes.map((type) => (

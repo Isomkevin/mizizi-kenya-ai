@@ -65,13 +65,13 @@ export function FarmerDocumentsTab({ farmer }: { farmer: FarmerProfile }) {
           <span className="font-medium">
             {pendingReview} document{pendingReview === 1 ? "" : "s"}
           </span>{" "}
-          classified and awaiting your confirmation before graph linking.
+          classified and awaiting your confirmation before linking to the borrower profile.
         </div>
       ) : null}
 
       <section className="rounded-xl border border-border bg-card p-5">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-display text-xl">Ingested documents</h3>
+          <h3 className="font-display text-xl">Uploaded documents</h3>
           <span className="font-mono-data text-[10px] uppercase tracking-wider text-muted-foreground">
             {farmer.documents.length} file{farmer.documents.length === 1 ? "" : "s"}
           </span>
@@ -221,15 +221,10 @@ function DocumentRow({ farmerId, document }: { farmerId: string; document: Docum
                   ? "confirmed"
                   : status}
           </span>
-          {document.extractionProvider ? (
-            <span className="font-mono-data text-[10px] uppercase tracking-wider">
-              via {document.extractionProvider}
-            </span>
-          ) : null}
           {document.graphSyncStatus ? (
-            <span className="inline-flex items-center gap-1 font-mono-data text-[10px] uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider">
               <Clock3 className="h-3 w-3" />
-              graph {document.graphSyncStatus}
+              Profile {document.graphSyncStatus}
             </span>
           ) : null}
           <span>{new Date(document.uploadedAt).toLocaleString()}</span>
@@ -269,8 +264,8 @@ function RemoveDocumentButton({
           <AlertDialogTitle>Remove document?</AlertDialogTitle>
           <AlertDialogDescription>
             {isProcessing
-              ? `"${documentName}" will be deleted and will not be classified or added to the graph.`
-              : `"${documentName}" will be removed from this profile without confirming classification or linking it to the graph.`}
+              ? `"${documentName}" will be deleted and will not be classified or added to the profile.`
+              : `"${documentName}" will be removed from this profile without confirming classification or linking it to other records.`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

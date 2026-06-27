@@ -4,15 +4,15 @@ export function FarmerClimateTab({ farmer }: { farmer: FarmerProfile }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
       <section className="rounded-xl border border-border bg-card p-5">
-        <h3 className="font-display text-xl">Climate signal summary</h3>
+        <h3 className="font-display text-xl">Climate exposure</h3>
         <p className="mt-2 text-sm text-muted-foreground">{farmer.climate.insight}</p>
         <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
           <Metric label="Rainfall" value={`${farmer.climate.rainfallMm} mm`} />
           <Metric
-            label="Drought prob."
+            label="Drought risk"
             value={`${(farmer.climate.droughtProbability * 100).toFixed(0)}%`}
           />
-          <Metric label="NDVI" value={farmer.climate.ndvi.toFixed(2)} />
+          <Metric label="Crop health" value={farmer.climate.ndvi.toFixed(2)} />
         </div>
       </section>
       <section className="rounded-xl border border-border bg-card p-5">

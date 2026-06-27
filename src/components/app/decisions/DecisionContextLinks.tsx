@@ -27,22 +27,22 @@ export function DecisionContextLinks({ decision }: { decision: DecisionDetail })
       params: { farmerId: decision.farmerId },
       search: { tab: "overview" },
       icon: UserRound,
-      label: "Farmer profile",
+      label: "Borrower profile",
       description: decision.farmerName,
     },
     {
       to: "/app/graph",
       search: { farmerId: decision.farmerId },
       icon: Network,
-      label: "Graph workspace",
-      description: "Explore relationships behind this decision",
+      label: "Connection map",
+      description: "Cooperatives, suppliers, and linked accounts",
     },
     {
       to: "/app/farmers/$farmerId",
       params: { farmerId: decision.farmerId },
       search: { tab: "applications" },
       icon: ScrollText,
-      label: "Application",
+      label: "Application details",
       description: decision.applicationId,
     },
     {
@@ -50,8 +50,8 @@ export function DecisionContextLinks({ decision }: { decision: DecisionDetail })
       params: { farmerId: decision.farmerId },
       search: { tab: "climate" },
       icon: CloudSun,
-      label: "Climate signals",
-      description: "County rainfall, drought risk, and NDVI context",
+      label: "Climate exposure",
+      description: "County rainfall, drought risk, and crop health",
     },
     {
       to: "/app/farmers/$farmerId",
@@ -65,21 +65,20 @@ export function DecisionContextLinks({ decision }: { decision: DecisionDetail })
       to: "/app/analytics",
       search: { tab: "explainability" },
       icon: BarChart3,
-      label: "Explainability analytics",
-      description: "Platform-wide model transparency and audit trends",
+      label: "Decision audit",
+      description: "Override trends and common risk drivers",
     },
   ];
 
   return (
     <section className="rounded-xl border border-border bg-card p-5">
       <div className="space-y-1">
-        <p className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
-          Connected intelligence
+        <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
+          Supporting evidence
         </p>
-        <h2 className="font-display text-xl">Related workspaces</h2>
+        <h2 className="font-display text-xl">Related records</h2>
         <p className="text-sm text-muted-foreground">
-          Jump to the farmer profile, graph neighbourhood, and supporting evidence for this
-          decision.
+          Jump to the borrower profile, connection map, and documents for this application.
         </p>
       </div>
 

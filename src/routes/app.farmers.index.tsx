@@ -14,7 +14,7 @@ export const Route = createFileRoute("/app/farmers/")({
     create: search.create === true || search.create === "true" || search.create === "1",
   }),
   head: () => ({
-    meta: [{ title: "Mizizi · Farmer Intelligence" }],
+    meta: [{ title: "Mizizi · Borrowers" }],
   }),
   component: FarmerSearchPage,
 });
@@ -47,13 +47,11 @@ function FarmerSearchPage() {
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
-            Farmer intelligence
-          </p>
-          <h1 className="font-display text-4xl leading-tight md:text-5xl">Farmer Search</h1>
+          <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Borrowers</p>
+          <h1 className="font-display text-4xl leading-tight md:text-5xl">Borrower search</h1>
           <p className="max-w-3xl text-muted-foreground">
-            Search, resolve identity and inspect financial, climate and relationship signals for
-            every farmer profile.
+            Find borrowers by name, ID, or cooperative. Review financial history, climate exposure,
+            and verified relationships before you decide.
           </p>
         </div>
         <Button className="shrink-0" onClick={() => setCreateOpen(true)}>

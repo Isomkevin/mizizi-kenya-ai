@@ -5,14 +5,14 @@ import type { SearchEntityType } from "@/api/types";
 import { globalSearchFn as serverGlobalSearchFn, searchFarmersFn } from "@/api/functions/search";
 
 export const searchTypeLabels: Record<SearchEntityType, string> = {
-  farmer: "Farmers",
+  farmer: "Borrowers",
   loan: "Loans",
   cooperative: "Cooperatives",
   county: "Counties",
-  dealer: "Dealers",
+  dealer: "Suppliers",
   application: "Applications",
-  risk: "Risk",
-  decision: "Decisions",
+  risk: "Risk levels",
+  decision: "Applications",
 };
 
 export function globalSearchFn(query: string, type?: string, limit = 15) {

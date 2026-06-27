@@ -19,8 +19,8 @@ export function AiInsightsPanel() {
     <div className="rounded-2xl border border-border bg-card p-6">
       <div className="flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-primary" />
-        <div className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
-          AI insights · today
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
+          Alerts · today
         </div>
       </div>
       <ul className="mt-4 space-y-4">
@@ -47,7 +47,7 @@ function InsightCard({ insight }: { insight: DashboardInsight }) {
           </div>
           <div className="text-xs text-muted-foreground">{insight.body}</div>
           <div className="rounded-md bg-muted/50 px-2.5 py-2 text-xs">
-            <span className="font-mono-data text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
               Why ·{" "}
             </span>
             {insight.why}

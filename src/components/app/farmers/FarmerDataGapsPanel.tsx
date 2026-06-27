@@ -150,8 +150,8 @@ export function FarmerDataGapsPanel({
             <div className="mt-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
               <span>
-                Decision confidence is limited until critical signals are linked. Review gaps below
-                or upload supporting documents.
+                Your recommendation may be less reliable until critical records are linked. Review
+                gaps below or upload supporting documents.
               </span>
             </div>
           ) : null}
@@ -230,7 +230,7 @@ export function FarmerDataGapsPanel({
                 search={{ farmerId: farmer.id }}
                 className="inline-flex items-center gap-1 text-primary hover:underline"
               >
-                Inspect graph neighbourhood <ArrowRight className="h-3 w-3" />
+                View connection map <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
           ) : null}

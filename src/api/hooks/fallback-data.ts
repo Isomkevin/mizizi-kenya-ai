@@ -11,7 +11,7 @@ import type {
 export const dashboardPayload: DashboardPayload = {
   welcome: {
     greeting: "Good morning, Kevin",
-    subtitle: "Today's agricultural lending overview",
+    subtitle: "Your credit risk overview",
     summary:
       "Portfolio quality remains healthy. Two counties need climate-focused review before approvals are finalized.",
     weatherInsight: "Rift Valley rainfall variance +11% vs seasonal baseline",
@@ -60,10 +60,10 @@ export const dashboardPayload: DashboardPayload = {
       trend: "down",
       href: "/app/portfolio",
     },
-    { id: "confidence", label: "Avg confidence", value: "0.91", delta: "+0.03", trend: "up" },
+    { id: "confidence", label: "Recommendation strength", value: "Strong", delta: "91% avg.", trend: "up" },
     {
       id: "farmers",
-      label: "Farmers connected",
+      label: "Borrowers on file",
       value: "18,402",
       delta: "+412 / 30d",
       trend: "up",
@@ -71,9 +71,9 @@ export const dashboardPayload: DashboardPayload = {
     },
     {
       id: "graph-health",
-      label: "Graph health",
+      label: "Profiles fully linked",
       value: "98.4%",
-      delta: "Synced",
+      delta: "Up to date",
       trend: "neutral",
       href: "/app/graph",
     },
@@ -128,9 +128,9 @@ export const dashboardPayload: DashboardPayload = {
   insights: [
     {
       id: "ins-1",
-      title: "High-confidence approvals available",
-      body: "18 applications scored >= 0.92 with complete explainability traces.",
-      why: "Repayment consistency and cooperative link quality remain strong.",
+      title: "18 applications ready for fast approval",
+      body: "Strong repayment history and complete documentation across the batch.",
+      why: "These borrowers match profiles of recently approved loans with low delinquency.",
       icon: "shield",
       severity: "very-low",
     },
@@ -144,9 +144,9 @@ export const dashboardPayload: DashboardPayload = {
     },
     {
       id: "ins-3",
-      title: "Entity resolution reduced duplicates",
-      body: "12 previously fragmented records now merged into stable farmer identities.",
-      why: "Phone-number and dealer-edge confidence passed merge threshold.",
+      title: "Duplicate records merged",
+      body: "12 previously fragmented records now consolidated into stable borrower profiles.",
+      why: "Phone number and supplier links confirmed the same identity.",
       icon: "duplicate",
       severity: "low",
     },
@@ -166,8 +166,8 @@ export const dashboardPayload: DashboardPayload = {
       id: "act-2",
       timestamp: "09:31",
       type: "climate-refresh",
-      message: "Climate model flagged three cooperatives in Nyandarua.",
-      actor: "Climate pipeline",
+      message: "Rainfall outlook flagged three cooperatives in Nyandarua.",
+      actor: "Climate monitoring",
       risk: "medium",
       farmerId: "farmer-002",
     },
@@ -175,8 +175,8 @@ export const dashboardPayload: DashboardPayload = {
       id: "act-3",
       timestamp: "09:14",
       type: "graph-updated",
-      message: "Graph resolver linked eight farmers to Mwea cluster.",
-      actor: "Neo4j sync",
+      message: "Eight borrowers linked to Mwea cluster after profile enrichment.",
+      actor: "Data team",
       confidence: 0.89,
       risk: "low",
       farmerId: "farmer-003",
@@ -185,20 +185,20 @@ export const dashboardPayload: DashboardPayload = {
   quickActions: [
     {
       id: "qa-1",
-      label: "Create farmer",
-      description: "Register a new farmer profile",
+      label: "Register borrower",
+      description: "Add a new farmer profile",
       href: "/app/farmers?create=true",
     },
     {
       id: "qa-2",
-      label: "Run graph analysis",
-      description: "Explore peer clusters and relationship paths",
+      label: "View connections",
+      description: "See cooperative and supplier links",
       href: "/app/graph",
     },
     {
       id: "qa-3",
-      label: "Generate explanation",
-      description: "Open a decision workspace for review",
+      label: "Review applications",
+      description: "Open the pending decision queue",
       href: "/app/decisions",
     },
     {

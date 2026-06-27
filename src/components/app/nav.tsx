@@ -19,13 +19,13 @@ export interface AppNavItem {
 }
 
 export const appNav: AppNavItem[] = [
-  { to: "/app", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/app/farmers", label: "Farmer intelligence", icon: Users },
-  { to: "/app/graph", label: "Graph workspace", icon: Network },
-  { to: "/app/decisions", label: "Decisions", icon: FileText },
-  { to: "/app/portfolio", label: "Portfolio", icon: Wallet },
-  { to: "/app/climate", label: "Climate", icon: CloudSun },
-  { to: "/app/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/app", label: "Home", icon: LayoutDashboard, end: true },
+  { to: "/app/decisions", label: "Applications", icon: FileText },
+  { to: "/app/farmers", label: "Borrowers", icon: Users },
+  { to: "/app/portfolio", label: "Portfolio risk", icon: Wallet },
+  { to: "/app/climate", label: "Climate exposure", icon: CloudSun },
+  { to: "/app/analytics", label: "Reports", icon: BarChart3 },
+  { to: "/app/graph", label: "Connections", icon: Network },
 ];
 
 export function currentNavLabel(pathname: string): string {

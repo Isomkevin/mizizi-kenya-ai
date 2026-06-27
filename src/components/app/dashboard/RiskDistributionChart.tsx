@@ -42,7 +42,7 @@ export function RiskDistributionChart() {
           to="/app/analytics"
           className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
-          Open analytics <ArrowUpRight className="h-3 w-3" />
+          Open reports <ArrowUpRight className="h-3 w-3" />
         </Link>
       </div>
 

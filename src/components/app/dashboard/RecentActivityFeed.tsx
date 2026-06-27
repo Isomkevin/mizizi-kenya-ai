@@ -13,14 +13,15 @@ import { useDashboard } from "@/api/hooks/use-dashboard";
 import type { ActivityItem, ActivityType } from "@/api/types";
 import { RiskBadge } from "@/components/app/RiskBadge";
 import { Button } from "@/components/ui/button";
+import { formatRecommendationStrength } from "@/lib/risk-display";
 import { cn } from "@/lib/utils";
 
 const typeMeta: Record<ActivityType, { label: string; icon: typeof Activity }> = {
   "loan-approved": { label: "Loan approved", icon: UserCheck },
-  "graph-updated": { label: "Graph updated", icon: GitBranch },
-  "climate-refresh": { label: "Climate refresh", icon: CloudSun },
+  "graph-updated": { label: "Profile enriched", icon: GitBranch },
+  "climate-refresh": { label: "Climate alert", icon: CloudSun },
   "sms-delivered": { label: "SMS delivered", icon: MessageSquare },
-  "explanation-generated": { label: "Explanation generated", icon: Shield },
+  "explanation-generated": { label: "Audit completed", icon: Shield },
   "officer-override": { label: "Officer override", icon: Activity },
 };
 
@@ -66,9 +67,9 @@ function ActivityRow({ item }: { item: ActivityItem }) {
           </div>
           <p className="mt-0.5 text-muted-foreground">{item.message}</p>
           <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            <span>Actor · {item.actor}</span>
+            <span>{item.actor}</span>
             {item.confidence != null ? (
-              <span className="font-mono-data">Confidence · {item.confidence.toFixed(2)}</span>
+              <span>{formatRecommendationStrength(item.confidence)}</span>
             ) : null}
           </div>
         </div>
@@ -86,7 +87,7 @@ function ActivityRow({ item }: { item: ActivityItem }) {
       </div>
       {open ? (
         <div className="ml-[4.75rem] mt-2 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
-          Full audit trail and linked entities open from the farmer or decision workspace.
+          Full audit trail and linked records open from the borrower profile or application workspace.
         </div>
       ) : null}
     </li>

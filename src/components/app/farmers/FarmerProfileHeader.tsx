@@ -35,7 +35,7 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerProfile }) {
           <Button variant="outline" asChild>
             <Link to="/app/graph" search={{ farmerId: farmer.id }}>
               <Network className="h-4 w-4" />
-              View graph
+              View connections
             </Link>
           </Button>
           <Button variant="outline">

@@ -32,14 +32,14 @@ export function FarmerResultCard({ farmer }: { farmer: FarmerSummary }) {
       <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
         <Metric label="Crop" value={farmer.cropType} />
         <Metric label="Decision" value={farmer.decisionStatus} />
-        <Metric label="Confidence" value={`${Math.round(farmer.confidence * 100)}%`} />
+        <Metric label="Recommendation" value={`${Math.round(farmer.confidence * 100)}%`} />
         <Metric label="Climate" value={farmer.climateIndicator} />
       </div>
 
       <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <Network className="h-3.5 w-3.5" />
-          {farmer.graphConnections} graph connections
+          {farmer.graphConnections} verified links
         </span>
         <span className="inline-flex items-center gap-1 opacity-0 transition group-hover:opacity-100">
           Open profile <ArrowRight className="h-3 w-3" />

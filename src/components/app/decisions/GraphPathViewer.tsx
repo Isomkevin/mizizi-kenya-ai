@@ -17,15 +17,15 @@ export function GraphPathViewer({ decision }: { decision: DecisionDetail }) {
     <section className="rounded-xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-display text-2xl">Graph path viewer</h2>
+          <h2 className="font-display text-2xl">Related parties & links</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Evidence paths traced through the farmer&apos;s graph neighbourhood.
+            Cooperatives, suppliers, and other connections that support this recommendation.
           </p>
         </div>
         <Button variant="outline" size="sm" asChild>
           <Link to="/app/graph" search={{ farmerId: decision.farmerId }}>
             <Network className="h-4 w-4" />
-            Open graph workspace
+            View connection map
           </Link>
         </Button>
       </div>
@@ -41,13 +41,13 @@ export function GraphPathViewer({ decision }: { decision: DecisionDetail }) {
           ))
         ) : (
           <li className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-            No graph paths recorded for this decision yet.{" "}
+            No linked parties recorded for this application yet.{" "}
             <Link
               to="/app/graph"
               search={{ farmerId: decision.farmerId }}
               className="text-primary hover:underline"
             >
-              Inspect the farmer graph
+              View borrower connections
             </Link>
             .
           </li>
