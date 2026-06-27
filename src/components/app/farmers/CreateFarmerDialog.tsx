@@ -66,7 +66,11 @@ export function CreateFarmerDialog({ open, onOpenChange }: CreateFarmerDialogPro
         cropType: form.cropType.trim() || "Maize",
       });
       handleOpenChange(false);
-      void navigate({ to: "/app/farmers/$farmerId", params: { farmerId: farmer.id } });
+      void navigate({
+        to: "/app/farmers/$farmerId",
+        params: { farmerId: farmer.id },
+        search: { tab: "documents" },
+      });
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Failed to create farmer.");
     }

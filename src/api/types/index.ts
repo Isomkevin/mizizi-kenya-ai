@@ -218,14 +218,61 @@ export interface TimelineEvent {
   description: string;
 }
 
+export type FarmerDocumentType =
+  | "identity"
+  | "land_record"
+  | "farm_photo"
+  | "loan_agreement"
+  | "insurance"
+  | "satellite_report"
+  | "cooperative_membership"
+  | "quotation"
+  | "other";
+
+export type DocumentIngestionStatus = "processing" | "complete" | "failed";
+
+export type IngestionLlmProvider = "featherless" | "openrouter" | "rules";
+
 export interface DocumentRecord {
   id: string;
   name: string;
-  type: string;
+  type: FarmerDocumentType | string;
   verificationStatus: string;
   uploadedAt: string;
   source: string;
   ocrStatus: string;
+  mimeType?: string;
+  sizeBytes?: number;
+  storagePath?: string;
+  ingestionStatus?: DocumentIngestionStatus;
+  ocrConfidence?: number;
+  extractionProvider?: IngestionLlmProvider;
+  graphSyncStatus?: "pending" | "synced" | "failed";
+  extractedFields?: Record<string, string | number>;
+  errorMessage?: string;
+}
+
+export interface UploadFarmerDocumentInput {
+  farmerId: string;
+  fileName: string;
+  mimeType: string;
+  docType: FarmerDocumentType;
+  contentBase64: string;
+}
+
+export interface DocumentUploadResult {
+  documentId: string;
+  farmerId: string;
+  ingestionStatus: DocumentIngestionStatus;
+}
+
+export interface DocumentExtractionResult {
+  documentType: FarmerDocumentType;
+  extractedFields: Record<string, string | number>;
+  entities: Array<{ type: string; name: string; confidence: number }>;
+  ocrConfidence: number;
+  verificationHint: "verified" | "pending_review" | "conflict";
+  provider: IngestionLlmProvider;
 }
 
 export interface CommunicationRecord {

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
 import { useFarmerProfile } from "@/api/hooks/use-farmers";
 import { FarmerActivityTab } from "@/components/app/farmers/FarmerActivityTab";
@@ -12,15 +13,39 @@ import { FarmerProfileHeader } from "@/components/app/farmers/FarmerProfileHeade
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/app/farmers/$farmerId")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: typeof search.tab === "string" ? search.tab : undefined,
+  }),
   head: () => ({
     meta: [{ title: "Mizizi · Farmer Profile" }],
   }),
   component: FarmerProfilePage,
 });
 
+const PROFILE_TABS = [
+  "overview",
+  "financial",
+  "climate",
+  "applications",
+  "decisions",
+  "documents",
+  "activity",
+] as const;
+
 function FarmerProfilePage() {
   const { farmerId } = Route.useParams();
+  const { tab } = Route.useSearch();
+  const initialTab = PROFILE_TABS.includes(tab as (typeof PROFILE_TABS)[number])
+    ? (tab as (typeof PROFILE_TABS)[number])
+    : "overview";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const { data: farmer, isLoading } = useFarmerProfile(farmerId);
+
+  useEffect(() => {
+    if (tab && PROFILE_TABS.includes(tab as (typeof PROFILE_TABS)[number])) {
+      setActiveTab(tab as (typeof PROFILE_TABS)[number]);
+    }
+  }, [tab]);
 
   if (isLoading) {
     return (
@@ -42,7 +67,7 @@ function FarmerProfilePage() {
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
       <FarmerProfileHeader farmer={farmer} />
 
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="financial">Financial</TabsTrigger>

@@ -17,6 +17,13 @@ export const serverEnv = {
   neo4jUser: () => env("NEO4J_USER") ?? "neo4j",
   neo4jPassword: () => env("NEO4J_PASSWORD"),
   openAiKey: () => env("OPENAI_API_KEY"),
+  featherlessApiKey: () => env("FEATHERLESS_API_KEY"),
+  featherlessBaseUrl: () => env("FEATHERLESS_BASE_URL") ?? "https://api.featherless.ai/v1",
+  featherlessModel: () =>
+    env("FEATHERLESS_MODEL") ?? "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  openRouterApiKey: () => env("OPENROUTER_API_KEY"),
+  openRouterBaseUrl: () => env("OPENROUTER_BASE_URL") ?? "https://openrouter.ai/api/v1",
+  openRouterModel: () => env("OPENROUTER_MODEL") ?? "meta-llama/llama-3.1-70b-instruct",
   tenantId: () => env("MIZIZI_TENANT_ID") ?? "lesom-sandbox",
   useLocalStore: () => !serverEnv.supabaseUrl() || env("MIZIZI_USE_LOCAL_STORE") === "true",
 };
