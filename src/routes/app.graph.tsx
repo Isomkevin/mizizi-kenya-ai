@@ -58,6 +58,7 @@ function GraphWorkspace() {
         farmerId={farmerId}
         query={query}
         depth={depth}
+        graphMeta={graph?.meta}
         onQueryChange={setQuery}
         onDepthChange={setDepth}
         onReset={() => {

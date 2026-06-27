@@ -17,9 +17,18 @@ Configure **one** of the options below. Both use the same env vars in your root 
 
 ## Option A — Local Neo4j (Docker)
 
-### 1. Add local credentials to `.env`
+### Quick bootstrap (recommended)
 
-Copy from [`.env.neo4j.local.example`](../.env.neo4j.local.example):
+```bash
+bun run neo4j:local
+bun run dev
+```
+
+This merges [`.env.neo4j.local.example`](../.env.neo4j.local.example) into `.env`, starts Docker, waits for health, applies constraints, and seeds farmers into the graph.
+
+### Manual steps
+
+Copy credentials into `.env` (or run `bun run neo4j:env:local`):
 
 ```env
 NEO4J_PROFILE=local
@@ -80,6 +89,17 @@ bun run neo4j:down
 ---
 
 ## Option C — Online Neo4j (Aura)
+
+### Quick bootstrap
+
+```bash
+bun run neo4j:env:aura
+# Edit .env — set NEO4J_URI and NEO4J_PASSWORD from Aura console
+bun run neo4j:aura
+bun run dev
+```
+
+### Manual steps
 
 ### 1. Create an Aura instance
 
@@ -175,7 +195,11 @@ LIMIT 25
 | `bun run neo4j:logs` | Tail Neo4j container logs |
 | `bun run neo4j:setup` | Wait, apply constraints, optional `--gds` |
 | `bun run neo4j:verify` | JSON connectivity + graph stats |
-| `bun run neo4j:local` | up + setup + seed (local only) |
+| `bun run neo4j:env:local` | Merge local Neo4j vars into `.env` |
+| `bun run neo4j:env:aura` | Merge Aura Neo4j vars into `.env` |
+| `bun run neo4j:wait` | Wait for Docker healthcheck |
+| `bun run neo4j:aura` | setup + seed (Aura, no Docker) |
+| `bun run neo4j:local` | env + up + wait + setup + seed (local) |
 | `bun run seed` | Reset local DB and sync farmers to Neo4j |
 
 ---

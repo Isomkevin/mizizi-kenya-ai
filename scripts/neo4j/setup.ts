@@ -1,3 +1,4 @@
+import "./load-dotenv";
 import {
   applyCypherFile,
   createNeo4jDriver,

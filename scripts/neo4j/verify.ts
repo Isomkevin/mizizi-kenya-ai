@@ -1,3 +1,4 @@
+import "./load-dotenv";
 import { createNeo4jDriver, getGraphStats, readNeo4jEnv, waitForNeo4j } from "./lib";
 
 async function run(): Promise<void> {

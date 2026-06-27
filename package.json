@@ -13,9 +13,13 @@
     "neo4j:up": "docker compose -f docker-compose.neo4j.yml up -d",
     "neo4j:down": "docker compose -f docker-compose.neo4j.yml down",
     "neo4j:logs": "docker compose -f docker-compose.neo4j.yml logs -f",
+    "neo4j:wait": "bun run scripts/neo4j/wait-docker.ts",
+    "neo4j:env:local": "bun run scripts/neo4j/apply-env.ts local",
+    "neo4j:env:aura": "bun run scripts/neo4j/apply-env.ts aura",
     "neo4j:setup": "bun run scripts/neo4j/setup.ts",
     "neo4j:verify": "bun run scripts/neo4j/verify.ts",
-    "neo4j:local": "docker compose -f docker-compose.neo4j.yml up -d && bun run neo4j:setup && bun run seed",
+    "neo4j:local": "bun run neo4j:env:local && bun run neo4j:up && bun run neo4j:wait && bun run neo4j:setup && bun run seed",
+    "neo4j:aura": "bun run neo4j:setup && bun run seed",
     "format": "prettier --write ."
   },
   "dependencies": {

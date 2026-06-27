@@ -119,7 +119,11 @@ Dev server: `http://localhost:5173` (hot reload).
 | `bun run seed`   | Reset local DB and sync graph to Neo4j when configured |
 | `bun run neo4j:up` | Start local Neo4j (Docker) |
 | `bun run neo4j:setup` | Apply constraints and verify Neo4j |
-| `bun run neo4j:local` | Local Neo4j bootstrap: up + setup + seed |
+| `bun run neo4j:env:local` | Merge local Neo4j vars into `.env` |
+| `bun run neo4j:env:aura` | Merge Aura Neo4j vars into `.env` |
+| `bun run neo4j:wait` | Wait for Docker healthcheck |
+| `bun run neo4j:local` | env + up + wait + setup + seed (local) |
+| `bun run neo4j:aura` | setup + seed (Aura, no Docker) |
 | `bun run format` | Prettier                                          |
 
 ### Neo4j (graph intelligence)
@@ -127,12 +131,14 @@ Dev server: `http://localhost:5173` (hot reload).
 Local Docker or Neo4j Aura — full guide: **[docs/neo4j.md](docs/neo4j.md)**
 
 ```bash
-# Option A — local (after copying .env.neo4j.local.example into .env)
+# Option A — local (one command after Docker is installed)
 bun run neo4j:local
 bun run dev
 
-# Option C — Aura (after copying .env.neo4j.aura.example into .env)
-bun run neo4j:setup && bun run seed
+# Option C — Aura (after editing .env with Aura URI + password)
+bun run neo4j:env:aura
+# edit .env with Aura credentials
+bun run neo4j:aura
 bun run dev
 ```
 

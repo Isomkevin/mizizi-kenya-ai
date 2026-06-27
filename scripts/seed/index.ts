@@ -1,3 +1,4 @@
+import "../neo4j/load-dotenv";
 import { resetDb } from "@/server/db/local-store";
 import { refreshClimate } from "@/server/services/analytics";
 import { serverEnv } from "@/server/env";
