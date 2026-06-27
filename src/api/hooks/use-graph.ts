@@ -2,14 +2,22 @@ import { useQuery } from "@tanstack/react-query";
 
 import { graphPayload } from "@/api/hooks/fallback-data";
 import { expandGraphFn, getGraphFn } from "@/api/functions/graph";
+import type { GraphPayload } from "@/api/types";
+
+export const DEFAULT_GRAPH_FARMER_ID = "f-001";
+
+function withGraphFallback(payload: GraphPayload): GraphPayload {
+  return payload.nodes.length > 0 ? payload : graphPayload;
+}
 
 export function useGraph(farmerId?: string) {
-  const resolvedFarmerId = farmerId ?? "farmer-001";
+  const resolvedFarmerId = farmerId ?? DEFAULT_GRAPH_FARMER_ID;
   return useQuery({
-    queryKey: ["graph", "base", farmerId],
+    queryKey: ["graph", "base", resolvedFarmerId],
     queryFn: async () => {
       try {
-        return await getGraphFn({ data: { farmerId: resolvedFarmerId } });
+        const payload = await getGraphFn({ data: { farmerId: resolvedFarmerId } });
+        return withGraphFallback(payload);
       } catch {
         return graphPayload;
       }
@@ -22,7 +30,8 @@ export function useExpandedGraph(rootId?: string, depth = 1) {
     queryKey: ["graph", "expanded", rootId, depth],
     queryFn: async () => {
       try {
-        return await expandGraphFn({ data: { rootId: rootId ?? "", depth } });
+        const payload = await expandGraphFn({ data: { rootId: rootId ?? "", depth } });
+        return withGraphFallback(payload);
       } catch {
         return graphPayload;
       }

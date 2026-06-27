@@ -479,26 +479,43 @@ export const farmerProfiles: Record<string, FarmerProfile> = {
 export const graphPayload: GraphPayload = {
   nodes: [
     {
-      id: "farmer-001",
+      id: "f-001",
       label: "Wanjiru Kamau",
-      type: "farmer",
-      risk: "medium",
-      properties: { county: "Nakuru" },
+      type: "Farmer",
+      risk: "low",
+      properties: { county: "Kiambu" },
     },
     {
-      id: "coop-12",
-      label: "Molo Farmers Cooperative",
-      type: "cooperative",
-      properties: { members: 1420 },
+      id: "coop-f-001",
+      label: "Limuru Growers Cooperative",
+      type: "Cooperative",
+      properties: { county: "Kiambu" },
     },
-    { id: "dealer-8", label: "AgriInput Dealer 8", type: "dealer", properties: { region: "Rift" } },
-    { id: "county-nakuru", label: "Nakuru", type: "county", properties: { risk_index: 0.62 } },
+    {
+      id: "loan-f-001",
+      label: "Loan 84,000",
+      type: "Loan",
+      properties: { status: "approved" },
+    },
+    {
+      id: "dealer-f-001",
+      label: "Kiambu Input Dealer",
+      type: "InputDealer",
+      properties: { county: "Kiambu" },
+    },
+    {
+      id: "zone-kiambu",
+      label: "Kiambu Climate Zone",
+      type: "ClimateZone",
+      properties: { droughtProbability: 0.2 },
+    },
   ],
   edges: [
-    { id: "e1", source: "farmer-001", target: "coop-12", type: "member_of" },
-    { id: "e2", source: "farmer-001", target: "dealer-8", type: "purchases_from" },
-    { id: "e3", source: "farmer-001", target: "county-nakuru", type: "located_in" },
-    { id: "e4", source: "coop-12", target: "county-nakuru", type: "operates_in" },
+    { id: "f-001-e1", source: "f-001", target: "coop-f-001", type: "MEMBER_OF" },
+    { id: "f-001-e2", source: "f-001", target: "loan-f-001", type: "OWNS_LOAN" },
+    { id: "f-001-e3", source: "f-001", target: "dealer-f-001", type: "PURCHASES_FROM" },
+    { id: "f-001-e4", source: "f-001", target: "zone-kiambu", type: "LOCATED_IN" },
+    { id: "f-001-e5", source: "coop-f-001", target: "dealer-f-001", type: "WORKS_WITH" },
   ],
 };
 

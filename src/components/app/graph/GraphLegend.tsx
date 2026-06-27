@@ -1,9 +1,6 @@
-const nodeTypeColors: Record<string, string> = {
-  farmer: "var(--risk-medium)",
-  cooperative: "var(--moss)",
-  dealer: "var(--azure)",
-  county: "var(--amber)",
-};
+import { graphNodeColorVar } from "@/components/app/graph/graph-colors";
+
+const legendTypes = ["farmer", "cooperative", "dealer", "loan", "climatezone"] as const;
 
 export function GraphLegend() {
   return (
@@ -12,17 +9,16 @@ export function GraphLegend() {
         Graph legend
       </div>
       <ul className="mt-3 space-y-2 text-sm">
-        {Object.entries(nodeTypeColors).map(([type, color]) => (
+        {legendTypes.map((type) => (
           <li key={type} className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-            <span className="capitalize">{type}</span>
+            <span
+              className="h-2.5 w-2.5 rounded-full"
+              style={{ backgroundColor: graphNodeColorVar(type) }}
+            />
+            <span className="capitalize">{type.replace("climatezone", "climate zone")}</span>
           </li>
         ))}
       </ul>
     </div>
   );
-}
-
-export function graphNodeColor(type: string) {
-  return nodeTypeColors[type] ?? "var(--muted-foreground)";
 }
