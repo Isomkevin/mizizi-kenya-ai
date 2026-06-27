@@ -60,7 +60,10 @@ export async function fileToBase64(file: File): Promise<string> {
   });
 }
 
-function invalidateFarmerDocuments(queryClient: ReturnType<typeof useQueryClient>, farmerId: string) {
+function invalidateFarmerDocuments(
+  queryClient: ReturnType<typeof useQueryClient>,
+  farmerId: string,
+) {
   queryClient.invalidateQueries({ queryKey: ["farmers", "detail", farmerId] });
   queryClient.invalidateQueries({ queryKey: ["farmers", "profiles"] });
 }

@@ -42,7 +42,9 @@ export function FarmerDocumentsTab({ farmer }: { farmer: FarmerProfile }) {
 
       {pendingReview > 0 ? (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">
-          <span className="font-medium">{pendingReview} document{pendingReview === 1 ? "" : "s"}</span>{" "}
+          <span className="font-medium">
+            {pendingReview} document{pendingReview === 1 ? "" : "s"}
+          </span>{" "}
           classified and awaiting your confirmation before graph linking.
         </div>
       ) : null}

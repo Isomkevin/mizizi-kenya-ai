@@ -1,7 +1,11 @@
 import { useCallback, useRef, useState } from "react";
 import { FileUp, Loader2 } from "lucide-react";
 
-import { fileToBase64, isAcceptedDocumentFile, useUploadFarmerDocument } from "@/api/hooks/use-documents";
+import {
+  fileToBase64,
+  isAcceptedDocumentFile,
+  useUploadFarmerDocument,
+} from "@/api/hooks/use-documents";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

@@ -254,7 +254,7 @@ export async function confirmDocumentClassification(
   }
 
   const extraction = extractionFromDocument(current);
-  let updatedFarmer = applyExtractionToFarmer(farmer, extraction);
+  const updatedFarmer = applyExtractionToFarmer(farmer, extraction);
 
   const confirmed: DocumentRecord = {
     ...current,
