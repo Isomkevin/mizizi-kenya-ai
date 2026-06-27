@@ -19,6 +19,18 @@ const DOCUMENT_TYPES: FarmerDocumentType[] = [
   "other",
 ];
 
+const TYPE_LABELS: Record<FarmerDocumentType, string> = {
+  identity: "National ID / identity",
+  land_record: "Land ownership",
+  farm_photo: "Farm photo",
+  loan_agreement: "Loan agreement",
+  insurance: "Insurance certificate",
+  satellite_report: "Satellite report",
+  cooperative_membership: "Cooperative membership",
+  quotation: "Input quotation",
+  other: "Other",
+};
+
 function parseJsonBlock(text: string): Record<string, unknown> | null {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   const candidate = fenced?.[1]?.trim() ?? text.trim();
@@ -43,11 +55,56 @@ function normalizeDocType(value: unknown, fallback: FarmerDocumentType): FarmerD
   return fallback;
 }
 
-function rulesExtraction(
-  docType: FarmerDocumentType,
-  fileName: string,
-  farmer: FarmerProfile,
-): DocumentExtractionResult {
+export function inferDocTypeFromFileName(fileName: string, mimeType: string): FarmerDocumentType {
+  const lower = fileName.toLowerCase();
+  const mime = mimeType.toLowerCase();
+
+  if (
+    lower.includes("national") ||
+    lower.includes("identity") ||
+    /\bid\b/.test(lower) ||
+    lower.includes("passport")
+  ) {
+    return "identity";
+  }
+  if (
+    lower.includes("land") ||
+    lower.includes("title") ||
+    lower.includes("deed") ||
+    lower.includes("parcel")
+  ) {
+    return "land_record";
+  }
+  if (lower.includes("coop") || lower.includes("sacco") || lower.includes("membership")) {
+    return "cooperative_membership";
+  }
+  if (lower.includes("loan") || lower.includes("credit") || lower.includes("agreement")) {
+    return "loan_agreement";
+  }
+  if (lower.includes("insurance") || lower.includes("cover")) {
+    return "insurance";
+  }
+  if (lower.includes("satellite") || lower.includes("ndvi") || lower.includes("remote")) {
+    return "satellite_report";
+  }
+  if (lower.includes("quotation") || lower.includes("quote") || lower.includes("invoice")) {
+    return "quotation";
+  }
+  if (
+    mime.startsWith("image/") &&
+    (lower.includes("farm") || lower.includes("field") || lower.includes("crop"))
+  ) {
+    return "farm_photo";
+  }
+  if (mime.startsWith("image/") && !lower.includes("id")) {
+    return "farm_photo";
+  }
+
+  return "other";
+}
+
+function rulesExtraction(fileName: string, farmer: FarmerProfile): DocumentExtractionResult {
+  const docType = inferDocTypeFromFileName(fileName, "application/octet-stream");
   const lower = fileName.toLowerCase();
   const extractedFields: Record<string, string | number> = {
     farmerName: farmer.name,
@@ -80,13 +137,15 @@ function rulesExtraction(
 
 function buildMessages(
   farmer: FarmerProfile,
-  docType: FarmerDocumentType,
   fileName: string,
   mimeType: string,
   textContent: string | null,
   imageDataUrl: string | null,
 ): ChatMessage[] {
-  const system = `You extract structured facts from agricultural finance documents in Kenya.
+  const allowedTypes = DOCUMENT_TYPES.map((type) => `${type} (${TYPE_LABELS[type]})`).join(", ");
+
+  const system = `You classify and extract structured facts from agricultural finance documents in Kenya.
+First classify the document into exactly one documentType from: ${allowedTypes}.
 Return JSON only with keys:
 documentType, extractedFields (object), entities (array of {type, name, confidence}),
 ocrConfidence (0-1), verificationHint ("verified"|"pending_review"|"conflict").
@@ -98,7 +157,6 @@ Use ONLY evidence from the document content or metadata. Do not invent national 
     county: farmer.county,
     cooperative: farmer.cooperative,
     cropType: farmer.cropType,
-    selectedDocType: docType,
     fileName,
     mimeType,
     textContent: textContent?.slice(0, 8000) ?? null,
@@ -112,7 +170,7 @@ Use ONLY evidence from the document content or metadata. Do not invent national 
         content: [
           {
             type: "text",
-            text: `Extract document facts from this upload.\n${JSON.stringify(context)}`,
+            text: `Classify this document and extract facts.\n${JSON.stringify(context)}`,
           },
           { type: "image_url", image_url: { url: imageDataUrl } },
         ],
@@ -124,14 +182,14 @@ Use ONLY evidence from the document content or metadata. Do not invent national 
     { role: "system", content: system },
     {
       role: "user",
-      content: `Extract document facts.\n${JSON.stringify(context)}`,
+      content: `Classify this document and extract facts.\n${JSON.stringify(context)}`,
     },
   ];
 }
 
 function normalizeExtraction(
   parsed: Record<string, unknown>,
-  docType: FarmerDocumentType,
+  fallbackType: FarmerDocumentType,
   provider: IngestionLlmProvider,
 ): DocumentExtractionResult {
   const extractedFields =
@@ -160,7 +218,7 @@ function normalizeExtraction(
       : "pending_review";
 
   return {
-    documentType: normalizeDocType(parsed.documentType, docType),
+    documentType: normalizeDocType(parsed.documentType, fallbackType),
     extractedFields,
     entities,
     ocrConfidence: Math.min(1, Math.max(0, Number(parsed.ocrConfidence ?? 0.7))),
@@ -171,18 +229,17 @@ function normalizeExtraction(
 
 export async function extractDocumentFacts(input: {
   farmer: FarmerProfile;
-  docType: FarmerDocumentType;
   fileName: string;
   mimeType: string;
   buffer: Buffer;
 }): Promise<DocumentExtractionResult> {
+  const inferredType = inferDocTypeFromFileName(input.fileName, input.mimeType);
   const textContent = extractTextFromBuffer(input.mimeType, input.buffer);
   const isImage = input.mimeType.toLowerCase().startsWith("image/");
   const imageDataUrl = isImage ? toDataUrl(input.mimeType, input.buffer) : null;
 
   const messages = buildMessages(
     input.farmer,
-    input.docType,
     input.fileName,
     input.mimeType,
     textContent,
@@ -193,9 +250,14 @@ export async function extractDocumentFacts(input: {
   if (llm) {
     const parsed = parseJsonBlock(llm.text);
     if (parsed) {
-      return normalizeExtraction(parsed, input.docType, llm.provider);
+      return normalizeExtraction(parsed, inferredType, llm.provider);
     }
   }
 
-  return rulesExtraction(input.docType, input.fileName, input.farmer);
+  return rulesExtraction(input.fileName, input.farmer);
+}
+
+export function documentTypeLabel(type: FarmerDocumentType | string): string {
+  if (type in TYPE_LABELS) return TYPE_LABELS[type as FarmerDocumentType];
+  return String(type);
 }

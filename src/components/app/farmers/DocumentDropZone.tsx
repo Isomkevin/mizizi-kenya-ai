@@ -1,22 +1,8 @@
 import { useCallback, useRef, useState } from "react";
 import { FileUp, Loader2 } from "lucide-react";
 
-import {
-  FARMER_DOCUMENT_TYPES,
-  fileToBase64,
-  isAcceptedDocumentFile,
-  useUploadFarmerDocument,
-} from "@/api/hooks/use-documents";
-import type { FarmerDocumentType } from "@/api/types";
+import { fileToBase64, isAcceptedDocumentFile, useUploadFarmerDocument } from "@/api/hooks/use-documents";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 interface DocumentDropZoneProps {
@@ -27,7 +13,6 @@ interface DocumentDropZoneProps {
 export function DocumentDropZone({ farmerId, className }: DocumentDropZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const upload = useUploadFarmerDocument(farmerId);
-  const [docType, setDocType] = useState<FarmerDocumentType>("identity");
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +32,6 @@ export function DocumentDropZone({ farmerId, className }: DocumentDropZoneProps)
           await upload.mutateAsync({
             fileName: file.name,
             mimeType: file.type || "application/octet-stream",
-            docType,
             contentBase64,
           });
         } catch (uploadError) {
@@ -57,39 +41,17 @@ export function DocumentDropZone({ farmerId, className }: DocumentDropZoneProps)
         }
       }
     },
-    [docType, upload],
+    [upload],
   );
 
   return (
     <section className={cn("space-y-4 rounded-xl border border-border bg-card p-5", className)}>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h3 className="font-display text-xl">Document ingestion</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Drop identity, land, cooperative, and loan files. Extraction runs via Featherless with
-            OpenRouter fallback, then syncs graph links in the background.
-          </p>
-        </div>
-        <div className="w-full sm:w-56">
-          <Label htmlFor="doc-type" className="text-xs text-muted-foreground">
-            Default document type
-          </Label>
-          <Select
-            value={docType}
-            onValueChange={(value) => setDocType(value as FarmerDocumentType)}
-          >
-            <SelectTrigger id="doc-type" className="mt-1 h-9">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {FARMER_DOCUMENT_TYPES.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div>
+        <h3 className="font-display text-xl">Document ingestion</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Drop any farmer files here — Mizizi will classify them automatically, then you confirm
+          before they are linked to the graph.
+        </p>
       </div>
 
       <div
@@ -131,7 +93,7 @@ export function DocumentDropZone({ farmerId, className }: DocumentDropZoneProps)
           {upload.isPending ? "Uploading…" : "Drag and drop documents here"}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          PDF, JPG, PNG, WEBP, CSV, TXT · max 10MB
+          PDF, JPG, PNG, WEBP, CSV, TXT · max 10MB · no manual type selection needed
         </p>
         <Button type="button" variant="outline" size="sm" className="mt-4" tabIndex={-1}>
           Browse files

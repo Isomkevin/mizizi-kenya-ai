@@ -47,7 +47,7 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] Farmer search at `/app/farmers` with filters, result cards, `useFarmers`
 - [x] Farmer profile at `/app/farmers/$farmerId` with tabs (overview, financial, climate, applications, decisions, documents, activity)
 - [x] Create farmer flow + profile routing (`CreateFarmerDialog`, nested `/app/farmers` routes)
-- [x] Document ingestion on profile Documents tab: drag-and-drop upload, Featherless → OpenRouter → rules extraction, background Neo4j/local graph sync (`ingestion-service`, `DocumentDropZone`)
+- [x] Document ingestion on profile Documents tab: drag-and-drop upload, automatic classification (Featherless → OpenRouter → rules), officer confirm/reclassify gate, background Neo4j/local graph sync on confirmation
 - [x] Components in `src/components/app/farmers/`
 
 ## Phase 4 — Done

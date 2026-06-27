@@ -1,7 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { FarmerDocumentType, UploadFarmerDocumentInput } from "@/api/types";
-import { uploadFarmerDocumentFn } from "@/api/functions/documents";
+import {
+  confirmFarmerDocumentFn,
+  reclassifyFarmerDocumentFn,
+  uploadFarmerDocumentFn,
+} from "@/api/functions/documents";
 
 const ACCEPTED_MIME = [
   "application/pdf",
@@ -28,6 +32,10 @@ export const FARMER_DOCUMENT_TYPES: Array<{ value: FarmerDocumentType; label: st
   { value: "other", label: "Other" },
 ];
 
+export function documentTypeLabel(type: FarmerDocumentType | string): string {
+  return FARMER_DOCUMENT_TYPES.find((item) => item.value === type)?.label ?? String(type);
+}
+
 export function isAcceptedDocumentFile(file: File): boolean {
   return ACCEPTED_MIME.includes(file.type) || /\.(pdf|jpe?g|png|webp|txt|csv)$/i.test(file.name);
 }
@@ -52,6 +60,11 @@ export async function fileToBase64(file: File): Promise<string> {
   });
 }
 
+function invalidateFarmerDocuments(queryClient: ReturnType<typeof useQueryClient>, farmerId: string) {
+  queryClient.invalidateQueries({ queryKey: ["farmers", "detail", farmerId] });
+  queryClient.invalidateQueries({ queryKey: ["farmers", "profiles"] });
+}
+
 export function useUploadFarmerDocument(farmerId: string) {
   const queryClient = useQueryClient();
 
@@ -64,9 +77,40 @@ export function useUploadFarmerDocument(farmerId: string) {
         },
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["farmers", "detail", farmerId] });
-      queryClient.invalidateQueries({ queryKey: ["farmers", "profiles"] });
+    onSuccess: () => invalidateFarmerDocuments(queryClient, farmerId),
+  });
+}
+
+export function useConfirmFarmerDocument(farmerId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (documentId: string) => {
+      return confirmFarmerDocumentFn({ data: { farmerId, documentId } });
+    },
+    onSuccess: (farmer) => {
+      queryClient.setQueryData(["farmers", "detail", farmerId], farmer);
+      invalidateFarmerDocuments(queryClient, farmerId);
+    },
+  });
+}
+
+export function useReclassifyFarmerDocument(farmerId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { documentId: string; docType: FarmerDocumentType }) => {
+      return reclassifyFarmerDocumentFn({
+        data: {
+          farmerId,
+          documentId: input.documentId,
+          docType: input.docType,
+        },
+      });
+    },
+    onSuccess: (farmer) => {
+      queryClient.setQueryData(["farmers", "detail", farmerId], farmer);
+      invalidateFarmerDocuments(queryClient, farmerId);
     },
   });
 }

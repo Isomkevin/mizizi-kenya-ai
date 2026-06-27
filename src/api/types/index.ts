@@ -233,6 +233,8 @@ export type DocumentIngestionStatus = "processing" | "complete" | "failed";
 
 export type IngestionLlmProvider = "featherless" | "openrouter" | "rules";
 
+export type DocumentClassificationStatus = "pending_review" | "confirmed";
+
 export interface DocumentRecord {
   id: string;
   name: string;
@@ -245,10 +247,14 @@ export interface DocumentRecord {
   sizeBytes?: number;
   storagePath?: string;
   ingestionStatus?: DocumentIngestionStatus;
+  classificationStatus?: DocumentClassificationStatus;
+  detectedType?: FarmerDocumentType;
+  classificationConfidence?: number;
   ocrConfidence?: number;
   extractionProvider?: IngestionLlmProvider;
   graphSyncStatus?: "pending" | "synced" | "failed";
   extractedFields?: Record<string, string | number>;
+  extractedEntities?: Array<{ type: string; name: string; confidence: number }>;
   errorMessage?: string;
 }
 
@@ -256,8 +262,18 @@ export interface UploadFarmerDocumentInput {
   farmerId: string;
   fileName: string;
   mimeType: string;
-  docType: FarmerDocumentType;
   contentBase64: string;
+}
+
+export interface ConfirmFarmerDocumentInput {
+  farmerId: string;
+  documentId: string;
+}
+
+export interface ReclassifyFarmerDocumentInput {
+  farmerId: string;
+  documentId: string;
+  docType: FarmerDocumentType;
 }
 
 export interface DocumentUploadResult {

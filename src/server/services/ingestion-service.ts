@@ -4,9 +4,14 @@ import type {
   DocumentUploadResult,
   FarmerDocumentType,
   FarmerProfile,
+  ReclassifyFarmerDocumentInput,
   UploadFarmerDocumentInput,
 } from "@/api/types";
-import { extractDocumentFacts } from "@/server/services/document-extraction";
+import {
+  documentTypeLabel,
+  extractDocumentFacts,
+  inferDocTypeFromFileName,
+} from "@/server/services/document-extraction";
 import {
   decodeUploadContent,
   saveFarmerDocumentFile,
@@ -31,6 +36,22 @@ function verificationFromHint(hint: DocumentExtractionResult["verificationHint"]
   }
 }
 
+function extractionFromDocument(document: DocumentRecord): DocumentExtractionResult {
+  return {
+    documentType: (document.type as FarmerDocumentType) ?? "other",
+    extractedFields: document.extractedFields ?? {},
+    entities: document.extractedEntities ?? [],
+    ocrConfidence: document.ocrConfidence ?? 0.5,
+    verificationHint:
+      document.verificationStatus === "verified"
+        ? "verified"
+        : document.verificationStatus === "conflict"
+          ? "conflict"
+          : "pending_review",
+    provider: document.extractionProvider ?? "rules",
+  };
+}
+
 function applyExtractionToFarmer(
   farmer: FarmerProfile,
   extraction: DocumentExtractionResult,
@@ -51,7 +72,10 @@ function applyExtractionToFarmer(
     graphConnections:
       farmer.graphConnections + extraction.entities.filter((e) => e.confidence >= 0.6).length,
     trustIndicators: Array.from(
-      new Set([...farmer.trustIndicators, `${extraction.documentType} document ingested`]),
+      new Set([
+        ...farmer.trustIndicators,
+        `${documentTypeLabel(extraction.documentType)} document confirmed`,
+      ]),
     ),
   };
 
@@ -64,6 +88,10 @@ function applyExtractionToFarmer(
       ? assessment.factors
       : updated.contributingFactors,
   };
+}
+
+function findDocumentIndex(farmer: FarmerProfile, documentId: string): number {
+  return farmer.documents.findIndex((doc) => doc.id === documentId);
 }
 
 export async function stageDocumentUpload(
@@ -87,7 +115,7 @@ export async function stageDocumentUpload(
   const document: DocumentRecord = {
     id: documentId,
     name: input.fileName,
-    type: input.docType,
+    type: "other",
     verificationStatus: "pending_review",
     uploadedAt: now,
     source: "officer_upload",
@@ -106,7 +134,7 @@ export async function stageDocumentUpload(
       timestamp: now,
       category: "document",
       title: "Document uploaded",
-      description: `${input.fileName} queued for ingestion.`,
+      description: `${input.fileName} queued for automatic classification.`,
     },
     ...farmer.timeline,
   ];
@@ -128,11 +156,13 @@ export async function processDocumentIngestion(
   const farmer = await persistence.getFarmerById(farmerId);
   if (!farmer) return;
 
-  const index = farmer.documents.findIndex((doc) => doc.id === documentId);
+  const index = findDocumentIndex(farmer, documentId);
   if (index === -1) return;
 
   const current = farmer.documents[index];
-  if (current.ingestionStatus === "complete") return;
+  if (current.ingestionStatus === "complete" && current.classificationStatus === "confirmed") {
+    return;
+  }
 
   try {
     if (!current.storagePath) {
@@ -143,44 +173,40 @@ export async function processDocumentIngestion(
     const buffer = await readFile(current.storagePath);
     const extraction = await extractDocumentFacts({
       farmer,
-      docType: (current.type as FarmerDocumentType) ?? "other",
       fileName: current.name,
       mimeType: current.mimeType ?? "application/octet-stream",
       buffer,
     });
 
-    const completed: DocumentRecord = {
+    const classified: DocumentRecord = {
       ...current,
       type: extraction.documentType,
-      verificationStatus: verificationFromHint(extraction.verificationHint),
+      detectedType: extraction.documentType,
+      classificationConfidence: extraction.ocrConfidence,
+      verificationStatus: "pending_review",
       ocrStatus: "complete",
       ocrConfidence: extraction.ocrConfidence,
       extractionProvider: extraction.provider,
       extractedFields: extraction.extractedFields,
+      extractedEntities: extraction.entities,
       ingestionStatus: "complete",
+      classificationStatus: "pending_review",
       graphSyncStatus: "pending",
     };
 
-    const updatedFarmer = applyExtractionToFarmer(farmer, extraction);
-    updatedFarmer.documents[index] = completed;
-    updatedFarmer.timeline = [
+    farmer.documents[index] = classified;
+    farmer.timeline = [
       {
-        id: `${documentId}-ingested`,
+        id: `${documentId}-classified`,
         timestamp: new Date().toISOString(),
         category: "document",
-        title: "Document ingested",
-        description: `${current.name} processed via ${extraction.provider}.`,
+        title: "Document classified",
+        description: `${current.name} detected as ${documentTypeLabel(extraction.documentType)} (${Math.round(extraction.ocrConfidence * 100)}% confidence). Awaiting officer confirmation.`,
       },
-      ...updatedFarmer.timeline,
+      ...farmer.timeline,
     ];
 
-    await persistence.upsertFarmer(updatedFarmer);
-
-    const graphResult = await syncDocumentToGraph(updatedFarmer, completed, extraction);
-    completed.graphSyncStatus = graphResult.synced ? "synced" : "failed";
-    updatedFarmer.documents[index] = completed;
-    await persistence.upsertFarmer(updatedFarmer);
-    await syncFarmerToGraph(updatedFarmer);
+    await persistence.upsertFarmer(farmer);
   } catch (error) {
     const failed: DocumentRecord = {
       ...current,
@@ -202,6 +228,116 @@ export async function processDocumentIngestion(
     ];
     await persistence.upsertFarmer(farmer);
   }
+}
+
+export async function confirmDocumentClassification(
+  farmerId: string,
+  documentId: string,
+): Promise<FarmerProfile> {
+  const persistence = getPersistence();
+  const farmer = await persistence.getFarmerById(farmerId);
+  if (!farmer) {
+    throw new Error("Farmer profile not found.");
+  }
+
+  const index = findDocumentIndex(farmer, documentId);
+  if (index === -1) {
+    throw new Error("Document not found.");
+  }
+
+  const current = farmer.documents[index];
+  if (current.classificationStatus === "confirmed") {
+    return farmer;
+  }
+  if (current.ingestionStatus !== "complete") {
+    throw new Error("Document classification is not ready for confirmation.");
+  }
+
+  const extraction = extractionFromDocument(current);
+  let updatedFarmer = applyExtractionToFarmer(farmer, extraction);
+
+  const confirmed: DocumentRecord = {
+    ...current,
+    verificationStatus: verificationFromHint(extraction.verificationHint),
+    classificationStatus: "confirmed",
+    graphSyncStatus: "pending",
+  };
+
+  updatedFarmer.documents[index] = confirmed;
+  updatedFarmer.timeline = [
+    {
+      id: `${documentId}-confirmed`,
+      timestamp: new Date().toISOString(),
+      category: "document",
+      title: "Document confirmed",
+      description: `Officer confirmed ${current.name} as ${documentTypeLabel(confirmed.type)}.`,
+    },
+    ...updatedFarmer.timeline,
+  ];
+
+  await persistence.upsertFarmer(updatedFarmer);
+
+  const graphResult = await syncDocumentToGraph(updatedFarmer, confirmed, extraction);
+  confirmed.graphSyncStatus = graphResult.synced ? "synced" : "failed";
+  updatedFarmer.documents[index] = confirmed;
+  await persistence.upsertFarmer(updatedFarmer);
+  await syncFarmerToGraph(updatedFarmer);
+
+  const latest = await persistence.getFarmerById(farmerId);
+  if (!latest) {
+    throw new Error("Farmer profile not found after confirmation.");
+  }
+  return latest;
+}
+
+export async function reclassifyDocument(
+  input: ReclassifyFarmerDocumentInput,
+): Promise<FarmerProfile> {
+  const persistence = getPersistence();
+  const farmer = await persistence.getFarmerById(input.farmerId);
+  if (!farmer) {
+    throw new Error("Farmer profile not found.");
+  }
+
+  const index = findDocumentIndex(farmer, input.documentId);
+  if (index === -1) {
+    throw new Error("Document not found.");
+  }
+
+  const current = farmer.documents[index];
+  if (current.classificationStatus === "confirmed") {
+    throw new Error("Confirmed documents cannot be reclassified.");
+  }
+  if (current.ingestionStatus !== "complete") {
+    throw new Error("Document is not ready for reclassification.");
+  }
+
+  const inferred = inferDocTypeFromFileName(current.name, current.mimeType ?? "");
+  const updated: DocumentRecord = {
+    ...current,
+    type: input.docType,
+    detectedType: current.detectedType ?? inferred,
+    classificationStatus: "pending_review",
+  };
+
+  farmer.documents[index] = updated;
+  farmer.timeline = [
+    {
+      id: `${input.documentId}-reclassified`,
+      timestamp: new Date().toISOString(),
+      category: "document",
+      title: "Document reclassified",
+      description: `Officer updated classification to ${documentTypeLabel(input.docType)}.`,
+    },
+    ...farmer.timeline,
+  ];
+
+  await persistence.upsertFarmer(farmer);
+  const latest = await persistence.getFarmerById(input.farmerId);
+  if (!latest) {
+    throw new Error("Farmer profile not found after reclassification.");
+  }
+  return latest;
 }
 
 export async function uploadAndIngestDocument(
