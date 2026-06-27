@@ -11,8 +11,7 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/farmers/")({
   validateSearch: (search: Record<string, unknown>) => ({
-    create:
-      search.create === true || search.create === "true" || search.create === "1",
+    create: search.create === true || search.create === "true" || search.create === "1",
   }),
   head: () => ({
     meta: [{ title: "Mizizi · Farmer Intelligence" }],
