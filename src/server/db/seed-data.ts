@@ -742,5 +742,6 @@ export function buildSeedDatabase(): MiziziDatabase {
         filters: JSON.stringify({ climateExposureMin: 45 }),
       },
     ],
+    masumiJobs: [],
   };
 }

@@ -1,0 +1,61 @@
+services:
+  - type: web
+    name: mizizi-web
+    runtime: node
+    plan: starter
+    buildCommand: bun install && bun run build
+    startCommand: bun run preview -- --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MIZIZI_USE_LOCAL_STORE
+        value: "true"
+      - key: MASUMI_MODE
+        value: demo
+      - key: MASUMI_AGENTS_URL
+        fromService:
+          type: web
+          name: mizizi-agents
+          property: hostport
+      - key: MASUMI_CALLBACK_SECRET
+        generateValue: true
+      - key: NODE_VERSION
+        value: "22"
+
+  - type: web
+    name: mizizi-agents
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./services/mizizi-agents/Dockerfile
+    dockerContext: ./services/mizizi-agents
+    envVars:
+      - key: MASUMI_MODE
+        value: demo
+      - key: MIZIZI_CALLBACK_URL
+        fromService:
+          type: web
+          name: mizizi-web
+          property: host
+      - key: MIZIZI_CALLBACK_SECRET
+        fromService:
+          type: web
+          name: mizizi-web
+          envVarKey: MASUMI_CALLBACK_SECRET
+
+  - type: cron
+    name: mizizi-orchestrator-cron
+    schedule: "0 */6 * * *"
+    runtime: node
+    buildCommand: bun install
+    startCommand: >-
+      curl -sf -X POST "$MIZIZI_WEB_URL/api/agents/orchestrator/run"
+      -H "x-mizizi-callback-secret: $MASUMI_CALLBACK_SECRET"
+    envVars:
+      - key: MIZIZI_WEB_URL
+        fromService:
+          type: web
+          name: mizizi-web
+          property: host
+      - key: MASUMI_CALLBACK_SECRET
+        fromService:
+          type: web
+          name: mizizi-web
+          envVarKey: MASUMI_CALLBACK_SECRET

@@ -7,9 +7,10 @@ import {
   CloudSun,
   FileUp,
   Loader2,
-  ShieldQuestion,
+  ShieldCheck,
 } from "lucide-react";
 
+import { useGrantConsent } from "@/api/hooks/use-masumi";
 import { useRequestEnrichment } from "@/api/hooks/use-farmers";
 import type { DataGap, DataGapAction, FarmerProfile } from "@/api/types";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,8 @@ function gapStatusLabel(status: DataGap["status"]): string {
 }
 
 function GapActionLink({ farmerId, gap }: { farmerId: string; gap: DataGap }) {
+  const grantConsent = useGrantConsent();
+
   if (gap.suggestedAction === "upload") {
     return (
       <Button variant="outline" size="sm" asChild>
@@ -59,10 +62,14 @@ function GapActionLink({ farmerId, gap }: { farmerId: string; gap: DataGap }) {
       <Button
         variant="outline"
         size="sm"
-        disabled
-        title="Consent workflow coming with Masumi agents"
+        disabled={grantConsent.isPending}
+        onClick={() => void grantConsent.mutateAsync({ farmerId })}
       >
-        <ShieldQuestion className="h-3.5 w-3.5" />
+        {grantConsent.isPending ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <ShieldCheck className="h-3.5 w-3.5" />
+        )}
         {actionLabels.farmer_consent}
       </Button>
     );

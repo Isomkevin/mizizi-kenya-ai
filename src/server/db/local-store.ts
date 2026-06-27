@@ -11,6 +11,7 @@ import type {
   FarmerProfile,
   FarmerSummary,
   GraphPayload,
+  MasumiJob,
   QuickAction,
   SearchResult,
   WelcomeSnapshot,
@@ -32,6 +33,8 @@ export interface MiziziDatabase {
   decisions: DecisionDetail[];
   analytics: AnalyticsPayload;
   graphViews: { id: string; userId: string; name: string; farmerId?: string; filters: string }[];
+  masumiJobs: MasumiJob[];
+  masumiOrchestratorLastRun?: string;
 }
 
 const DB_PATH = join(process.cwd(), ".data", "mizizi-db.json");
@@ -43,6 +46,7 @@ async function ensureDb(): Promise<MiziziDatabase> {
   try {
     const raw = await readFile(DB_PATH, "utf-8");
     cache = JSON.parse(raw) as MiziziDatabase;
+    if (!cache.masumiJobs) cache.masumiJobs = [];
     return cache;
   } catch {
     cache = buildSeedDatabase();

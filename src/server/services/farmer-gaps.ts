@@ -1,4 +1,4 @@
-import type { DataGapId, FarmerProfile, RequestEnrichmentInput } from "@/api/types";
+import type { DataGapId, EnrichDataType, FarmerProfile, RequestEnrichmentInput } from "@/api/types";
 import { countyCoordinates } from "@/server/lib/kenya-counties";
 import { refreshClimate } from "@/server/services/analytics";
 import {
@@ -6,10 +6,22 @@ import {
   deriveEnrichmentStatus,
   detectDataGaps,
 } from "@/server/services/gap-detector";
+import { assertConsentForEnrichType } from "@/server/services/masumi/consent";
+import { isMasumiEnabled } from "@/server/services/masumi/agent-client";
+import {
+  dispatchMasumiJob,
+  pollPendingMasumiJobsForFarmer,
+} from "@/server/services/masumi/masumi-service";
 import { getPersistence } from "@/server/services/persistence";
 import { assessFarmerRisk } from "@/server/services/risk-engine";
 
 export async function syncFarmerDataGaps(farmer: FarmerProfile): Promise<FarmerProfile> {
+  if (isMasumiEnabled()) {
+    await pollPendingMasumiJobsForFarmer(farmer.id);
+    const refreshed = await getPersistence().getFarmerById(farmer.id);
+    if (refreshed) farmer = refreshed;
+  }
+
   const persistence = getPersistence();
   const graph = await persistence.getGraphByFarmerId(farmer.id);
   const jobs = farmer.enrichmentJobs ?? [];
@@ -36,6 +48,34 @@ export async function syncFarmerDataGaps(farmer: FarmerProfile): Promise<FarmerP
       : updated.contributingFactors,
     recommendation: assessment.recommendation,
   };
+}
+
+function syncEnrichmentJobsFromMasumi(
+  farmer: FarmerProfile,
+  gapId: DataGapId,
+  enrichType: EnrichDataType,
+  agentJobId: string | undefined,
+  masumiJobId: string,
+): FarmerProfile["enrichmentJobs"] {
+  const jobs = [...(farmer.enrichmentJobs ?? [])];
+  const index = jobs.findIndex((job) => job.gapId === gapId && job.status !== "complete");
+  const entry = {
+    id: masumiJobId,
+    gapId,
+    enrichType,
+    status: "running" as const,
+    requestedAt: new Date().toISOString(),
+    requestedBy: "officer" as const,
+    message: "Masumi agent job dispatched.",
+    masumiJobId,
+    agentJobId,
+  };
+  if (index === -1) {
+    jobs.push(entry);
+  } else {
+    jobs[index] = { ...jobs[index], ...entry, enrichType: jobs[index].enrichType };
+  }
+  return jobs;
 }
 
 async function fulfillClimateGap(farmer: FarmerProfile): Promise<FarmerProfile> {
@@ -92,15 +132,51 @@ export async function requestFarmerEnrichment(
 
   const now = new Date().toISOString();
   const jobs = [...(farmer.enrichmentJobs ?? [])];
+  const masumiEnabled = isMasumiEnabled();
 
   for (const gapId of targetGapIds) {
     const gap = farmer.dataGaps?.find((item) => item.id === gapId);
     if (!gap || gap.status === "present" || !gap.enrichType) continue;
 
+    const consent = assertConsentForEnrichType(farmer, gap.enrichType);
+    if (!consent.ok && gap.enrichType === "MOBILE_MONEY") {
+      continue;
+    }
+
     const alreadyQueued = jobs.some(
       (job) => job.gapId === gapId && (job.status === "queued" || job.status === "running"),
     );
     if (alreadyQueued) continue;
+
+    if (masumiEnabled) {
+      try {
+        const masumiJob = await dispatchMasumiJob({
+          farmer,
+          gapId: gapId as DataGapId,
+          enrichType: gap.enrichType,
+          requestedBy: "officer",
+        });
+        farmer.enrichmentJobs = syncEnrichmentJobsFromMasumi(
+          farmer,
+          gapId as DataGapId,
+          gap.enrichType,
+          masumiJob.agentJobId,
+          masumiJob.id,
+        );
+        continue;
+      } catch (error) {
+        jobs.push({
+          id: `${farmer.id}-enrich-${gapId}-${Date.now()}`,
+          gapId: gapId as DataGapId,
+          enrichType: gap.enrichType,
+          status: "failed",
+          requestedAt: now,
+          requestedBy: "officer",
+          message: error instanceof Error ? error.message : "Masumi dispatch failed",
+        });
+        continue;
+      }
+    }
 
     jobs.push({
       id: `${farmer.id}-enrich-${gapId}-${Date.now()}`,
@@ -115,13 +191,13 @@ export async function requestFarmerEnrichment(
 
   farmer = {
     ...farmer,
-    enrichmentJobs: jobs,
+    enrichmentJobs: farmer.enrichmentJobs ?? jobs,
     timeline: [
       {
         id: `${farmer.id}-enrich-${Date.now()}`,
         timestamp: now,
         category: "application",
-        title: "Data enrichment requested",
+        title: masumiEnabled ? "Masumi enrichment dispatched" : "Data enrichment requested",
         description: `Officer requested ${targetGapIds.length} missing signal${targetGapIds.length === 1 ? "" : "s"}.`,
       },
       ...farmer.timeline,
@@ -130,28 +206,18 @@ export async function requestFarmerEnrichment(
 
   await persistence.upsertFarmer(farmer);
 
-  if (targetGapIds.includes("climate_zone")) {
+  if (!masumiEnabled && targetGapIds.includes("climate_zone")) {
     farmer = await fulfillClimateGap(farmer);
     const climateJobs = (farmer.enrichmentJobs ?? []).map((job) =>
-      job.gapId === "climate_zone" && job.status === "queued"
+      job.gapId === "climate_zone" && (job.status === "queued" || job.status === "running")
         ? {
             ...job,
             status: "complete" as const,
-            message: "Climate refreshed from Open-Meteo.",
+            message: "Climate refreshed from Open-Meteo (local fallback).",
           }
         : job,
     );
     farmer = { ...farmer, enrichmentJobs: climateJobs };
-    farmer.timeline = [
-      {
-        id: `${farmer.id}-climate-${Date.now()}`,
-        timestamp: new Date().toISOString(),
-        category: "climate",
-        title: "Climate signals refreshed",
-        description: `County climate updated for ${farmer.county}.`,
-      },
-      ...farmer.timeline,
-    ];
     await persistence.upsertFarmer(farmer);
   }
 

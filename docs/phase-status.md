@@ -15,6 +15,7 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 | 4     | Graph intelligence workspace                    | **Done** |
 | 5     | Explainability workspace                        | **Done** |
 | 6     | Analytics platform                              | **Done** |
+| 7     | Masumi agentic data collection                  | **Done** |
 
 ## Phase 0 — Done
 
@@ -73,6 +74,15 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] `GlobalSearch` uses `useGlobalSearch()` / server search fn
 - [x] Minimal auth via `AuthProvider` + `/app` route guard (dev bypass)
 
+## Phase 7 — Masumi agentic data collection — Done (2026-06-27)
+
+- [x] Python MIP-003 agents (`services/mizizi-agents/`) — climate, coop, mobile, orchestrator
+- [x] TypeScript `masumi-service` — dispatch, poll, webhook, consent, job store
+- [x] Officer enrichment → Masumi dispatch; consent workflow on farmer profile
+- [x] HTTP routes: `/api/webhooks/masumi-callback`, `/api/agents/status`, orchestrator cron
+- [x] Analytics **Masumi agents** tab; Docker Compose + Render blueprint
+- [x] `docs/masumi.md` runbook
+
 ## Next priorities
 
 - Harden production Supabase auth session flows (replace dev bypass in production runtime)
@@ -89,7 +99,9 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] Extended constraints for Document, FarmParcel, DataSource
 - [x] Optional GDS PageRank script + seed-time refresh when plugin available
 - [x] Local Docker Neo4j (`docker-compose.neo4j.yml`, `bun run neo4j:local`)
-- [x] Aura setup path (`bun run neo4j:setup`, `.env.neo4j.aura.example`)
+- [x] Aura setup path (`bun run neo4j:aura`, `.env.neo4j.aura.example`)
+- [x] Env merge helpers (`bun run neo4j:env:local` / `neo4j:env:aura`)
+- [x] Graph UI Neo4j connection status (`GraphConnectionStatus` on `/app/graph`)
 - [x] `docs/neo4j.md` — local + Aura runbooks
 
 ## Technical debt / notes

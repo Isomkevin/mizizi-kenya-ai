@@ -4,6 +4,7 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "rec
 
 import { useAnalytics } from "@/api/hooks/use-analytics";
 import { AnalyticsMap } from "@/components/app/analytics/AnalyticsMap";
+import { MasumiAgentsPanel } from "@/components/app/analytics/MasumiAgentsPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/app/analytics")({
@@ -46,6 +47,7 @@ function AnalyticsPage() {
           <TabsTrigger value="climate">Climate</TabsTrigger>
           <TabsTrigger value="graph">Network</TabsTrigger>
           <TabsTrigger value="explainability">Decision audit</TabsTrigger>
+          <TabsTrigger value="agents">Masumi agents</TabsTrigger>
         </TabsList>
 
         <TabsContent value="executive">
@@ -137,6 +139,10 @@ function AnalyticsPage() {
               </ul>
             </Panel>
           </div>
+        </TabsContent>
+
+        <TabsContent value="agents">
+          <MasumiAgentsPanel />
         </TabsContent>
       </Tabs>
     </div>

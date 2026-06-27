@@ -186,6 +186,68 @@ export interface EnrichmentJob {
   requestedAt: string;
   requestedBy: "officer" | "system";
   message?: string;
+  masumiJobId?: string;
+  agentJobId?: string;
+  masumiTxHash?: string;
+}
+
+export type MasumiJobStatus =
+  | "DISPATCHED"
+  | "AWAITING_PAYMENT"
+  | "RUNNING"
+  | "DELIVERED"
+  | "FAILED"
+  | "CANCELLED";
+
+export type MasumiAgentType =
+  | "mizizi-orchestrator"
+  | "mizizi-climate-data"
+  | "mizizi-coop-data"
+  | "mizizi-mpesa-proxy";
+
+export type ConsentStatus = "NONE" | "PENDING" | "ACTIVE" | "REVOKED";
+
+export interface ConsentRecord {
+  status: ConsentStatus;
+  grantedAt?: string;
+  revokedAt?: string;
+  scope: string[];
+  season: string;
+}
+
+export interface MasumiJob {
+  id: string;
+  farmerId: string;
+  gapId?: DataGapId;
+  enrichType: EnrichDataType | "ORCHESTRATION";
+  agentType: MasumiAgentType;
+  agentJobId?: string;
+  blockchainIdentifier?: string;
+  masumiTxHash?: string;
+  inputHash?: string;
+  outputHash?: string;
+  status: MasumiJobStatus;
+  requestedAt: string;
+  requestedBy: "officer" | "system";
+  completedAt?: string;
+  error?: string;
+  resultSummary?: string;
+}
+
+export interface MasumiAgentHealth {
+  agentType: MasumiAgentType;
+  route: string;
+  status: "available" | "unavailable" | "unknown";
+  message?: string;
+}
+
+export interface MasumiAgentsStatusPayload {
+  mode: "demo" | "live" | "disabled";
+  paymentConnected: boolean;
+  agents: MasumiAgentHealth[];
+  jobsCompleted24h: number;
+  jobsPending: number;
+  orchestratorLastRun?: string;
 }
 
 export interface RequestEnrichmentInput {
@@ -202,6 +264,7 @@ export interface FarmerProfile extends FarmerSummary {
   dataGaps?: DataGap[];
   enrichmentStatus?: EnrichmentStatus;
   enrichmentJobs?: EnrichmentJob[];
+  consent?: ConsentRecord;
   insufficientData?: boolean;
   sourceFreshness: string;
   trustIndicators: string[];

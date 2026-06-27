@@ -20,6 +20,12 @@
     "neo4j:verify": "bun run scripts/neo4j/verify.ts",
     "neo4j:local": "bun run neo4j:env:local && bun run neo4j:up && bun run neo4j:wait && bun run neo4j:setup && bun run seed",
     "neo4j:aura": "bun run neo4j:setup && bun run seed",
+    "masumi:env": "bun run scripts/masumi/apply-env.ts",
+    "masumi:up": "docker compose -f docker-compose.masumi.yml up -d --build",
+    "masumi:down": "docker compose -f docker-compose.masumi.yml down",
+    "masumi:logs": "docker compose -f docker-compose.masumi.yml logs -f",
+    "masumi:wait": "bun run scripts/masumi/wait-agents.ts",
+    "masumi:local": "bun run masumi:env && bun run masumi:up && bun run masumi:wait",
     "format": "prettier --write ."
   },
   "dependencies": {

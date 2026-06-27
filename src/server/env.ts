@@ -37,4 +37,17 @@ export const serverEnv = {
   openRouterModel: () => env("OPENROUTER_MODEL") ?? "meta-llama/llama-3.1-70b-instruct",
   tenantId: () => env("MIZIZI_TENANT_ID") ?? "lesom-sandbox",
   useLocalStore: () => !serverEnv.supabaseUrl() || env("MIZIZI_USE_LOCAL_STORE") === "true",
+  masumiMode: () => {
+    const mode = env("MASUMI_MODE");
+    if (mode === "live" || mode === "demo" || mode === "disabled") return mode;
+    return env("MASUMI_AGENTS_URL") ? "demo" : "disabled";
+  },
+  masumiAgentsUrl: () => env("MASUMI_AGENTS_URL") ?? "http://localhost:8080",
+  masumiPaymentUrl: () => env("MASUMI_PAYMENT_URL") ?? "http://localhost:3001/api/v1",
+  masumiPaymentApiKey: () => env("MASUMI_PAYMENT_API_KEY"),
+  masumiCallbackSecret: () => env("MASUMI_CALLBACK_SECRET") ?? "mizizi-dev-callback-secret",
+  masumiClimateAgentPath: () => env("MASUMI_CLIMATE_AGENT_PATH") ?? "/climate",
+  masumiCoopAgentPath: () => env("MASUMI_COOP_AGENT_PATH") ?? "/coop",
+  masumiMobileAgentPath: () => env("MASUMI_MOBILE_AGENT_PATH") ?? "/mobile",
+  masumiOrchestratorPath: () => env("MASUMI_ORCHESTRATOR_PATH") ?? "/orchestrator",
 };
