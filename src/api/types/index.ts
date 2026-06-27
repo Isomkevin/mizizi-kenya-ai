@@ -276,6 +276,11 @@ export interface ReclassifyFarmerDocumentInput {
   docType: FarmerDocumentType;
 }
 
+export interface RemoveFarmerDocumentInput {
+  farmerId: string;
+  documentId: string;
+}
+
 export interface DocumentUploadResult {
   documentId: string;
   farmerId: string;

@@ -4,6 +4,7 @@ import type { FarmerDocumentType, UploadFarmerDocumentInput } from "@/api/types"
 import {
   confirmFarmerDocumentFn,
   reclassifyFarmerDocumentFn,
+  removeFarmerDocumentFn,
   uploadFarmerDocumentFn,
 } from "@/api/functions/documents";
 
@@ -110,6 +111,20 @@ export function useReclassifyFarmerDocument(farmerId: string) {
           docType: input.docType,
         },
       });
+    },
+    onSuccess: (farmer) => {
+      queryClient.setQueryData(["farmers", "detail", farmerId], farmer);
+      invalidateFarmerDocuments(queryClient, farmerId);
+    },
+  });
+}
+
+export function useRemoveFarmerDocument(farmerId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (documentId: string) => {
+      return removeFarmerDocumentFn({ data: { farmerId, documentId } });
     },
     onSuccess: (farmer) => {
       queryClient.setQueryData(["farmers", "detail", farmerId], farmer);

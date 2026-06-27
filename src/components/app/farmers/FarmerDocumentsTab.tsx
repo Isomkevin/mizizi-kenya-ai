@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, Clock3, FileWarning, Loader2, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Clock3, FileWarning, Loader2, ShieldCheck, X } from "lucide-react";
 
 import {
   documentTypeLabel,
   FARMER_DOCUMENT_TYPES,
   useConfirmFarmerDocument,
   useReclassifyFarmerDocument,
+  useRemoveFarmerDocument,
 } from "@/api/hooks/use-documents";
 import { useFarmerProfile } from "@/api/hooks/use-farmers";
 import type { DocumentRecord, FarmerDocumentType, FarmerProfile } from "@/api/types";
 import { DocumentDropZone } from "@/components/app/farmers/DocumentDropZone";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -76,6 +88,7 @@ export function FarmerDocumentsTab({ farmer }: { farmer: FarmerProfile }) {
 function DocumentRow({ farmerId, document }: { farmerId: string; document: DocumentRecord }) {
   const confirm = useConfirmFarmerDocument(farmerId);
   const reclassify = useReclassifyFarmerDocument(farmerId);
+  const remove = useRemoveFarmerDocument(farmerId);
   const [editType, setEditType] = useState<FarmerDocumentType>(
     (document.type as FarmerDocumentType) ?? "other",
   );
@@ -102,7 +115,17 @@ function DocumentRow({ farmerId, document }: { farmerId: string; document: Docum
     <li className="rounded-md border border-border bg-background p-3 text-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-2">
-          <div className="font-medium">{document.name}</div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="font-medium">{document.name}</div>
+            {!isConfirmed ? (
+              <RemoveDocumentButton
+                documentName={document.name}
+                isProcessing={status === "processing"}
+                isPending={remove.isPending}
+                onRemove={() => void remove.mutateAsync(document.id)}
+              />
+            ) : null}
+          </div>
 
           {status === "processing" ? (
             <p className="text-muted-foreground">Classifying document…</p>
@@ -205,5 +228,53 @@ function DocumentRow({ farmerId, document }: { farmerId: string; document: Docum
         </div>
       </div>
     </li>
+  );
+}
+
+function RemoveDocumentButton({
+  documentName,
+  isProcessing,
+  isPending,
+  onRemove,
+}: {
+  documentName: string;
+  isProcessing: boolean;
+  isPending: boolean;
+  onRemove: () => void;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
+          aria-label={`Remove ${documentName}`}
+          disabled={isPending}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Remove document?</AlertDialogTitle>
+          <AlertDialogDescription>
+            {isProcessing
+              ? `"${documentName}" will be deleted and will not be classified or added to the graph.`
+              : `"${documentName}" will be removed from this profile without confirming classification or linking it to the graph.`}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={onRemove}
+          >
+            Remove
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

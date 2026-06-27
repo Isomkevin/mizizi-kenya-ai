@@ -14,6 +14,7 @@ import {
 } from "@/server/services/document-extraction";
 import {
   decodeUploadContent,
+  deleteFarmerDocumentFile,
   saveFarmerDocumentFile,
   validateUploadMime,
 } from "@/server/services/document-storage";
@@ -336,6 +337,50 @@ export async function reclassifyDocument(
   const latest = await persistence.getFarmerById(input.farmerId);
   if (!latest) {
     throw new Error("Farmer profile not found after reclassification.");
+  }
+  return latest;
+}
+
+export async function removeFarmerDocument(
+  farmerId: string,
+  documentId: string,
+): Promise<FarmerProfile> {
+  const persistence = getPersistence();
+  const farmer = await persistence.getFarmerById(farmerId);
+  if (!farmer) {
+    throw new Error("Farmer profile not found.");
+  }
+
+  const index = findDocumentIndex(farmer, documentId);
+  if (index === -1) {
+    throw new Error("Document not found.");
+  }
+
+  const current = farmer.documents[index];
+  if (current.classificationStatus === "confirmed") {
+    throw new Error("Confirmed documents cannot be removed from the profile.");
+  }
+
+  if (current.storagePath) {
+    await deleteFarmerDocumentFile(current.storagePath);
+  }
+
+  farmer.documents = farmer.documents.filter((doc) => doc.id !== documentId);
+  farmer.timeline = [
+    {
+      id: `${documentId}-removed`,
+      timestamp: new Date().toISOString(),
+      category: "document",
+      title: "Document removed",
+      description: `${current.name} was removed and will not be classified or linked to the graph.`,
+    },
+    ...farmer.timeline,
+  ];
+
+  await persistence.upsertFarmer(farmer);
+  const latest = await persistence.getFarmerById(farmerId);
+  if (!latest) {
+    throw new Error("Farmer profile not found after removal.");
   }
   return latest;
 }

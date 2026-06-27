@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const UPLOAD_ROOT = join(process.cwd(), ".data", "uploads");
@@ -56,4 +56,14 @@ export function extractTextFromBuffer(mimeType: string, buffer: Buffer): string 
 
 export function toDataUrl(mimeType: string, buffer: Buffer): string {
   return `data:${mimeType};base64,${buffer.toString("base64")}`;
+}
+
+export async function deleteFarmerDocumentFile(storagePath: string): Promise<void> {
+  try {
+    await unlink(storagePath);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw error;
+    }
+  }
 }

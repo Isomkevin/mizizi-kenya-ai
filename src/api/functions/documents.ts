@@ -3,12 +3,14 @@ import { createServerFn } from "@tanstack/react-start";
 import type {
   ConfirmFarmerDocumentInput,
   ReclassifyFarmerDocumentInput,
+  RemoveFarmerDocumentInput,
   UploadFarmerDocumentInput,
 } from "@/api/types";
 import {
   confirmDocumentClassification,
   processDocumentIngestion,
   reclassifyDocument,
+  removeFarmerDocument,
   stageDocumentUpload,
 } from "@/server/services/ingestion-service";
 
@@ -32,4 +34,10 @@ export const reclassifyFarmerDocumentFn = createServerFn({ method: "POST" })
   .validator((data: ReclassifyFarmerDocumentInput) => data)
   .handler(async ({ data }) => {
     return reclassifyDocument(data);
+  });
+
+export const removeFarmerDocumentFn = createServerFn({ method: "POST" })
+  .validator((data: RemoveFarmerDocumentInput) => data)
+  .handler(async ({ data }) => {
+    return removeFarmerDocument(data.farmerId, data.documentId);
   });
