@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { farmerProfiles } from "@/api/hooks/fallback-data";
-import type { FarmerSummary, RiskLevel } from "@/api/types";
-import { getFarmerFn, searchFarmerProfilesFn } from "@/api/functions/farmers";
+import type { CreateFarmerInput, FarmerSummary, RiskLevel } from "@/api/types";
+import { createFarmerFn, getFarmerFn, searchFarmerProfilesFn } from "@/api/functions/farmers";
 
 export interface FarmerFiltersInput {
   query?: string;
@@ -87,6 +87,17 @@ export function useFarmers(filters: FarmerFiltersInput) {
 
 export function useFarmerProfile(farmerId: string) {
   return useFarmer(farmerId);
+}
+
+export function useCreateFarmer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateFarmerInput) => createFarmerFn({ data: input }),
+    onSuccess: (farmer) => {
+      queryClient.invalidateQueries({ queryKey: ["farmers"] });
+      queryClient.setQueryData(["farmers", "detail", farmer.id], farmer);
+    },
+  });
 }
 
 function matchesFilters(farmer: FarmerSummary, filters: FarmerFiltersInput) {

@@ -20,7 +20,15 @@ export const Route = createFileRoute("/app/farmers/$farmerId")({
 
 function FarmerProfilePage() {
   const { farmerId } = Route.useParams();
-  const { data: farmer } = useFarmerProfile(farmerId);
+  const { data: farmer, isLoading } = useFarmerProfile(farmerId);
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
+        Loading farmer profile…
+      </div>
+    );
+  }
 
   if (!farmer) {
     return (

@@ -140,6 +140,15 @@ export interface FarmerSummary {
   applicationStatus?: string;
 }
 
+export interface CreateFarmerInput {
+  name: string;
+  farmerId: string;
+  phone?: string;
+  county: string;
+  cooperative: string;
+  cropType: string;
+}
+
 export interface FarmerProfile extends FarmerSummary {
   phone?: string;
   parcelHa?: number;

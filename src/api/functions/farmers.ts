@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { getFarmer, searchFarmers } from "@/server/services/farmers";
+import type { CreateFarmerInput } from "@/api/types";
+import { createFarmer, getFarmer, searchFarmers } from "@/server/services/farmers";
 
 export const getFarmerFn = createServerFn({ method: "GET" })
   .validator((data: { id: string }) => data)
@@ -19,4 +20,10 @@ export const searchFarmerProfilesFn = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     return searchFarmers(data);
+  });
+
+export const createFarmerFn = createServerFn({ method: "POST" })
+  .validator((data: CreateFarmerInput) => data)
+  .handler(async ({ data }) => {
+    return createFarmer(data);
   });

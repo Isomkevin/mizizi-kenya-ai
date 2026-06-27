@@ -290,7 +290,7 @@ export const quickActions: QuickAction[] = [
     id: "qa-1",
     label: "Create farmer",
     description: "Register a new farmer profile",
-    href: "/app/farmers",
+    href: "/app/farmers?create=true",
   },
   {
     id: "qa-2",
