@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { useDecision } from "@/api/hooks/use-decisions";
 import { ContributingFactors } from "@/components/app/decisions/ContributingFactors";
+import { DecisionContextLinks } from "@/components/app/decisions/DecisionContextLinks";
 import { DecisionSummary } from "@/components/app/decisions/DecisionSummary";
 import { GraphPathViewer } from "@/components/app/decisions/GraphPathViewer";
 import { OfficerDecisionPanel } from "@/components/app/decisions/OfficerDecisionPanel";
@@ -37,6 +38,7 @@ function DecisionWorkspacePage() {
       </Link>
 
       <DecisionSummary decision={decision} />
+      <DecisionContextLinks decision={decision} />
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
         <ContributingFactors decision={decision} />
         <OfficerDecisionPanel decision={decision} />

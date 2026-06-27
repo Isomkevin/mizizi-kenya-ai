@@ -19,6 +19,7 @@ import { Route as AppDecisionsRouteImport } from './routes/app.decisions'
 import { Route as AppClimateRouteImport } from './routes/app.climate'
 import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
 import { Route as AppFarmersIndexRouteImport } from './routes/app.farmers.index'
+import { Route as AppDecisionsIndexRouteImport } from './routes/app.decisions.index'
 import { Route as AppFarmersFarmerIdRouteImport } from './routes/app.farmers.$farmerId'
 import { Route as AppDecisionsDecisionIdRouteImport } from './routes/app.decisions.$decisionId'
 
@@ -72,6 +73,11 @@ const AppFarmersIndexRoute = AppFarmersIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppFarmersRoute,
 } as any)
+const AppDecisionsIndexRoute = AppDecisionsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppDecisionsRoute,
+} as any)
 const AppFarmersFarmerIdRoute = AppFarmersFarmerIdRouteImport.update({
   id: '/$farmerId',
   path: '/$farmerId',
@@ -95,18 +101,19 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/app/decisions/$decisionId': typeof AppDecisionsDecisionIdRoute
   '/app/farmers/$farmerId': typeof AppFarmersFarmerIdRoute
+  '/app/decisions/': typeof AppDecisionsIndexRoute
   '/app/farmers/': typeof AppFarmersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/climate': typeof AppClimateRoute
-  '/app/decisions': typeof AppDecisionsRouteWithChildren
   '/app/graph': typeof AppGraphRoute
   '/app/portfolio': typeof AppPortfolioRoute
   '/app': typeof AppIndexRoute
   '/app/decisions/$decisionId': typeof AppDecisionsDecisionIdRoute
   '/app/farmers/$farmerId': typeof AppFarmersFarmerIdRoute
+  '/app/decisions': typeof AppDecisionsIndexRoute
   '/app/farmers': typeof AppFarmersIndexRoute
 }
 export interface FileRoutesById {
@@ -122,6 +129,7 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/app/decisions/$decisionId': typeof AppDecisionsDecisionIdRoute
   '/app/farmers/$farmerId': typeof AppFarmersFarmerIdRoute
+  '/app/decisions/': typeof AppDecisionsIndexRoute
   '/app/farmers/': typeof AppFarmersIndexRoute
 }
 export interface FileRouteTypes {
@@ -138,18 +146,19 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/decisions/$decisionId'
     | '/app/farmers/$farmerId'
+    | '/app/decisions/'
     | '/app/farmers/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/app/analytics'
     | '/app/climate'
-    | '/app/decisions'
     | '/app/graph'
     | '/app/portfolio'
     | '/app'
     | '/app/decisions/$decisionId'
     | '/app/farmers/$farmerId'
+    | '/app/decisions'
     | '/app/farmers'
   id:
     | '__root__'
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/decisions/$decisionId'
     | '/app/farmers/$farmerId'
+    | '/app/decisions/'
     | '/app/farmers/'
   fileRoutesById: FileRoutesById
 }
@@ -244,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFarmersIndexRouteImport
       parentRoute: typeof AppFarmersRoute
     }
+    '/app/decisions/': {
+      id: '/app/decisions/'
+      path: '/'
+      fullPath: '/app/decisions/'
+      preLoaderRoute: typeof AppDecisionsIndexRouteImport
+      parentRoute: typeof AppDecisionsRoute
+    }
     '/app/farmers/$farmerId': {
       id: '/app/farmers/$farmerId'
       path: '/$farmerId'
@@ -263,10 +280,12 @@ declare module '@tanstack/react-router' {
 
 interface AppDecisionsRouteChildren {
   AppDecisionsDecisionIdRoute: typeof AppDecisionsDecisionIdRoute
+  AppDecisionsIndexRoute: typeof AppDecisionsIndexRoute
 }
 
 const AppDecisionsRouteChildren: AppDecisionsRouteChildren = {
   AppDecisionsDecisionIdRoute: AppDecisionsDecisionIdRoute,
+  AppDecisionsIndexRoute: AppDecisionsIndexRoute,
 }
 
 const AppDecisionsRouteWithChildren = AppDecisionsRoute._addFileChildren(
