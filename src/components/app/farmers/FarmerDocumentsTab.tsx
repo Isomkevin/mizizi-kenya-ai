@@ -11,6 +11,7 @@ import {
 import { useFarmerProfile } from "@/api/hooks/use-farmers";
 import type { DocumentRecord, FarmerDocumentType, FarmerProfile } from "@/api/types";
 import { DocumentDropZone } from "@/components/app/farmers/DocumentDropZone";
+import { FarmerDataGapsPanel } from "@/components/app/farmers/FarmerDataGapsPanel";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,9 +49,16 @@ export function FarmerDocumentsTab({ farmer }: { farmer: FarmerProfile }) {
     (doc) => doc.classificationStatus === "pending_review" && doc.ingestionStatus === "complete",
   ).length;
 
+  const syncedDocuments = farmer.documents.filter((doc) => doc.graphSyncStatus === "synced");
+  const missingGapCount = farmer.dataGaps?.filter((gap) => gap.status === "missing").length ?? 0;
+
   return (
     <div className="space-y-4">
       <DocumentDropZone farmerId={farmer.id} />
+
+      {syncedDocuments.length > 0 && missingGapCount > 0 ? (
+        <FarmerDataGapsPanel farmer={farmer} variant="compact" />
+      ) : null}
 
       {pendingReview > 0 ? (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">

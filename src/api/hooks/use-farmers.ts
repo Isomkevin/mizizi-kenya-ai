@@ -2,8 +2,13 @@ import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { farmerProfiles } from "@/api/hooks/fallback-data";
-import type { CreateFarmerInput, FarmerSummary, RiskLevel } from "@/api/types";
-import { createFarmerFn, getFarmerFn, searchFarmerProfilesFn } from "@/api/functions/farmers";
+import type { CreateFarmerInput, DataGapId, FarmerSummary, RiskLevel } from "@/api/types";
+import {
+  createFarmerFn,
+  getFarmerFn,
+  requestEnrichmentFn,
+  searchFarmerProfilesFn,
+} from "@/api/functions/farmers";
 
 export interface FarmerFiltersInput {
   query?: string;
@@ -93,6 +98,18 @@ export function useCreateFarmer() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateFarmerInput) => createFarmerFn({ data: input }),
+    onSuccess: (farmer) => {
+      queryClient.invalidateQueries({ queryKey: ["farmers"] });
+      queryClient.setQueryData(["farmers", "detail", farmer.id], farmer);
+    },
+  });
+}
+
+export function useRequestEnrichment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { farmerId: string; gapIds?: DataGapId[] }) =>
+      requestEnrichmentFn({ data: input }),
     onSuccess: (farmer) => {
       queryClient.invalidateQueries({ queryKey: ["farmers"] });
       queryClient.setQueryData(["farmers", "detail", farmer.id], farmer);

@@ -1,6 +1,7 @@
 import type { CreateFarmerInput, FarmerProfile, SearchResult } from "@/api/types";
 import { getPersistence } from "@/server/services/persistence";
 import { assessFarmerRisk } from "@/server/services/risk-engine";
+import { syncFarmerDataGaps } from "@/server/services/farmer-gaps";
 
 export type FarmerSearchInput = {
   query?: string;
@@ -30,7 +31,10 @@ export async function searchFarmers(input: FarmerSearchInput = {}): Promise<Farm
 
 export async function getFarmer(id: string): Promise<FarmerProfile | null> {
   const farmer = await getPersistence().getFarmerById(id);
-  return farmer ?? null;
+  if (!farmer) return null;
+  const synced = await syncFarmerDataGaps(farmer);
+  await getPersistence().upsertFarmer(synced);
+  return synced;
 }
 
 function toSearchResult(farmer: FarmerProfile): SearchResult {
@@ -65,6 +69,10 @@ function buildNewFarmerProfile(input: CreateFarmerInput, id: string): FarmerProf
     climateIndicator: "Baseline pending",
     applicationStatus: "draft",
     dataCompleteness: 42,
+    dataGaps: [],
+    enrichmentStatus: "none",
+    enrichmentJobs: [],
+    insufficientData: true,
     sourceFreshness: "Just now",
     trustIndicators: ["Profile created in Mizizi"],
     contributingFactors: [],
@@ -120,10 +128,13 @@ export async function createFarmer(input: CreateFarmerInput): Promise<FarmerProf
 
   await persistence.upsertFarmer(profile);
 
+  const synced = await syncFarmerDataGaps(profile);
+  await persistence.upsertFarmer(synced);
+
   const db = await persistence.getDb();
-  db.searchIndex = db.searchIndex.filter((entry) => entry.id !== profile.id);
-  db.searchIndex.unshift(toSearchResult(profile));
+  db.searchIndex = db.searchIndex.filter((entry) => entry.id !== synced.id);
+  db.searchIndex.unshift(toSearchResult(synced));
   await persistence.saveDb(db);
 
-  return profile;
+  return synced;
 }

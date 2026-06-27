@@ -2,11 +2,13 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 import { useDecision } from "@/api/hooks/use-decisions";
+import { useFarmerProfile } from "@/api/hooks/use-farmers";
 import { ContributingFactors } from "@/components/app/decisions/ContributingFactors";
 import { DecisionContextLinks } from "@/components/app/decisions/DecisionContextLinks";
 import { DecisionSummary } from "@/components/app/decisions/DecisionSummary";
 import { GraphPathViewer } from "@/components/app/decisions/GraphPathViewer";
 import { OfficerDecisionPanel } from "@/components/app/decisions/OfficerDecisionPanel";
+import { FarmerDataGapsPanel } from "@/components/app/farmers/FarmerDataGapsPanel";
 
 export const Route = createFileRoute("/app/decisions/$decisionId")({
   head: () => ({
@@ -18,6 +20,7 @@ export const Route = createFileRoute("/app/decisions/$decisionId")({
 function DecisionWorkspacePage() {
   const { decisionId } = Route.useParams();
   const { data: decision } = useDecision(decisionId);
+  const { data: farmer } = useFarmerProfile(decision?.farmerId ?? "");
 
   if (!decision) {
     return (
@@ -38,6 +41,11 @@ function DecisionWorkspacePage() {
       </Link>
 
       <DecisionSummary decision={decision} />
+      {farmer &&
+      (farmer.insufficientData ||
+        (farmer.dataGaps?.some((g) => g.status === "missing") ?? false)) ? (
+        <FarmerDataGapsPanel farmer={farmer} variant="compact" />
+      ) : null}
       <DecisionContextLinks decision={decision} />
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
         <ContributingFactors decision={decision} />

@@ -149,12 +149,60 @@ export interface CreateFarmerInput {
   cropType: string;
 }
 
+export type DataGapId =
+  | "identity"
+  | "cooperative"
+  | "repayment"
+  | "farm_parcel"
+  | "climate_zone"
+  | "input_purchase"
+  | "mobile_activity"
+  | "graph_coverage";
+
+export type DataGapStatus = "present" | "missing" | "pending_enrichment" | "stale";
+
+export type DataGapAction = "upload" | "enrich_api" | "officer_input" | "farmer_consent";
+
+export type EnrichDataType = "COOPERATIVE" | "CLIMATE" | "MOBILE_MONEY" | "PARCEL";
+
+export type EnrichmentStatus = "none" | "requested" | "in_progress" | "complete";
+
+export interface DataGap {
+  id: DataGapId;
+  label: string;
+  severity: "critical" | "important" | "optional";
+  weight: number;
+  status: DataGapStatus;
+  reason: string;
+  suggestedAction: DataGapAction;
+  enrichType?: EnrichDataType;
+}
+
+export interface EnrichmentJob {
+  id: string;
+  gapId: DataGapId;
+  enrichType: EnrichDataType;
+  status: "queued" | "running" | "complete" | "failed";
+  requestedAt: string;
+  requestedBy: "officer" | "system";
+  message?: string;
+}
+
+export interface RequestEnrichmentInput {
+  farmerId: string;
+  gapIds?: DataGapId[];
+}
+
 export interface FarmerProfile extends FarmerSummary {
   phone?: string;
   parcelHa?: number;
   recommendation?: string;
   officerRecommendation?: string;
   dataCompleteness: number;
+  dataGaps?: DataGap[];
+  enrichmentStatus?: EnrichmentStatus;
+  enrichmentJobs?: EnrichmentJob[];
+  insufficientData?: boolean;
   sourceFreshness: string;
   trustIndicators: string[];
   contributingFactors: DecisionFactor[];

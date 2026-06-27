@@ -21,6 +21,7 @@ import {
 import { syncDocumentToGraph, syncFarmerToGraph } from "@/server/services/neo4j";
 import { getPersistence } from "@/server/services/persistence";
 import { assessFarmerRisk } from "@/server/services/risk-engine";
+import { syncFarmerDataGaps } from "@/server/services/farmer-gaps";
 
 function newDocumentId(farmerId: string): string {
   return `${farmerId}-doc-${Date.now()}`;
@@ -284,10 +285,26 @@ export async function confirmDocumentClassification(
   await persistence.upsertFarmer(updatedFarmer);
   await syncFarmerToGraph(updatedFarmer);
 
-  const latest = await persistence.getFarmerById(farmerId);
+  let latest = await persistence.getFarmerById(farmerId);
   if (!latest) {
     throw new Error("Farmer profile not found after confirmation.");
   }
+
+  latest = await syncFarmerDataGaps(latest);
+  latest.timeline = [
+    {
+      id: `${documentId}-gaps`,
+      timestamp: new Date().toISOString(),
+      category: "graph",
+      title: "Graph gap scan complete",
+      description:
+        latest.dataGaps?.filter((gap) => gap.status === "missing").length === 0
+          ? "All key signals are linked after ingestion."
+          : `${latest.dataGaps?.filter((gap) => gap.status === "missing").length ?? 0} signal(s) still missing — review data gaps.`,
+    },
+    ...latest.timeline,
+  ];
+  await persistence.upsertFarmer(latest);
   return latest;
 }
 
