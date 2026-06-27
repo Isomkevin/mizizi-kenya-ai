@@ -11,7 +11,7 @@ Mizizi models farmer risk context as a multi-entity graph. The graph powers read
 - `ClimateZone` — county-aligned climate risk context.
 - `Document` — officer-uploaded evidence with verification metadata.
 - `FarmParcel` — land parcel hectares linked from document extraction.
-- `DataSource` — provenance for uploaded documents (`officer_upload`).
+- `DataSource` — provenance for uploaded documents (`officer_upload`) or Masumi agents (`masumi_agent`, with `masumi_tx_hash`)
 
 ## Relationships
 

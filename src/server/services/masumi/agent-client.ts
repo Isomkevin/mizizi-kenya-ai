@@ -83,11 +83,17 @@ export async function startAgentJob(input: {
   return (await response.json()) as AgentStartResponse;
 }
 
-export async function pollAgentJob(agentType: ReturnType<typeof agentTypeForEnrichType>, jobId: string): Promise<AgentStatusResponse> {
+export async function pollAgentJob(
+  agentType: ReturnType<typeof agentTypeForEnrichType>,
+  jobId: string,
+): Promise<AgentStatusResponse> {
   const path = agentPathForType(agentType, agentPaths());
-  const response = await fetch(`${agentsBaseUrl()}${path}/status?job_id=${encodeURIComponent(jobId)}`, {
-    signal: AbortSignal.timeout(15000),
-  });
+  const response = await fetch(
+    `${agentsBaseUrl()}${path}/status?job_id=${encodeURIComponent(jobId)}`,
+    {
+      signal: AbortSignal.timeout(15000),
+    },
+  );
   if (!response.ok) {
     throw new Error(`Agent status failed (${response.status})`);
   }
@@ -113,20 +119,19 @@ export function buildAgentInputForGap(
   if (enrichType === "MOBILE_MONEY") {
     return [
       { key: "farmer_id", value: farmer.id },
-      { key: "consent_token", value: farmer.consent?.status === "ACTIVE" ? `consent-${farmer.id}` : "" },
+      {
+        key: "consent_token",
+        value: farmer.consent?.status === "ACTIVE" ? `consent-${farmer.id}` : "",
+      },
     ];
   }
 
   if (enrichType === "CLIMATE" || gapId === "climate_zone") {
-    return base.filter((item) =>
-      ["farmer_id", "county", "lat", "lon"].includes(item.key),
-    );
+    return base.filter((item) => ["farmer_id", "county", "lat", "lon"].includes(item.key));
   }
 
   if (enrichType === "COOPERATIVE" || gapId === "repayment" || gapId === "cooperative") {
-    return base.filter((item) =>
-      ["farmer_id", "cooperative", "cooperative_id"].includes(item.key),
-    );
+    return base.filter((item) => ["farmer_id", "cooperative", "cooperative_id"].includes(item.key));
   }
 
   return base;

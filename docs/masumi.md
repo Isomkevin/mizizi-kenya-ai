@@ -38,34 +38,34 @@ On a farmer profile, use **Request missing data** on the Data completeness panel
 
 ## Scripts
 
-| Command | Description |
-| ------- | ----------- |
-| `bun run masumi:env` | Merge `MASUMI_*` vars into `.env` |
-| `bun run masumi:up` | Docker Compose — agents on `:8080` |
-| `bun run masumi:down` | Stop agents |
-| `bun run masumi:wait` | Block until `/health` OK |
-| `bun run masumi:local` | env + up + wait (one command) |
-| `bun run masumi:orchestrator` | POST batch orchestrator (cron) |
+| Command                       | Description                        |
+| ----------------------------- | ---------------------------------- |
+| `bun run masumi:env`          | Merge `MASUMI_*` vars into `.env`  |
+| `bun run masumi:up`           | Docker Compose — agents on `:8088` |
+| `bun run masumi:down`         | Stop agents                        |
+| `bun run masumi:wait`         | Block until `/health` OK           |
+| `bun run masumi:local`        | env + up + wait (one command)      |
+| `bun run masumi:orchestrator` | POST batch orchestrator (cron)     |
 
 ## Environment
 
-| Variable | Default | Purpose |
-| -------- | ------- | ------- |
-| `MASUMI_MODE` | `demo` | `demo` \| `live` \| `disabled` |
-| `MASUMI_AGENTS_URL` | `http://localhost:8080` | Python agents base URL |
-| `MASUMI_CALLBACK_SECRET` | dev secret | Webhook auth header |
-| `MASUMI_PAYMENT_URL` | — | Payment service `/api/v1` (live) |
-| `MASUMI_PAYMENT_API_KEY` | — | Payment service API key |
+| Variable                 | Default                 | Purpose                          |
+| ------------------------ | ----------------------- | -------------------------------- |
+| `MASUMI_MODE`            | `demo`                  | `demo` \| `live` \| `disabled`   |
+| `MASUMI_AGENTS_URL`      | `http://localhost:8088` | Python agents base URL           |
+| `MASUMI_CALLBACK_SECRET` | dev secret              | Webhook auth header              |
+| `MASUMI_PAYMENT_URL`     | —                       | Payment service `/api/v1` (live) |
+| `MASUMI_PAYMENT_API_KEY` | —                       | Payment service API key          |
 
 Agent path overrides: `MASUMI_CLIMATE_AGENT_PATH`, `MASUMI_COOP_AGENT_PATH`, etc.
 
 ## HTTP API (Mizizi server)
 
-| Route | Method | Purpose |
-| ----- | ------ | ------- |
-| `/api/agents/status` | GET | Agent health + job counts |
-| `/api/webhooks/masumi-callback` | POST | Agent delivery webhook |
-| `/api/agents/orchestrator/run` | POST | Cron trigger (requires `x-mizizi-callback-secret`) |
+| Route                           | Method | Purpose                                            |
+| ------------------------------- | ------ | -------------------------------------------------- |
+| `/api/agents/status`            | GET    | Agent health + job counts                          |
+| `/api/webhooks/masumi-callback` | POST   | Agent delivery webhook                             |
+| `/api/agents/orchestrator/run`  | POST   | Cron trigger (requires `x-mizizi-callback-secret`) |
 
 Server functions (TanStack): `getMasumiStatusFn`, `listMasumiJobsFn`, `grantConsentFn`, `runOrchestratorFn`.
 
@@ -97,12 +97,12 @@ Each agent mount exposes:
 - `POST /start_job`
 - `GET /status?job_id=…`
 
-| Mount | Agent ID | Capability |
-| ----- | -------- | ---------- |
-| `/climate` | `mizizi-climate-data` | Open-Meteo climate refresh |
-| `/coop` | `mizizi-coop-data` | Cooperative repayment fetch |
-| `/mobile` | `mizizi-mpesa-proxy` | Aggregated mobile flows (consent) |
-| `/orchestrator` | `mizizi-orchestrator` | Batch gap dispatch |
+| Mount           | Agent ID              | Capability                        |
+| --------------- | --------------------- | --------------------------------- |
+| `/climate`      | `mizizi-climate-data` | Open-Meteo climate refresh        |
+| `/coop`         | `mizizi-coop-data`    | Cooperative repayment fetch       |
+| `/mobile`       | `mizizi-mpesa-proxy`  | Aggregated mobile flows (consent) |
+| `/orchestrator` | `mizizi-orchestrator` | Batch gap dispatch                |
 
 ## Consent gate
 
@@ -110,11 +110,11 @@ Mobile money enrichment requires `ConsentRecord.status === ACTIVE` for the curre
 
 ## Troubleshooting
 
-| Symptom | Fix |
-| ------- | --- |
-| Agents unavailable on analytics tab | Run `bun run masumi:up` and `bun run masumi:wait` |
-| Jobs stuck in RUNNING | Poll via farmer profile refresh; check agent logs `docker compose -f docker-compose.masumi.yml logs -f` |
-| Webhook 401 | Match `MIZIZI_CALLBACK_SECRET` on web + agents |
-| `MASUMI_MODE=disabled` | Set `MASUMI_MODE=demo` and `MASUMI_AGENTS_URL` |
+| Symptom                             | Fix                                                                                                     |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Agents unavailable on analytics tab | Run `bun run masumi:up` and `bun run masumi:wait`                                                       |
+| Jobs stuck in RUNNING               | Poll via farmer profile refresh; check agent logs `docker compose -f docker-compose.masumi.yml logs -f` |
+| Webhook 401                         | Match `MIZIZI_CALLBACK_SECRET` on web + agents                                                          |
+| `MASUMI_MODE=disabled`              | Set `MASUMI_MODE=demo` and `MASUMI_AGENTS_URL`                                                          |
 
 Skill reference: `.agents/skills/masumi/SKILL.md`

@@ -111,20 +111,20 @@ bun run dev
 
 Dev server: `http://localhost:5173` (hot reload).
 
-| Script           | Description                                       |
-| ---------------- | ------------------------------------------------- |
-| `bun run dev`    | Local dev server                                  |
-| `bun run build`  | Production build (regenerates `routeTree.gen.ts`) |
-| `bun run lint`   | ESLint                                            |
-| `bun run seed`   | Reset local DB and sync graph to Neo4j when configured |
-| `bun run neo4j:up` | Start local Neo4j (Docker) |
-| `bun run neo4j:setup` | Apply constraints and verify Neo4j |
-| `bun run neo4j:env:local` | Merge local Neo4j vars into `.env` |
-| `bun run neo4j:env:aura` | Merge Aura Neo4j vars into `.env` |
-| `bun run neo4j:wait` | Wait for Docker healthcheck |
-| `bun run neo4j:local` | env + up + wait + setup + seed (local) |
-| `bun run neo4j:aura` | setup + seed (Aura, no Docker) |
-| `bun run format` | Prettier                                          |
+| Script                    | Description                                            |
+| ------------------------- | ------------------------------------------------------ |
+| `bun run dev`             | Local dev server                                       |
+| `bun run build`           | Production build (regenerates `routeTree.gen.ts`)      |
+| `bun run lint`            | ESLint                                                 |
+| `bun run seed`            | Reset local DB and sync graph to Neo4j when configured |
+| `bun run neo4j:up`        | Start local Neo4j (Docker)                             |
+| `bun run neo4j:setup`     | Apply constraints and verify Neo4j                     |
+| `bun run neo4j:env:local` | Merge local Neo4j vars into `.env`                     |
+| `bun run neo4j:env:aura`  | Merge Aura Neo4j vars into `.env`                      |
+| `bun run neo4j:wait`      | Wait for Docker healthcheck                            |
+| `bun run neo4j:local`     | env + up + wait + setup + seed (local)                 |
+| `bun run neo4j:aura`      | setup + seed (Aura, no Docker)                         |
+| `bun run format`          | Prettier                                               |
 
 ### Neo4j (graph intelligence)
 

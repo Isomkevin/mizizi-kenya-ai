@@ -32,8 +32,7 @@ export function useMasumiJobs(filters?: {
 export function useGrantConsent() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: { farmerId: string; scope?: string[] }) =>
-      grantConsentFn({ data: input }),
+    mutationFn: (input: { farmerId: string; scope?: string[] }) => grantConsentFn({ data: input }),
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({ queryKey: ["farmers", variables.farmerId] });
     },

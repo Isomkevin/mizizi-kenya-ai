@@ -23,17 +23,17 @@ async function handleMasumiApiRoutes(request: Request): Promise<Response | null>
   const path = url.pathname;
 
   if (path === "/api/webhooks/masumi-callback" && request.method === "POST") {
-    const { processMasumiWebhookRequest } = await import("@/api/functions/agents");
+    const { processMasumiWebhookRequest } = await import("@/server/routes/masumi-api");
     return processMasumiWebhookRequest(request);
   }
 
   if (path === "/api/agents/status" && request.method === "GET") {
-    const { getMasumiHealthResponse } = await import("@/api/functions/agents");
+    const { getMasumiHealthResponse } = await import("@/server/routes/masumi-api");
     return getMasumiHealthResponse();
   }
 
   if (path === "/api/agents/orchestrator/run" && request.method === "POST") {
-    const { triggerOrchestratorRequest } = await import("@/api/functions/agents");
+    const { triggerOrchestratorRequest } = await import("@/server/routes/masumi-api");
     return triggerOrchestratorRequest(request);
   }
 

@@ -87,12 +87,7 @@ export async function dispatchMasumiJob(input: {
 
   const agentType = agentTypeForEnrichType(input.enrichType);
   const coords = defaultCoordsForFarmer(input.farmer);
-  const inputData = buildAgentInputForGap(
-    input.farmer,
-    input.gapId,
-    input.enrichType,
-    coords,
-  );
+  const inputData = buildAgentInputForGap(input.farmer, input.gapId, input.enrichType, coords);
   const purchaserId = masumiPurchaserId(input.farmer.id, input.gapId);
 
   const started = await startAgentJob({
@@ -260,9 +255,7 @@ export async function runOrchestratorBatch(limit = 20): Promise<{ dispatched: nu
 
   const persistence = getPersistence();
   const farmers = await persistence.listFarmers();
-  const lowCompleteness = farmers
-    .filter((f) => f.dataCompleteness < 70)
-    .slice(0, limit);
+  const lowCompleteness = farmers.filter((f) => f.dataCompleteness < 70).slice(0, limit);
 
   let dispatched = 0;
   for (const farmer of lowCompleteness) {

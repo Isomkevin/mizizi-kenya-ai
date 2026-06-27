@@ -49,9 +49,7 @@ async function run(): Promise<void> {
 
   const neo4jStatus = await verifyNeo4jConnectivity();
   const gds =
-    neo4jStatus.connected && serverEnv.neo4jGdsEnabled()
-      ? await tryRefreshGdsTrustScores()
-      : null;
+    neo4jStatus.connected && serverEnv.neo4jGdsEnabled() ? await tryRefreshGdsTrustScores() : null;
 
   console.log(
     `Seed complete for tenant ${db.tenantId}: ${db.farmers.length} farmers, ${db.decisions.length} decisions, ${Object.keys(db.graphs).length} graphs, ${graphSynced} graph syncs, ${climatePrimed} county climate refreshes.`,

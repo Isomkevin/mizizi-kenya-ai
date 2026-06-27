@@ -1,4 +1,4 @@
-const AGENTS_URL = process.env.MASUMI_AGENTS_URL ?? "http://localhost:8080";
+const AGENTS_URL = process.env.MASUMI_AGENTS_URL ?? "http://localhost:8088";
 const MAX_ATTEMPTS = 30;
 const DELAY_MS = 2000;
 

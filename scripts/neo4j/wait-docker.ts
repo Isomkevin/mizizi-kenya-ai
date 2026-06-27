@@ -7,7 +7,12 @@ const DELAY_MS = 5000;
 function inspectHealth(): string | null {
   const result = spawnSync(
     "docker",
-    ["inspect", "-f", "{{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}", CONTAINER],
+    [
+      "inspect",
+      "-f",
+      "{{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}",
+      CONTAINER,
+    ],
     { encoding: "utf-8" },
   );
   if (result.status !== 0) return null;
@@ -28,9 +33,7 @@ async function run(): Promise<void> {
       return;
     }
     if (status === null) {
-      console.error(
-        `Container "${CONTAINER}" not found. Run \`bun run neo4j:up\` first.`,
-      );
+      console.error(`Container "${CONTAINER}" not found. Run \`bun run neo4j:up\` first.`);
       process.exit(1);
     }
 

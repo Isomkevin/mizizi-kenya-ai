@@ -4,14 +4,14 @@ Mizizi uses Neo4j for graph intelligence: farmer relationships, document evidenc
 
 Configure **one** of the options below. Both use the same env vars in your root `.env`.
 
-| Variable | Required | Description |
-| -------- | -------- | ----------- |
-| `NEO4J_URI` | Yes | `bolt://localhost:7687` (local) or `neo4j+s://….databases.neo4j.io` (Aura) |
-| `NEO4J_PASSWORD` | Yes | Database password |
-| `NEO4J_USER` | No | Default `neo4j` |
-| `NEO4J_DATABASE` | No | Default `neo4j` |
-| `NEO4J_PROFILE` | No | `local` or `aura` (auto-detected from URI if omitted) |
-| `NEO4J_GDS` | No | Set `true` on Aura Pro to run GDS trust scoring during setup/seed |
+| Variable         | Required | Description                                                                |
+| ---------------- | -------- | -------------------------------------------------------------------------- |
+| `NEO4J_URI`      | Yes      | `bolt://localhost:7687` (local) or `neo4j+s://….databases.neo4j.io` (Aura) |
+| `NEO4J_PASSWORD` | Yes      | Database password                                                          |
+| `NEO4J_USER`     | No       | Default `neo4j`                                                            |
+| `NEO4J_DATABASE` | No       | Default `neo4j`                                                            |
+| `NEO4J_PROFILE`  | No       | `local` or `aura` (auto-detected from URI if omitted)                      |
+| `NEO4J_GDS`      | No       | Set `true` on Aura Pro to run GDS trust scoring during setup/seed          |
 
 ---
 
@@ -44,8 +44,8 @@ NEO4J_DATABASE=neo4j
 bun run neo4j:up
 ```
 
-- Browser: http://localhost:7474  
-- Login: `neo4j` / `mizizi-local-dev`  
+- Browser: http://localhost:7474
+- Login: `neo4j` / `mizizi-local-dev`
 - Bolt: `bolt://localhost:7687`
 
 ### 3. Apply constraints and verify
@@ -188,19 +188,19 @@ LIMIT 25
 
 ## NPM scripts reference
 
-| Script | Description |
-| ------ | ----------- |
-| `bun run neo4j:up` | Start local Docker Neo4j |
-| `bun run neo4j:down` | Stop local Docker Neo4j |
-| `bun run neo4j:logs` | Tail Neo4j container logs |
-| `bun run neo4j:setup` | Wait, apply constraints, optional `--gds` |
-| `bun run neo4j:verify` | JSON connectivity + graph stats |
-| `bun run neo4j:env:local` | Merge local Neo4j vars into `.env` |
-| `bun run neo4j:env:aura` | Merge Aura Neo4j vars into `.env` |
-| `bun run neo4j:wait` | Wait for Docker healthcheck |
-| `bun run neo4j:aura` | setup + seed (Aura, no Docker) |
-| `bun run neo4j:local` | env + up + wait + setup + seed (local) |
-| `bun run seed` | Reset local DB and sync farmers to Neo4j |
+| Script                    | Description                               |
+| ------------------------- | ----------------------------------------- |
+| `bun run neo4j:up`        | Start local Docker Neo4j                  |
+| `bun run neo4j:down`      | Stop local Docker Neo4j                   |
+| `bun run neo4j:logs`      | Tail Neo4j container logs                 |
+| `bun run neo4j:setup`     | Wait, apply constraints, optional `--gds` |
+| `bun run neo4j:verify`    | JSON connectivity + graph stats           |
+| `bun run neo4j:env:local` | Merge local Neo4j vars into `.env`        |
+| `bun run neo4j:env:aura`  | Merge Aura Neo4j vars into `.env`         |
+| `bun run neo4j:wait`      | Wait for Docker healthcheck               |
+| `bun run neo4j:aura`      | setup + seed (Aura, no Docker)            |
+| `bun run neo4j:local`     | env + up + wait + setup + seed (local)    |
+| `bun run seed`            | Reset local DB and sync farmers to Neo4j  |
 
 ---
 
@@ -216,14 +216,14 @@ Do not run local Docker and Aura at the same time in `.env` — point `.env` at 
 
 ## Troubleshooting
 
-| Symptom | Fix |
-| ------- | --- |
-| `not configured` | Set both `NEO4J_URI` and `NEO4J_PASSWORD` in `.env` |
-| Connection refused (local) | `bun run neo4j:up`, wait ~30s, retry `neo4j:verify` |
-| Auth failed | Match password to Docker (`mizizi-local-dev`) or Aura console |
-| TLS errors locally | Use `bolt://` not `neo4j+s://` for Docker |
-| Empty graph UI | Run `bun run seed`; open `/app/graph?farmerId=f-001` |
-| Source shows `local` | Neo4j unreachable; app fell back to `.data/mizizi-db.json` |
+| Symptom                    | Fix                                                           |
+| -------------------------- | ------------------------------------------------------------- |
+| `not configured`           | Set both `NEO4J_URI` and `NEO4J_PASSWORD` in `.env`           |
+| Connection refused (local) | `bun run neo4j:up`, wait ~30s, retry `neo4j:verify`           |
+| Auth failed                | Match password to Docker (`mizizi-local-dev`) or Aura console |
+| TLS errors locally         | Use `bolt://` not `neo4j+s://` for Docker                     |
+| Empty graph UI             | Run `bun run seed`; open `/app/graph?farmerId=f-001`          |
+| Source shows `local`       | Neo4j unreachable; app fell back to `.data/mizizi-db.json`    |
 
 ---
 

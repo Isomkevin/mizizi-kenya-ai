@@ -8,7 +8,7 @@ const examplePath = join(root, ".env.masumi.example");
 const MASUMI_VARS = `
 # Masumi agentic data collection
 MASUMI_MODE=demo
-MASUMI_AGENTS_URL=http://localhost:8080
+MASUMI_AGENTS_URL=http://localhost:8088
 MASUMI_CALLBACK_SECRET=mizizi-dev-callback-secret
 # MASUMI_PAYMENT_URL=http://localhost:3001/api/v1
 # MASUMI_PAYMENT_API_KEY=

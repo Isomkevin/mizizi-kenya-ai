@@ -42,7 +42,7 @@ export const serverEnv = {
     if (mode === "live" || mode === "demo" || mode === "disabled") return mode;
     return env("MASUMI_AGENTS_URL") ? "demo" : "disabled";
   },
-  masumiAgentsUrl: () => env("MASUMI_AGENTS_URL") ?? "http://localhost:8080",
+  masumiAgentsUrl: () => env("MASUMI_AGENTS_URL") ?? "http://localhost:8088",
   masumiPaymentUrl: () => env("MASUMI_PAYMENT_URL") ?? "http://localhost:3001/api/v1",
   masumiPaymentApiKey: () => env("MASUMI_PAYMENT_API_KEY"),
   masumiCallbackSecret: () => env("MASUMI_CALLBACK_SECRET") ?? "mizizi-dev-callback-secret",

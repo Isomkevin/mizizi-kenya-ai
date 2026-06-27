@@ -21,10 +21,11 @@ export function MasumiAgentsPanel({ className }: { className?: string }) {
           </p>
           <h3 className="font-display text-xl">Agentic data collection</h3>
           <p className="text-sm text-muted-foreground">
-            Mode{" "}
-            <strong className="text-foreground">{status?.mode ?? "loading…"}</strong>
+            Mode <strong className="text-foreground">{status?.mode ?? "loading…"}</strong>
             {status?.paymentConnected ? " · Payment node connected" : ""}
-            {status ? ` · ${status.jobsPending} pending · ${status.jobsCompleted24h} delivered (24h)` : ""}
+            {status
+              ? ` · ${status.jobsPending} pending · ${status.jobsCompleted24h} delivered (24h)`
+              : ""}
           </p>
         </div>
         <Button
