@@ -394,11 +394,7 @@ const farmerSeeds: FarmerSeed[] = [
     parcelHa: 3.4,
     recommendation: "approve",
     officerRecommendation: "Fast-track approval",
-    trustIndicators: [
-      "Excellent repayment score",
-      "Strong peer network",
-      "Stable climate signal",
-    ],
+    trustIndicators: ["Excellent repayment score", "Strong peer network", "Stable climate signal"],
     dataCompleteness: 98,
     sourceFreshness: "2h ago",
     phone: "+254700000006",

@@ -1,8 +1,5 @@
 import type { FarmerProfile } from "@/api/types";
-import {
-  formatFactorDirection,
-  formatFactorInfluence,
-} from "@/lib/risk-display";
+import { formatFactorDirection, formatFactorInfluence } from "@/lib/risk-display";
 
 export function FarmerOverviewTab({ farmer }: { farmer: FarmerProfile }) {
   return (

@@ -58,10 +58,7 @@ export function mapNeo4jGraph(
     type: rel.type,
     properties: rel.properties
       ? Object.fromEntries(
-          Object.entries(rel.properties).map(([key, value]) => [
-            key,
-            serializeProperty(value),
-          ]),
+          Object.entries(rel.properties).map(([key, value]) => [key, serializeProperty(value)]),
         )
       : undefined,
   }));

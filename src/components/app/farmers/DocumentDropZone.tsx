@@ -53,8 +53,8 @@ export function DocumentDropZone({ farmerId, className }: DocumentDropZoneProps)
       <div>
         <h3 className="font-display text-xl">Upload documents</h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Drop borrower files here — Mizizi will classify them automatically. You confirm before they
-          are linked to the profile.
+          Drop borrower files here — Mizizi will classify them automatically. You confirm before
+          they are linked to the profile.
         </p>
       </div>
 

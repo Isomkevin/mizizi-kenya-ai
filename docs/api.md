@@ -21,10 +21,12 @@ Phase 0 adds TanStack Start server functions as the primary data access layer fo
 
 ## Graph
 
-- `getGraphFn` (`GET`, input `{ farmerId }`)  
-  Returns stored graph payload for a farmer.
-- `expandGraphFn` (`GET`, input `{ rootId, depth }`)  
+- `getGraphFn` (`GET`, input `{ farmerId, depth? }`)
+  Returns farmer subgraph from Neo4j when configured (default depth 2), else stored local payload.
+- `expandGraphFn` (`GET`, input `{ rootId, depth }`)
   Expands graph neighborhood using Neo4j when configured; otherwise local fallback payload.
+- `verifyNeo4jFn` (`GET`)
+  Returns Neo4j connectivity status for ops.
 
 ## Decisions
 

@@ -1,6 +1,7 @@
 import { resetDb } from "@/server/db/local-store";
 import { refreshClimate } from "@/server/services/analytics";
-import { syncFarmerToGraph } from "@/server/services/neo4j";
+import { tryRefreshGdsTrustScores } from "@/server/services/neo4j-evidence";
+import { syncFarmerToGraph, verifyNeo4jConnectivity } from "@/server/services/neo4j";
 import { getPersistence } from "@/server/services/persistence";
 
 const COUNTY_CENTROIDS: Record<string, { lat: number; lon: number }> = {
@@ -43,9 +44,21 @@ async function run(): Promise<void> {
   }
 
   await getPersistence().saveDb(await getPersistence().getDb());
+
+  const neo4jStatus = await verifyNeo4jConnectivity();
+  const gds = neo4jStatus.connected ? await tryRefreshGdsTrustScores() : null;
+
   console.log(
     `Seed complete for tenant ${db.tenantId}: ${db.farmers.length} farmers, ${db.decisions.length} decisions, ${Object.keys(db.graphs).length} graphs, ${graphSynced} graph syncs, ${climatePrimed} county climate refreshes.`,
   );
+  console.log(
+    `Neo4j: ${neo4jStatus.connected ? "connected" : "not configured"} — ${neo4jStatus.message}`,
+  );
+  if (gds) {
+    console.log(
+      `GDS trust refresh: ${gds.gdsAvailable ? `${gds.updated} cooperative properties updated` : "plugin unavailable (using Cypher metrics)"}`,
+    );
+  }
 }
 
 run().catch((error) => {

@@ -18,12 +18,32 @@ export async function listDecisions(input: DecisionListInput = {}): Promise<Deci
 
 export async function getDecision(id: string): Promise<DecisionDetail | null> {
   const decision = await getPersistence().getDecisionById(id);
-  if (decision) return decision;
+  if (decision) {
+    const needsEvidence = decision.factors.some(
+      (factor) =>
+        !factor.graphEvidence?.length && Boolean(factor.graphPath?.length || factor.source),
+    );
+    if (needsEvidence) {
+      const farmer = await getPersistence().getFarmerById(decision.farmerId);
+      if (farmer) {
+        const assessment = await assessFarmerRisk(farmer);
+        const enriched: DecisionDetail = {
+          ...decision,
+          factors: assessment.factors,
+          positiveSignals: assessment.positiveSignals,
+          negativeSignals: assessment.negativeSignals,
+        };
+        await getPersistence().upsertDecision(enriched);
+        return enriched;
+      }
+    }
+    return decision;
+  }
 
   const farmer = await getPersistence().getFarmerById(id);
   if (!farmer) return null;
 
-  const assessment = assessFarmerRisk(farmer);
+  const assessment = await assessFarmerRisk(farmer);
   const explanation = await generateGroundedExplanation({
     farmer,
     recommendation: assessment.recommendation,
@@ -75,7 +95,7 @@ export async function submitDecision(input: SubmitDecisionInput): Promise<Decisi
   }
 
   const farmer = await persistence.getFarmerById(current.farmerId);
-  const assessment = farmer ? assessFarmerRisk(farmer) : null;
+  const assessment = farmer ? await assessFarmerRisk(farmer) : null;
   const explanation = farmer
     ? await generateGroundedExplanation({
         farmer,

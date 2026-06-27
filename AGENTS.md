@@ -25,15 +25,15 @@ Quality bar: intentional, editorial, infrastructure-grade UI — not generic Saa
 
 ## Stack
 
-| Layer           | Choice                                                 |
-| --------------- | ------------------------------------------------------ |
-| Framework       | TanStack Start (file-based routes in `src/routes/`)    |
-| UI              | React 19, shadcn/ui primitives in `src/components/ui/` |
-| Styling         | Tailwind CSS v4 tokens in `src/styles.css`             |
-| Charts          | Recharts (via shadcn chart components)                 |
-| Graph (Phase 4) | `react-force-graph-2d`                                 |
+| Layer           | Choice                                                               |
+| --------------- | -------------------------------------------------------------------- |
+| Framework       | TanStack Start (file-based routes in `src/routes/`)                  |
+| UI              | React 19, shadcn/ui primitives in `src/components/ui/`               |
+| Styling         | Tailwind CSS v4 tokens in `src/styles.css`                           |
+| Charts          | Recharts (via shadcn chart components)                               |
+| Graph (Phase 4) | `react-force-graph-2d`                                               |
 | Data (current)  | Local-first persisted seed + Supabase/Neo4j adapters (`src/server/`) |
-| Package manager | Bun                                                    |
+| Package manager | Bun                                                                  |
 
 ## Documentation map
 

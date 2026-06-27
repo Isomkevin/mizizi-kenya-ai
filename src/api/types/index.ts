@@ -248,6 +248,13 @@ export interface DecisionSummary {
   createdAt: string;
 }
 
+export interface GraphEvidenceStep {
+  nodeId: string;
+  label: string;
+  type: string;
+  relationship?: string;
+}
+
 export interface DecisionFactor {
   id: string;
   label: string;
@@ -256,6 +263,7 @@ export interface DecisionFactor {
   confidence: number;
   source: string;
   graphPath?: string[];
+  graphEvidence?: GraphEvidenceStep[];
 }
 
 export interface TimelineEvent {
@@ -381,6 +389,11 @@ export interface GraphEdge {
 export interface GraphPayload {
   nodes: GraphNode[];
   edges: GraphEdge[];
+  meta?: {
+    source: "neo4j" | "local";
+    depth?: number;
+    syncedAt?: string;
+  };
 }
 
 export interface DecisionDetail {

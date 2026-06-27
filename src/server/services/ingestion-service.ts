@@ -54,10 +54,10 @@ function extractionFromDocument(document: DocumentRecord): DocumentExtractionRes
   };
 }
 
-function applyExtractionToFarmer(
+async function applyExtractionToFarmer(
   farmer: FarmerProfile,
   extraction: DocumentExtractionResult,
-): FarmerProfile {
+): Promise<FarmerProfile> {
   const cooperativeName =
     extraction.extractedFields.cooperativeName ?? extraction.extractedFields.cooperative;
   const parcelHa = extraction.extractedFields.parcelHa;
@@ -81,7 +81,7 @@ function applyExtractionToFarmer(
     ),
   };
 
-  const assessment = assessFarmerRisk(updated);
+  const assessment = await assessFarmerRisk(updated);
   return {
     ...updated,
     risk: assessment.risk,
@@ -256,7 +256,7 @@ export async function confirmDocumentClassification(
   }
 
   const extraction = extractionFromDocument(current);
-  const updatedFarmer = applyExtractionToFarmer(farmer, extraction);
+  const updatedFarmer = await applyExtractionToFarmer(farmer, extraction);
 
   const confirmed: DocumentRecord = {
     ...current,

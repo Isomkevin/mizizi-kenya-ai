@@ -26,7 +26,7 @@ export async function syncFarmerDataGaps(farmer: FarmerProfile): Promise<FarmerP
     insufficientData,
   };
 
-  const assessment = assessFarmerRisk(updated);
+  const assessment = await assessFarmerRisk(updated);
   return {
     ...updated,
     risk: assessment.risk,

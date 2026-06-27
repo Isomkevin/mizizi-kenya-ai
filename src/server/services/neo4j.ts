@@ -8,6 +8,7 @@ import type {
 } from "@/api/types";
 import { getDb } from "@/server/db/local-store";
 import { serverEnv } from "@/server/env";
+import { fetchFarmerSubgraphFromNeo4j } from "@/server/services/neo4j-evidence";
 import { getPersistence } from "@/server/services/persistence";
 
 let driver: Driver | null | undefined;
@@ -281,64 +282,33 @@ export async function syncDocumentToGraph(
 }
 
 export async function getSubgraph(rootId: string, depth = 1): Promise<GraphPayload> {
+  const fromNeo4j = await fetchFarmerSubgraphFromNeo4j(rootId, depth);
+  if (fromNeo4j?.nodes.length) {
+    await getPersistence().saveGraphByFarmerId(rootId, fromNeo4j);
+    return fromNeo4j;
+  }
+
+  const db = await getDb();
+  const local = db.graphs[rootId] ?? { nodes: [], edges: [] };
+  return { ...local, meta: { source: "local", depth } };
+}
+
+export async function verifyNeo4jConnectivity(): Promise<{
+  connected: boolean;
+  message: string;
+}> {
   const activeDriver = getNeo4jDriver();
   if (!activeDriver) {
-    const db = await getDb();
-    return db.graphs[rootId] ?? { nodes: [], edges: [] };
+    return { connected: false, message: "Neo4j credentials are not configured." };
   }
 
   const session = activeDriver.session();
   try {
-    const result = await session.run(
-      `
-      MATCH path = (root {id: $rootId})-[*1..$depth]-(neighbor)
-      WITH collect(path) AS paths
-      UNWIND paths AS p
-      UNWIND nodes(p) AS n
-      WITH collect(DISTINCT n) AS nodes, paths
-      UNWIND paths AS p2
-      UNWIND relationships(p2) AS r
-      WITH nodes, collect(DISTINCT r) AS rels
-      RETURN nodes, rels
-      `,
-      { rootId, depth: neo4j.int(Math.max(1, depth)) },
-    );
-
-    const record = result.records[0];
-    if (!record) return { nodes: [], edges: [] };
-
-    const nodes = (
-      record.get("nodes") as Array<{ properties: Record<string, unknown>; labels: string[] }>
-    ).map((node) => ({
-      id: String(node.properties.id),
-      label: String(node.properties.name ?? node.properties.id),
-      type: String(node.labels[0] ?? "Entity"),
-      properties: Object.fromEntries(
-        Object.entries(node.properties).map(([key, value]) => [
-          key,
-          typeof value === "object" ? String(value) : (value as string | number),
-        ]),
-      ),
-    }));
-
-    const edges = (
-      record.get("rels") as Array<{
-        elementId: string;
-        startNodeElementId: string;
-        endNodeElementId: string;
-        type: string;
-      }>
-    ).map((rel) => ({
-      id: rel.elementId,
-      source: rel.startNodeElementId,
-      target: rel.endNodeElementId,
-      type: rel.type,
-    }));
-
-    return { nodes, edges };
-  } catch {
-    const db = await getDb();
-    return db.graphs[rootId] ?? { nodes: [], edges: [] };
+    await session.run("RETURN 1 AS ok");
+    return { connected: true, message: "Neo4j connection verified." };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Neo4j connectivity check failed.";
+    return { connected: false, message };
   } finally {
     await session.close();
   }

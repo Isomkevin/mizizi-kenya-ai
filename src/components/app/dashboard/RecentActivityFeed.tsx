@@ -87,7 +87,8 @@ function ActivityRow({ item }: { item: ActivityItem }) {
       </div>
       {open ? (
         <div className="ml-[4.75rem] mt-2 rounded-lg border border-border bg-background p-3 text-xs text-muted-foreground">
-          Full audit trail and linked records open from the borrower profile or application workspace.
+          Full audit trail and linked records open from the borrower profile or application
+          workspace.
         </div>
       ) : null}
     </li>

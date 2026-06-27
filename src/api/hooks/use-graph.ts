@@ -10,13 +10,13 @@ function withGraphFallback(payload: GraphPayload): GraphPayload {
   return payload.nodes.length > 0 ? payload : graphPayload;
 }
 
-export function useGraph(farmerId?: string) {
+export function useGraph(farmerId?: string, depth = 2) {
   const resolvedFarmerId = farmerId ?? DEFAULT_GRAPH_FARMER_ID;
   return useQuery({
-    queryKey: ["graph", "base", resolvedFarmerId],
+    queryKey: ["graph", "base", resolvedFarmerId, depth],
     queryFn: async () => {
       try {
-        const payload = await getGraphFn({ data: { farmerId: resolvedFarmerId } });
+        const payload = await getGraphFn({ data: { farmerId: resolvedFarmerId, depth } });
         return withGraphFallback(payload);
       } catch {
         return graphPayload;
@@ -25,7 +25,7 @@ export function useGraph(farmerId?: string) {
   });
 }
 
-export function useExpandedGraph(rootId?: string, depth = 1) {
+export function useExpandedGraph(rootId?: string, depth = 2) {
   return useQuery({
     queryKey: ["graph", "expanded", rootId, depth],
     queryFn: async () => {

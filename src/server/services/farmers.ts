@@ -1,6 +1,6 @@
 import type { CreateFarmerInput, FarmerProfile, SearchResult } from "@/api/types";
 import { getPersistence } from "@/server/services/persistence";
-import { assessFarmerRisk } from "@/server/services/risk-engine";
+import { assessFarmerRisk, computeBaseRiskAssessment } from "@/server/services/risk-engine";
 import { syncFarmerDataGaps } from "@/server/services/farmer-gaps";
 
 export type FarmerSearchInput = {
@@ -100,7 +100,7 @@ function buildNewFarmerProfile(input: CreateFarmerInput, id: string): FarmerProf
     },
   };
 
-  const assessment = assessFarmerRisk(draft);
+  const assessment = computeBaseRiskAssessment(draft);
   return {
     ...draft,
     risk: assessment.risk,

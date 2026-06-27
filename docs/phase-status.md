@@ -6,15 +6,15 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 
 ## Phase overview
 
-| Phase | Scope                                           | Status      |
-| ----- | ----------------------------------------------- | ----------- |
-| 0     | Full-stack foundation (auth/schema/seed/BFF)    | **Done**    |
-| 1     | Design system, landing page, app route scaffold | **Done**    |
-| 2     | Enterprise app shell + dashboard                | **Done**    |
-| 3     | Farmer intelligence                             | **Done**    |
-| 4     | Graph intelligence workspace                    | **Done**    |
-| 5     | Explainability workspace                        | **Done**    |
-| 6     | Analytics platform                              | **Done**    |
+| Phase | Scope                                           | Status   |
+| ----- | ----------------------------------------------- | -------- |
+| 0     | Full-stack foundation (auth/schema/seed/BFF)    | **Done** |
+| 1     | Design system, landing page, app route scaffold | **Done** |
+| 2     | Enterprise app shell + dashboard                | **Done** |
+| 3     | Farmer intelligence                             | **Done** |
+| 4     | Graph intelligence workspace                    | **Done** |
+| 5     | Explainability workspace                        | **Done** |
+| 6     | Analytics platform                              | **Done** |
 
 ## Phase 0 — Done
 
@@ -76,8 +76,18 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 ## Next priorities
 
 - Harden production Supabase auth session flows (replace dev bypass in production runtime)
-- Expand Neo4j online queries and GDS jobs beyond seeded local fallbacks
 - Add decision pipeline tests for risk/explanation grounding and audit transitions
+
+## Neo4j integration — Done (2026-06-27)
+
+- [x] Neo4j-first `getGraph` reads with local cache fallback
+- [x] Fixed subgraph node/edge ID mapping for force-graph canvas
+- [x] Verified `graphEvidence` on decision factors (Cypher paths + local fallback)
+- [x] Async risk engine enriched with live graph metrics (degree, documents, optional GDS trust)
+- [x] Grounded explanations cite verified graph evidence; insufficient-data guard per PRD
+- [x] Graph workspace depth control (1–3) and data-source badge
+- [x] Extended constraints for Document, FarmParcel, DataSource
+- [x] Optional GDS PageRank script + seed-time refresh when plugin available
 
 ## Technical debt / notes
 

@@ -22,8 +22,9 @@ export const Route = createFileRoute("/app/graph")({
 function GraphWorkspace() {
   const { farmerId } = Route.useSearch();
   const [query, setQuery] = useState("");
+  const [depth, setDepth] = useState(2);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
-  const { data: graph } = useGraph(farmerId);
+  const { data: graph } = useGraph(farmerId, depth);
 
   const filteredGraph = useMemo(() => {
     if (!graph) return null;
@@ -56,8 +57,14 @@ function GraphWorkspace() {
       <GraphToolbar
         farmerId={farmerId}
         query={query}
+        depth={depth}
+        graphMeta={graph?.meta}
         onQueryChange={setQuery}
-        onReset={() => setQuery("")}
+        onDepthChange={setDepth}
+        onReset={() => {
+          setQuery("");
+          setDepth(2);
+        }}
       />
 
       <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">

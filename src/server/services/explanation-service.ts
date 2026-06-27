@@ -1,4 +1,5 @@
 import type { DecisionFactor, FarmerProfile } from "@/api/types";
+import { summarizeGraphEvidenceForPrompt } from "@/server/services/neo4j-evidence";
 import { serverEnv } from "@/server/env";
 
 interface ExplanationInput {
@@ -16,7 +17,15 @@ export interface GeneratedExplanation {
   source: "template" | "openai";
 }
 
+const INSUFFICIENT_EVIDENCE =
+  "Additional data is required before a reliable explanation can be generated.";
+
+function hasVerifiedGraphEvidence(factors: DecisionFactor[]): boolean {
+  return factors.some((factor) => (factor.graphEvidence?.length ?? 0) > 0);
+}
+
 function groundedTemplate(input: ExplanationInput): GeneratedExplanation {
+  const verifiedEvidence = summarizeGraphEvidenceForPrompt(input.factors);
   const topFactors = input.factors
     .slice()
     .sort((a, b) => b.weight - a.weight)
@@ -24,13 +33,26 @@ function groundedTemplate(input: ExplanationInput): GeneratedExplanation {
     .map((factor) => `${factor.label} (${Math.round(factor.weight * 100)}%)`)
     .join(", ");
 
+  if (!hasVerifiedGraphEvidence(input.factors) && input.farmer.dataCompleteness < 60) {
+    return {
+      officerExplanation: INSUFFICIENT_EVIDENCE,
+      farmerExplanation: INSUFFICIENT_EVIDENCE,
+      source: "template",
+    };
+  }
+
+  const evidenceSummary = verifiedEvidence.length
+    ? `Verified graph paths: ${verifiedEvidence.map((entry) => entry.path).join("; ")}.`
+    : "Graph evidence is limited to stored profile relationships.";
+
   const officerExplanation = [
     `Recommendation: ${input.recommendation.replace(/_/g, " ")}.`,
     `Confidence: ${Math.round(input.confidence * 100)}%.`,
     `Top factors: ${topFactors || "No factor data available"}.`,
+    evidenceSummary,
     input.negativeSignals.length ? `Primary risk alerts: ${input.negativeSignals.join(" ")}` : "",
     input.positiveSignals.length ? `Primary stabilizers: ${input.positiveSignals.join(" ")}` : "",
-    "Grounding note: this explanation is generated strictly from stored risk factors and profile evidence.",
+    "Grounding note: this explanation is generated strictly from stored risk factors and verified graph evidence.",
   ]
     .filter(Boolean)
     .join(" ");
@@ -39,10 +61,18 @@ function groundedTemplate(input: ExplanationInput): GeneratedExplanation {
     `Your application is currently marked as ${input.recommendation.replace(/_/g, " ")}.`,
     `Confidence is ${Math.round(input.confidence * 100)}%.`,
     `The strongest drivers are ${topFactors || "available repayment, climate, and profile signals"}.`,
+    verifiedEvidence.length
+      ? `Supporting graph links: ${verifiedEvidence
+          .slice(0, 2)
+          .map((entry) => entry.path)
+          .join("; ")}.`
+      : "",
     input.negativeSignals.length
       ? `We flagged: ${input.negativeSignals.slice(0, 2).join(" ")}`
       : "No major risk flags were detected from the latest data.",
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return { officerExplanation, farmerExplanation, source: "template" };
 }
@@ -50,6 +80,7 @@ function groundedTemplate(input: ExplanationInput): GeneratedExplanation {
 export async function generateGroundedExplanation(
   input: ExplanationInput,
 ): Promise<GeneratedExplanation> {
+  const verifiedEvidence = summarizeGraphEvidenceForPrompt(input.factors);
   const apiKey = serverEnv.openAiKey();
   if (!apiKey) return groundedTemplate(input);
 
@@ -64,9 +95,13 @@ export async function generateGroundedExplanation(
       weight: factor.weight,
       confidence: factor.confidence,
       source: factor.source,
+      graphEvidence: factor.graphEvidence ?? [],
     })),
+    verifiedGraphEvidence: verifiedEvidence,
     positiveSignals: input.positiveSignals,
     negativeSignals: input.negativeSignals,
+    insufficientEvidence:
+      !hasVerifiedGraphEvidence(input.factors) && input.farmer.dataCompleteness < 60,
   };
 
   try {
@@ -83,7 +118,7 @@ export async function generateGroundedExplanation(
           {
             role: "system",
             content:
-              "Return concise grounded credit explanations only from provided JSON facts. If facts are missing, say unavailable.",
+              "Return concise grounded credit explanations only from provided JSON facts and verified graph evidence. Never invent facts. If insufficientEvidence is true, return the exact sentence: Additional data is required before a reliable explanation can be generated.",
           },
           {
             role: "user",

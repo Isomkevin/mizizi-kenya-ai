@@ -1,4 +1,8 @@
 import type { DecisionDetail, DecisionFactor, FarmerProfile, RiskLevel } from "@/api/types";
+import {
+  enrichFactorsWithGraphEvidence,
+  getFarmerGraphMetrics,
+} from "@/server/services/neo4j-evidence";
 
 export interface RiskAssessment {
   recommendation: DecisionDetail["recommendation"];
@@ -7,6 +11,12 @@ export interface RiskAssessment {
   factors: DecisionFactor[];
   positiveSignals: string[];
   negativeSignals: string[];
+  graphMetrics?: {
+    degree: number;
+    documentCount: number;
+    source: "neo4j" | "local";
+    gdsAvailable: boolean;
+  };
 }
 
 const SCORE_TO_RISK: Array<{ max: number; level: RiskLevel }> = [
@@ -45,11 +55,19 @@ function confidenceForScore(score: number): number {
   return Number(Math.max(0.55, Math.min(0.98, value)).toFixed(2));
 }
 
-export function assessFarmerRisk(farmer: FarmerProfile): RiskAssessment {
+function countyZoneId(county: string): string {
+  return `zone-${county.toLowerCase().replace(/\s+/g, "-")}`;
+}
+
+export function computeBaseRiskAssessment(
+  farmer: FarmerProfile,
+  graphDegree?: number,
+): Omit<RiskAssessment, "graphMetrics"> {
   const droughtPenalty = Math.round(farmer.climate.droughtProbability * 35);
   const overduePenalty = farmer.repayments.some((repayment) => !repayment.onTime) ? 14 : 0;
   const completenessPenalty = Math.max(0, Math.round((100 - farmer.dataCompleteness) / 2.5));
-  const graphBonus = Math.min(12, Math.round(farmer.graphConnections / 2));
+  const effectiveConnections = graphDegree ?? farmer.graphConnections;
+  const graphBonus = Math.min(12, Math.round(effectiveConnections / 2));
   const confidenceBonus = Math.round(farmer.confidence * 8);
   const score = Math.max(
     0,
@@ -65,7 +83,7 @@ export function assessFarmerRisk(farmer: FarmerProfile): RiskAssessment {
       weight: Math.max(0.08, droughtPenalty / 100),
       confidence: 0.9,
       source: "climate_observations",
-      graphPath: [farmer.id, `zone-${farmer.county.toLowerCase().replace(/\s+/g, "-")}`],
+      graphPath: [farmer.id, countyZoneId(farmer.county)],
     },
     {
       id: `${farmer.id}-rf-repayment`,
@@ -83,6 +101,7 @@ export function assessFarmerRisk(farmer: FarmerProfile): RiskAssessment {
       weight: 0.16,
       confidence: 0.88,
       source: "profile_quality",
+      graphPath: farmer.documents[0] ? [farmer.id, farmer.documents[0].id] : [farmer.id],
     },
     {
       id: `${farmer.id}-rf-network`,
@@ -101,7 +120,7 @@ export function assessFarmerRisk(farmer: FarmerProfile): RiskAssessment {
     farmer.repayments.every((repayment) => repayment.onTime)
       ? "No late repayments detected in recent history."
       : "",
-    farmer.graphConnections >= 10 ? "Strong relationship graph coverage." : "",
+    effectiveConnections >= 10 ? "Strong relationship graph coverage." : "",
   ].filter(Boolean);
 
   const negativeSignals = [
@@ -119,5 +138,29 @@ export function assessFarmerRisk(farmer: FarmerProfile): RiskAssessment {
     factors,
     positiveSignals,
     negativeSignals,
+  };
+}
+
+export async function assessFarmerRisk(farmer: FarmerProfile): Promise<RiskAssessment> {
+  const metrics = await getFarmerGraphMetrics(farmer.id, farmer);
+  const base = computeBaseRiskAssessment(farmer, metrics.degree);
+
+  if (metrics.cooperativePagerank !== null && metrics.cooperativePagerank >= 0.15) {
+    base.positiveSignals.push(
+      `Cooperative trust score elevated (${metrics.cooperativePagerank.toFixed(2)}).`,
+    );
+  }
+
+  const factors = await enrichFactorsWithGraphEvidence(farmer.id, base.factors);
+
+  return {
+    ...base,
+    factors,
+    graphMetrics: {
+      degree: metrics.degree,
+      documentCount: metrics.documentCount,
+      source: metrics.source,
+      gdsAvailable: metrics.gdsAvailable,
+    },
   };
 }

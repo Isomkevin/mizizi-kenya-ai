@@ -56,10 +56,7 @@ function AnalyticsPage() {
             />
             <MetricCard label="Applications" value={data.executive.applications.toLocaleString()} />
             <MetricCard label="Approval rate" value={`${data.executive.approvalRate}%`} />
-            <MetricCard
-              label="Profiles fully linked"
-              value={`${data.executive.graphCoverage}%`}
-            />
+            <MetricCard label="Profiles fully linked" value={`${data.executive.graphCoverage}%`} />
           </div>
         </TabsContent>
 

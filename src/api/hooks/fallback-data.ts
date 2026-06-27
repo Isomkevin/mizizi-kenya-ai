@@ -60,7 +60,13 @@ export const dashboardPayload: DashboardPayload = {
       trend: "down",
       href: "/app/portfolio",
     },
-    { id: "confidence", label: "Recommendation strength", value: "Strong", delta: "91% avg.", trend: "up" },
+    {
+      id: "confidence",
+      label: "Recommendation strength",
+      value: "Strong",
+      delta: "91% avg.",
+      trend: "up",
+    },
     {
       id: "farmers",
       label: "Borrowers on file",
