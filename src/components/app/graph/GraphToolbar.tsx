@@ -1,6 +1,5 @@
 import { Search } from "lucide-react";
 
-import type { GraphPayload } from "@/api/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,7 +14,6 @@ interface GraphToolbarProps {
   farmerId?: string;
   query: string;
   depth: number;
-  graphMeta?: GraphPayload["meta"];
   onQueryChange: (value: string) => void;
   onDepthChange: (depth: number) => void;
   onReset: () => void;
@@ -25,7 +23,6 @@ export function GraphToolbar({
   farmerId,
   query,
   depth,
-  graphMeta,
   onQueryChange,
   onDepthChange,
   onReset,
@@ -42,23 +39,18 @@ export function GraphToolbar({
         />
       </div>
       <Select value={String(depth)} onValueChange={(value) => onDepthChange(Number(value))}>
-        <SelectTrigger className="h-9 w-[130px]">
-          <SelectValue placeholder="Depth" />
+        <SelectTrigger className="h-9 w-[160px]">
+          <SelectValue placeholder="Link range" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="1">Depth 1</SelectItem>
-          <SelectItem value="2">Depth 2</SelectItem>
-          <SelectItem value="3">Depth 3</SelectItem>
+          <SelectItem value="1">Direct links only</SelectItem>
+          <SelectItem value="2">Up to 2 links away</SelectItem>
+          <SelectItem value="3">Up to 3 links away</SelectItem>
         </SelectContent>
       </Select>
       {farmerId ? (
         <span className="rounded-md border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-          Focused borrower
-        </span>
-      ) : null}
-      {graphMeta ? (
-        <span className="rounded-md border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-          Source {graphMeta.source}
+          Borrower in focus
         </span>
       ) : null}
       <Button type="button" variant="outline" size="sm" onClick={onReset}>

@@ -106,7 +106,7 @@ function buildTimeline(seed: FarmerSeed): TimelineEvent[] {
       timestamp: "2026-06-12T10:10:00Z",
       category: "decision",
       title: "Credit recommendation generated",
-      description: `Credit recommendation prepared for ${farmer.name}.`,
+      description: `Credit recommendation prepared for ${seed.name}.`,
     },
   ];
 }

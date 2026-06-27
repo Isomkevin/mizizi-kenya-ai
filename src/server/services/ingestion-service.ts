@@ -86,6 +86,7 @@ async function applyExtractionToFarmer(
     ...updated,
     risk: assessment.risk,
     confidence: assessment.confidence,
+    recommendation: assessment.recommendation,
     contributingFactors: assessment.factors.length
       ? assessment.factors
       : updated.contributingFactors,
