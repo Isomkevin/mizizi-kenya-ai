@@ -21,9 +21,7 @@ export async function processMasumiWebhookRequest(request: Request): Promise<Res
 
   try {
     const payload = (await request.json()) as Record<string, unknown>;
-    const result = await handleMasumiWebhook(
-      payload as Parameters<typeof handleMasumiWebhook>[0],
-    );
+    const result = await handleMasumiWebhook(payload as Parameters<typeof handleMasumiWebhook>[0]);
     return new Response(JSON.stringify(result), {
       status: result.ok ? 200 : 400,
       headers: { "content-type": "application/json" },

@@ -102,7 +102,8 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] Aura setup path (`bun run neo4j:aura`, `.env.neo4j.aura.example`)
 - [x] Env merge helpers (`bun run neo4j:env:local` / `neo4j:env:aura`)
 - [x] Graph UI Neo4j connection status (`GraphConnectionStatus` on `/app/graph`)
-- [x] `docs/neo4j.md` — local + Aura runbooks
+- [x] `docs/neo4j-implementation.md` — external-facing Neo4j architecture & evidence document
+- [x] `docs/neo4j.md` — developer setup runbook (local + Aura)
 
 ## Technical debt / notes
 

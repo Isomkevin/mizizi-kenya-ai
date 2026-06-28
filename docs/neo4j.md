@@ -227,9 +227,10 @@ Do not run local Docker and Aura at the same time in `.env` — point `.env` at 
 
 ---
 
-## Code references
+## Related documentation
 
-- Driver: `src/server/services/neo4j.ts`
-- Evidence / subgraph queries: `src/server/services/neo4j-evidence.ts`
-- Graph model: [graph-model.md](./graph-model.md)
-- Constraints: `scripts/neo4j/001_constraints.cypher`
+| Document | Audience |
+| -------- | -------- |
+| [Neo4j implementation (external)](./neo4j-implementation.md) | Partners, auditors, challenge reviewers — full architecture & evidence design |
+| [Graph model reference](./graph-model.md) | Engineers — label and relationship quick reference |
+| [Product specification](./product-spec.md) | Product — full PRD including explainability standards |

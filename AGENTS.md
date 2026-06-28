@@ -40,7 +40,8 @@ Quality bar: intentional, editorial, infrastructure-grade UI — not generic Saa
 | File                                                         | Purpose                                                                            |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
 | [docs/product-spec.md](docs/product-spec.md)                 | Full PRD (~3,800 lines) — product vision, IA, design system, engineering standards |
-| [docs/phase-status.md](docs/phase-status.md)                 | What's shipped vs. next — **read this before picking up work**                     |
+| [docs/neo4j-implementation.md](docs/neo4j-implementation.md) | External Neo4j architecture, evidence pipeline, deployment (no code paths)         |
+| [docs/neo4j.md](docs/neo4j.md)                               | Developer Neo4j setup — local Docker, Aura, troubleshooting                      |
 | [.lovable/plan.md](.lovable/plan.md)                         | Phased build roadmap (Lovable + agents)                                            |
 | [.lovable/skills.md](.lovable/skills.md)                     | How Lovable uses repo agent skills                                                 |
 | [.agents/skills/README.md](.agents/skills/README.md)         | Skill index (Neo4j, Masumi, continue-build, …)                                     |

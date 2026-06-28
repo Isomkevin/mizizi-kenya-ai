@@ -128,7 +128,8 @@ Dev server: `http://localhost:5173` (hot reload).
 
 ### Neo4j (graph intelligence)
 
-Local Docker or Neo4j Aura — full guide: **[docs/neo4j.md](docs/neo4j.md)**
+- **Implementation overview (external):** **[docs/neo4j-implementation.md](docs/neo4j-implementation.md)** — architecture, data model, evidence pipeline, deployment
+- **Developer setup runbook:** **[docs/neo4j.md](docs/neo4j.md)** — local Docker, Aura, env, troubleshooting
 
 ```bash
 # Option A — local (one command after Docker is installed)
@@ -181,6 +182,8 @@ Details and checklists: [docs/phase-status.md](docs/phase-status.md). Phased roa
 
 | Document                                                     | Use when                                                 |
 | ------------------------------------------------------------ | -------------------------------------------------------- |
+| [docs/neo4j-implementation.md](docs/neo4j-implementation.md) | External Neo4j architecture, model, evidence, deployment |
+| [docs/neo4j.md](docs/neo4j.md)                               | Developer setup — local Docker, Aura, troubleshooting    |
 | [docs/product-spec.md](docs/product-spec.md)                 | Product vision, IA, design system, engineering standards |
 | [docs/phase-status.md](docs/phase-status.md)                 | Picking up work — what's done and what's next            |
 | [AGENTS.md](AGENTS.md)                                       | Agent and contributor conventions                        |

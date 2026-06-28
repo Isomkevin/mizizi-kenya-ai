@@ -7,10 +7,7 @@ import {
   runOrchestratorBatch,
 } from "@/server/services/masumi/masumi-service";
 import { listMasumiJobs } from "@/server/services/masumi/job-store";
-import {
-  grantConsentAndSync,
-  revokeConsentAndSync,
-} from "@/server/routes/masumi-api";
+import { grantConsentAndSync, revokeConsentAndSync } from "@/server/routes/masumi-api";
 
 export const getMasumiStatusFn = createServerFn({ method: "GET" }).handler(async () => {
   return getMasumiAgentsStatus();
