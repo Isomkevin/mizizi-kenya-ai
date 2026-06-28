@@ -80,7 +80,8 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] TypeScript `masumi-service` — dispatch, poll, webhook, consent, job store
 - [x] Officer enrichment → Masumi dispatch; consent workflow on farmer profile
 - [x] HTTP routes: `/api/webhooks/masumi-callback`, `/api/agents/status`, orchestrator cron
-- [x] Analytics **Masumi agents** tab; `deploy/masumi/` bundle (Docker Compose + Render blueprint)
+- [x] Analytics **Masumi agents** tab; `deploy/masumi/` bundle (Docker, Render blueprint, deploy docs)
+- [x] `deploy/masumi/` deploy docs (DEPLOY, ENV, LOCAL, payment, agents)
 - [x] `docs/masumi.md` runbook
 
 ## Next priorities
