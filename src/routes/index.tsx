@@ -54,6 +54,7 @@ function LandingPage() {
     <div className="min-h-screen bg-background text-foreground antialiased">
       <Nav />
       <Hero />
+      <DemoVideo />
       <InvisibleFarmer />
       <CostOfFragmentation />
       <MiziziDifference />
@@ -195,6 +196,40 @@ const silos = [
   { label: "NGO Platform", icon: Leaf },
   { label: "Insurance", icon: ShieldCheck },
 ];
+
+function DemoVideo() {
+  return (
+    <section className="border-b border-border/60 bg-canvas">
+      <div className="mx-auto max-w-7xl px-6 py-24">
+        <Reveal>
+          <SectionLabel>01 · Demo</SectionLabel>
+          <h2 className="font-display mt-4 text-balance text-4xl leading-[1.05] md:text-6xl">
+            See Mizizi in action.
+          </h2>
+          <p className="mt-4 max-w-2xl text-muted-foreground">
+            Watch the demo to understand how the platform connects farmer data, climate signals and explainable credit decisions.
+          </p>
+        </Reveal>
+
+        <Reveal delay={120}>
+          <div className="mt-10 overflow-hidden rounded-3xl border border-border bg-background shadow-elevated">
+            <div className="aspect-video w-full">
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/lf699J_fWTo?si=b_DRoafClA0PnZf2"
+                title="Mizizi demo video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 
 function InvisibleFarmer() {
   return (
