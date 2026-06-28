@@ -33,10 +33,10 @@ Related:
 
 | Component | Deploy target | Config in this folder |
 | --------- | ------------- | --------------------- |
-| Python MIP-003 agents | Render | `render.yaml`, `agents/` |
+| Python MIP-003 agents | Render | `blueprint.yaml`, `agents/` |
 | Mizizi TanStack app | Lovable / Vercel / Render (repo root) | Not in this blueprint |
 | Payment Node | Railway (recommended) | `payment/.env.example` |
-| Orchestrator cron | Render (optional) | `render.yaml` |
+| Orchestrator cron | Render (optional) | `blueprint.yaml` |
 
 ---
 
@@ -59,10 +59,12 @@ If Render logs show:
 
 ```text
 load build definition from render.yaml
-dockerfile parse error: unknown instruction: services:
+dockerfile parse error: unknown instruction: envVarGroups:
 ```
 
-you created a **Docker Web Service** with **Dockerfile Path** set to `render.yaml`. That file is a **Blueprint spec**, not a Dockerfile.
+Render is building the **Blueprint YAML** as a **Dockerfile**. See **[RENDER.md](./RENDER.md)** for the exact dashboard fix.
+
+You likely created **Web Service → Docker** with Dockerfile Path set to `render.yaml` or `blueprint.yaml` instead of using **New → Blueprint**.
 
 **Fix:**
 
@@ -72,7 +74,7 @@ you created a **Docker Web Service** with **Dockerfile Path** set to `render.yam
 4. Set **Blueprint file path** to:
 
    ```text
-   deploy/masumi/render.yaml
+   deploy/masumi/blueprint.yaml
    ```
 
 5. Click **Apply**. Render prompts for env vars marked `sync: false` (see [ENV.md](./ENV.md)).
@@ -84,7 +86,7 @@ you created a **Docker Web Service** with **Dockerfile Path** set to `render.yam
 | `mizizi-masumi-agents` | Docker web | Python agents on port 8080 |
 | `mizizi-masumi-orchestrator` | Cron (6h) | POST batch orchestrator on Mizizi web |
 
-Docker build uses `agents/Dockerfile` via `rootDir: deploy/masumi/agents` — not `render.yaml`.
+Docker build uses `deploy/masumi/agents/Dockerfile` — not `blueprint.yaml`.
 
 ### Verify agents
 
@@ -136,12 +138,12 @@ Use registration URLs from [agents/README.md](./agents/README.md). Set `MASUMI_M
 
 | Symptom | Cause | Fix |
 | ------- | ----- | --- |
-| `unknown instruction: services:` | Docker service using `render.yaml` as Dockerfile | Delete service; redeploy via **Blueprint** with path `deploy/masumi/render.yaml` |
+| `unknown instruction: envVarGroups:` | Blueprint YAML used as Dockerfile | Delete service; see [RENDER.md](./RENDER.md); use Blueprint path `deploy/masumi/blueprint.yaml` |
 | Agents unavailable in analytics | `MASUMI_AGENTS_URL` wrong or agents sleeping | Check URL; wake Render service; hit `/health` |
 | Webhook 401 | Secret mismatch | Align `MIZIZI_CALLBACK_SECRET` (agents) and `MASUMI_CALLBACK_SECRET` (web) |
 | Payment not connected (live) | Wrong URL/key or unfunded wallets | Check `/health` and `/api-key-status`; fund Preprod wallets |
 | Jobs stuck RUNNING | Agent can’t reach callback URL | Ensure `MIZIZI_CALLBACK_URL` is public HTTPS, not localhost |
-| Blueprint path not found | Wrong path in dashboard | Must be exactly `deploy/masumi/render.yaml` |
+| Blueprint path not found | Wrong path in dashboard | Must be exactly `deploy/masumi/blueprint.yaml` |
 
 ---
 

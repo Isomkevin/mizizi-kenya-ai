@@ -88,7 +88,7 @@ All deploy docs are in **`deploy/masumi/`**:
 | [deploy/masumi/ENV.md](../deploy/masumi/ENV.md) | Environment variables |
 | [deploy/masumi/README.md](../deploy/masumi/README.md) | Bundle index |
 
-Blueprint path: **`deploy/masumi/render.yaml`** (use Render **Blueprint**, not Docker Web Service). Mizizi web deploys separately.
+Blueprint path: **`deploy/masumi/blueprint.yaml`** (use Render **Blueprint**, not Docker Web Service). Mizizi web deploys separately.
 
 ## Agent endpoints (MIP-003)
 
@@ -116,7 +116,7 @@ Mobile money enrichment requires `ConsentRecord.status === ACTIVE` for the curre
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | Agents unavailable on analytics tab | Run `bun run masumi:up` and `bun run masumi:wait`                                                       |
 | Jobs stuck in RUNNING               | Poll via farmer profile refresh; check agent logs `bun run masumi:logs` |
-| Render `unknown instruction: services:` | Used Docker Web Service with `render.yaml` as Dockerfile — use Blueprint; see [deploy/masumi/DEPLOY.md](../deploy/masumi/DEPLOY.md) |
+| Render `unknown instruction: envVarGroups:` | Blueprint YAML used as Dockerfile — see [deploy/masumi/RENDER.md](../deploy/masumi/RENDER.md) |
 | Webhook 401                         | Match `MIZIZI_CALLBACK_SECRET` on web + agents                                                          |
 | `MASUMI_MODE=disabled`              | Set `MASUMI_MODE=demo` and `MASUMI_AGENTS_URL`                                                          |
 

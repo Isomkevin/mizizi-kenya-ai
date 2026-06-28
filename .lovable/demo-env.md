@@ -54,4 +54,4 @@ Lovable syncs from the connected Git branch. Commit and push fixes, then wait fo
 
 - **Auth:** `VITE_MIZIZI_DEMO=true` (or empty Supabase vars) keeps the officer dev session on production.
 - **Data:** Local store uses in-memory seed on serverless; each worker cold start reloads seed data (fine for demos).
-- **Masumi:** Disable on Lovable (`MASUMI_MODE=disabled`); deploy agents via `render.yaml` if needed later.
+- **Masumi:** Disable on Lovable (`MASUMI_MODE=disabled`); deploy agents via `deploy/masumi/blueprint.yaml` if needed later.

@@ -13,6 +13,6 @@ Deployment docs live in the deploy bundle:
 | Agent endpoints | [deploy/masumi/agents/README.md](../deploy/masumi/agents/README.md) |
 | Bundle index | [deploy/masumi/README.md](../deploy/masumi/README.md) |
 
-Render Blueprint path: `deploy/masumi/render.yaml`
+Render Blueprint path: `deploy/masumi/blueprint.yaml`
 
 Product integration (UI, API, scripts): [masumi.md](./masumi.md)

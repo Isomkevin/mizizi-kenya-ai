@@ -61,6 +61,6 @@ See [../ENV.md](../ENV.md) and [.env.example](./.env.example).
 docker compose up -d --build
 ```
 
-Render builds this folder via `rootDir: deploy/masumi/agents` in [../render.yaml](../render.yaml).
+Render builds via [../blueprint.yaml](../blueprint.yaml) → `deploy/masumi/agents/Dockerfile`.
 
 Deploy guide: [../DEPLOY.md](../DEPLOY.md)

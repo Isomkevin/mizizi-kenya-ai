@@ -1,20 +1,18 @@
-# Mizizi Masumi agents — Render Blueprint (NOT a Dockerfile)
+# Mizizi Masumi — Render Blueprint (NOT a Dockerfile)
 #
-# Apply via: Render Dashboard → New → Blueprint → Blueprint path:
-#   deploy/masumi/render.yaml
+# Apply: Render Dashboard → New → Blueprint → Blueprint path:
+#   deploy/masumi/blueprint.yaml
 #
-# Do NOT create a "Web Service → Docker" and point Dockerfile Path at this file.
-# Mizizi web (TanStack Start) deploys separately; wire MASUMI_* vars there after agents are live.
+# NEVER create "Web Service → Docker" and set Dockerfile Path to this file.
+# The real Dockerfile is: deploy/masumi/agents/Dockerfile
 
 envVarGroups:
   - name: masumi-preprod-payment
     envVars:
-      # Python agents (Pydantic: payment_service_url / payment_api_key)
       - key: PAYMENT_SERVICE_URL
         sync: false
       - key: PAYMENT_API_KEY
         sync: false
-      # Mizizi web uses these names — set the same values on your web deployment
       - key: MASUMI_PAYMENT_URL
         sync: false
       - key: MASUMI_PAYMENT_API_KEY
@@ -25,9 +23,8 @@ services:
     name: mizizi-masumi-agents
     runtime: docker
     plan: starter
-    rootDir: deploy/masumi/agents
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    dockerfilePath: ./deploy/masumi/agents/Dockerfile
+    dockerContext: ./deploy/masumi/agents
     healthCheckPath: /health
     envVars:
       - key: MASUMI_MODE

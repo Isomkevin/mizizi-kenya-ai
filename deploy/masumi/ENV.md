@@ -17,7 +17,7 @@ Use the **same values**; only variable names differ.
 
 ## Render blueprint prompts (`sync: false`)
 
-These are defined in [render.yaml](./render.yaml). Render asks for values when you **Apply** the Blueprint.
+These are defined in [blueprint.yaml](./blueprint.yaml). Render asks for values when you **Apply** the Blueprint.
 
 ### `mizizi-masumi-agents`
 
