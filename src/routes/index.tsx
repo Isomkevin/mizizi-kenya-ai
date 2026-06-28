@@ -207,7 +207,8 @@ function DemoVideo() {
             See Mizizi in action.
           </h2>
           <p className="mt-4 max-w-2xl text-muted-foreground">
-            Watch the demo to understand how the platform connects farmer data, climate signals and explainable credit decisions.
+            Watch the demo to understand how the platform connects farmer data, climate signals and
+            explainable credit decisions.
           </p>
         </Reveal>
 
@@ -222,7 +223,7 @@ function DemoVideo() {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
-              />
+              ></iframe>
             </div>
           </div>
         </Reveal>
