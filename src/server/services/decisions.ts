@@ -1,5 +1,6 @@
 import type { DecisionDetail, SubmitDecisionInput } from "@/api/types";
 import { generateGroundedExplanation } from "@/server/services/explanation-service";
+import { normalizeDecisionId, normalizeFarmerId } from "@/server/id-aliases";
 import { getPersistence } from "@/server/services/persistence";
 import { assessFarmerRisk } from "@/server/services/risk-engine";
 
@@ -17,61 +18,70 @@ export async function listDecisions(input: DecisionListInput = {}): Promise<Deci
 }
 
 export async function getDecision(id: string): Promise<DecisionDetail | null> {
-  const decision = await getPersistence().getDecisionById(id);
+  const lookupId = normalizeDecisionId(id);
+  const decision = await getPersistence().getDecisionById(lookupId);
   if (decision) {
     const needsEvidence = decision.factors.some(
       (factor) =>
         !factor.graphEvidence?.length && Boolean(factor.graphPath?.length || factor.source),
     );
     if (needsEvidence) {
-      const farmer = await getPersistence().getFarmerById(decision.farmerId);
-      if (farmer) {
-        const assessment = await assessFarmerRisk(farmer);
-        const enriched: DecisionDetail = {
-          ...decision,
-          factors: assessment.factors,
-          positiveSignals: assessment.positiveSignals,
-          negativeSignals: assessment.negativeSignals,
-        };
-        await getPersistence().upsertDecision(enriched);
-        return enriched;
+      try {
+        const farmer = await getPersistence().getFarmerById(decision.farmerId);
+        if (farmer) {
+          const assessment = await assessFarmerRisk(farmer);
+          const enriched: DecisionDetail = {
+            ...decision,
+            factors: assessment.factors,
+            positiveSignals: assessment.positiveSignals,
+            negativeSignals: assessment.negativeSignals,
+          };
+          await getPersistence().upsertDecision(enriched);
+          return enriched;
+        }
+      } catch {
+        return decision;
       }
     }
     return decision;
   }
 
-  const farmer = await getPersistence().getFarmerById(id);
+  const farmer = await getPersistence().getFarmerById(normalizeFarmerId(lookupId));
   if (!farmer) return null;
 
-  const assessment = await assessFarmerRisk(farmer);
-  const explanation = await generateGroundedExplanation({
-    farmer,
-    recommendation: assessment.recommendation,
-    confidence: assessment.confidence,
-    factors: assessment.factors,
-    positiveSignals: assessment.positiveSignals,
-    negativeSignals: assessment.negativeSignals,
-  });
+  try {
+    const assessment = await assessFarmerRisk(farmer);
+    const explanation = await generateGroundedExplanation({
+      farmer,
+      recommendation: assessment.recommendation,
+      confidence: assessment.confidence,
+      factors: assessment.factors,
+      positiveSignals: assessment.positiveSignals,
+      negativeSignals: assessment.negativeSignals,
+    });
 
-  const drafted: DecisionDetail = {
-    id: `decision-${farmer.id}`,
-    farmerId: farmer.id,
-    farmerName: farmer.name,
-    applicationId: farmer.applications[0]?.id ?? `app-${farmer.id}`,
-    recommendation: assessment.recommendation,
-    confidence: assessment.confidence,
-    risk: assessment.risk,
-    status: "pending",
-    factors: assessment.factors,
-    positiveSignals: assessment.positiveSignals,
-    negativeSignals: assessment.negativeSignals,
-    officerExplanation: explanation.officerExplanation,
-    farmerExplanation: explanation.farmerExplanation,
-    createdAt: new Date().toISOString(),
-  };
+    const drafted: DecisionDetail = {
+      id: `dec-${farmer.id}`,
+      farmerId: farmer.id,
+      farmerName: farmer.name,
+      applicationId: farmer.applications[0]?.id ?? `app-${farmer.id}`,
+      recommendation: assessment.recommendation,
+      confidence: assessment.confidence,
+      risk: assessment.risk,
+      status: "pending",
+      factors: assessment.factors,
+      positiveSignals: assessment.positiveSignals,
+      negativeSignals: assessment.negativeSignals,
+      officerExplanation: explanation.officerExplanation,
+      farmerExplanation: explanation.farmerExplanation,
+      createdAt: new Date().toISOString(),
+    };
 
-  await getPersistence().upsertDecision(drafted);
-  return drafted;
+    await getPersistence().upsertDecision(drafted);
+    return drafted;
+  } catch {
+    return null;
+  }
 }
 
 function normalizeSubmittedStatus(

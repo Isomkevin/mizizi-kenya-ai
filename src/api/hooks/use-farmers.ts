@@ -9,6 +9,7 @@ import {
   requestEnrichmentFn,
   searchFarmerProfilesFn,
 } from "@/api/functions/farmers";
+import { normalizeFarmerId } from "@/lib/id-aliases";
 
 export interface FarmerFiltersInput {
   query?: string;
@@ -23,12 +24,14 @@ export function useFarmer(id?: string) {
   return useQuery({
     queryKey: ["farmers", "detail", id],
     queryFn: async () => {
-      const lookupId = id ?? "";
+      const lookupId = normalizeFarmerId(id ?? "");
       try {
-        return await getFarmerFn({ data: { id: lookupId } });
+        const result = await getFarmerFn({ data: { id: lookupId } });
+        if (result) return result;
       } catch {
-        return farmerProfiles[lookupId] ?? null;
+        // fall through to client seed
       }
+      return farmerProfiles[lookupId] ?? farmerProfiles[id ?? ""] ?? null;
     },
     enabled: Boolean(id),
   });

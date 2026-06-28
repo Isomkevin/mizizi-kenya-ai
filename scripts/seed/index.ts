@@ -3,7 +3,11 @@ import { resetDb } from "@/server/db/local-store";
 import { refreshClimate } from "@/server/services/analytics";
 import { serverEnv } from "@/server/env";
 import { tryRefreshGdsTrustScores } from "@/server/services/neo4j-evidence";
-import { syncFarmerToGraph, verifyNeo4jConnectivity } from "@/server/services/neo4j";
+import {
+  markNeo4jUnavailable,
+  syncFarmerToGraph,
+  verifyNeo4jConnectivity,
+} from "@/server/services/neo4j";
 import { getPersistence } from "@/server/services/persistence";
 
 const COUNTY_CENTROIDS: Record<string, { lat: number; lon: number }> = {
@@ -21,8 +25,29 @@ const COUNTY_CENTROIDS: Record<string, { lat: number; lon: number }> = {
   Mombasa: { lat: -4.0435, lon: 39.6682 },
 };
 
+function auraTlsHint(): string {
+  const runtime = typeof process !== "undefined" ? process.versions.bun : undefined;
+  if (!runtime) return "";
+  return (
+    " Bun has a known TLS issue with neo4j+s:// before v1.3.11. " +
+    "Run `bun upgrade`, use `bun run neo4j:local`, or `bun run seed:node` for Aura."
+  );
+}
+
 async function run(): Promise<void> {
   const db = await resetDb();
+
+  const neo4jPreflight = await verifyNeo4jConnectivity();
+  if (!neo4jPreflight.connected && serverEnv.neo4jUri()) {
+    markNeo4jUnavailable(neo4jPreflight.message);
+    const tlsHint =
+      neo4jPreflight.message.includes("subject") ||
+      neo4jPreflight.message.includes("Failed to connect to server")
+        ? auraTlsHint()
+        : "";
+    console.warn(`Neo4j preflight failed — seeding with local graph cache.${tlsHint}`);
+    console.warn(neo4jPreflight.message);
+  }
 
   let graphSynced = 0;
   let climatePrimed = 0;

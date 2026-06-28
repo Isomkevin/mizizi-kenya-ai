@@ -1,15 +1,12 @@
 import type { GraphPayload } from "@/api/types";
+import { normalizeFarmerId } from "@/lib/id-aliases";
 import { fetchFarmerSubgraphFromNeo4j } from "@/server/services/neo4j-evidence";
 import { getSubgraph } from "@/server/services/neo4j";
 import { getPersistence } from "@/server/services/persistence";
 
-const LEGACY_FARMER_ID_ALIASES: Record<string, string> = {
-  "farmer-001": "f-001",
-};
-
 export async function getGraph(farmerId: string, depth = 2): Promise<GraphPayload> {
   const persistence = getPersistence();
-  const normalizedId = LEGACY_FARMER_ID_ALIASES[farmerId] ?? farmerId;
+  const normalizedId = normalizeFarmerId(farmerId);
 
   const fromNeo4j = await fetchFarmerSubgraphFromNeo4j(normalizedId, depth);
   if (fromNeo4j?.nodes.length) {

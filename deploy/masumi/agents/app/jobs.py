@@ -59,9 +59,6 @@ class JobStore:
     def get(self, job_id: str) -> JobRecord | None:
         return self._jobs.get(job_id)
 
-    def list_for_agent(self, agent_name: str) -> list[JobRecord]:
-        return [job for job in self._jobs.values() if job.agent_name == agent_name]
-
     async def run_job(self, job_id: str) -> None:
         record = self._jobs.get(job_id)
         if not record:

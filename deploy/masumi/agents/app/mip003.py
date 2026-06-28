@@ -19,7 +19,7 @@ def build_mip003_router(agent_name: str, input_schema: dict) -> APIRouter:
 
     @router.get("/availability")
     async def availability() -> dict:
-        active = len(job_store.list_for_agent(agent_name))
+        active = len([job for job in job_store._jobs.values() if job.agent_name == agent_name])
         return {
             "status": "available",
             "type": "masumi-agent",
@@ -71,12 +71,8 @@ def build_mip003_router(agent_name: str, input_schema: dict) -> APIRouter:
             blockchain_identifier=blockchain_id,
         )
 
-        if settings.masumi_mode == "demo":
-            record.status = "running"
-            job_store.schedule(record.job_id)
-        else:
-            record.status = "awaiting_payment"
-            job_store.schedule(record.job_id)
+        record.status = "running" if settings.masumi_mode == "demo" else "awaiting_payment"
+        job_store.schedule(record.job_id)
 
         return {
             "status": "success",

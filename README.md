@@ -174,7 +174,7 @@ Before opening a PR that touches routes or components, run `bun run lint` and `b
 | 5     | Explainability + officer decision workspace               | **Done** |
 | 6     | Analytics platform (GeoJSON map, rollups, exports)        | **Done** |
 
-Details and checklists: [docs/phase-status.md](docs/phase-status.md). Phased roadmap: [.lovable/plan.md](.lovable/plan.md). Full product vision: [docs/product-spec.md](docs/product-spec.md).
+Details and checklists: [docs/phase-status.md](docs/phase-status.md). Phased roadmap: [.lovable/plan.md](.lovable/plan.md). **Lovable demo env:** [.lovable/demo-env.md](.lovable/demo-env.md). Full product vision: [docs/product-spec.md](docs/product-spec.md).
 
 ---
 

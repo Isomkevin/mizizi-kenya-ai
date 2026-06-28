@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     mizizi_callback_url: str = "http://host.docker.internal:5173"
     mizizi_callback_secret: str = "mizizi-dev-callback-secret"
     open_meteo_base: str = "https://api.open-meteo.com/v1/forecast"
-    agent_fee_lovelace: int = 2_000_000  # ~2 ADA demo pricing
+    agent_fee_lovelace: int = 2_000_000
 
 
 settings = Settings()

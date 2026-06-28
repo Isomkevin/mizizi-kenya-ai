@@ -7,6 +7,7 @@ import {
   saveDb,
   type MiziziDatabase,
 } from "@/server/db/local-store";
+import { normalizeDecisionId, normalizeFarmerId } from "@/server/id-aliases";
 import { serverEnv } from "@/server/env";
 
 export interface PersistenceAdapter {
@@ -43,7 +44,14 @@ class LocalPersistence implements PersistenceAdapter {
 
   async getFarmerById(id: string): Promise<FarmerProfile | undefined> {
     const db = await getDb();
-    return db.farmers.find((farmer) => farmer.id === id || farmer.farmerId === id);
+    const normalized = normalizeFarmerId(id);
+    return db.farmers.find(
+      (farmer) =>
+        farmer.id === normalized ||
+        farmer.farmerId === normalized ||
+        farmer.id === id ||
+        farmer.farmerId === id,
+    );
   }
 
   async upsertFarmer(farmer: FarmerProfile): Promise<FarmerProfile> {
@@ -65,7 +73,10 @@ class LocalPersistence implements PersistenceAdapter {
 
   async getDecisionById(id: string): Promise<DecisionDetail | undefined> {
     const db = await getDb();
-    return db.decisions.find((decision) => decision.id === id);
+    const normalized = normalizeDecisionId(id);
+    return db.decisions.find(
+      (decision) => decision.id === normalized || decision.id === id,
+    );
   }
 
   async upsertDecision(decision: DecisionDetail): Promise<DecisionDetail> {
@@ -119,7 +130,7 @@ class SupabasePersistence implements PersistenceAdapter {
     if (!this.client) return this.fallback.listFarmers();
     try {
       const { data, error } = await this.client.from("farmers").select("*").limit(250);
-      if (error || !data) return this.fallback.listFarmers();
+      if (error || !data?.length) return this.fallback.listFarmers();
       return data as FarmerProfile[];
     } catch {
       return this.fallback.listFarmers();
@@ -161,7 +172,7 @@ class SupabasePersistence implements PersistenceAdapter {
     if (!this.client) return this.fallback.listDecisions();
     try {
       const { data, error } = await this.client.from("decisions").select("*").limit(250);
-      if (error || !data) return this.fallback.listDecisions();
+      if (error || !data?.length) return this.fallback.listDecisions();
       return data.map((row) => row.payload as DecisionDetail);
     } catch {
       return this.fallback.listDecisions();

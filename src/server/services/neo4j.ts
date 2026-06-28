@@ -12,9 +12,14 @@ import { fetchFarmerSubgraphFromNeo4j } from "@/server/services/neo4j-evidence";
 import { getPersistence } from "@/server/services/persistence";
 
 let driver: Driver | null | undefined;
+let driverDisabledReason: string | undefined;
 
 export function getNeo4jDriver(): Driver | null {
   if (driver !== undefined) return driver;
+  if (driverDisabledReason) {
+    driver = null;
+    return null;
+  }
   const uri = serverEnv.neo4jUri();
   const password = serverEnv.neo4jPassword();
   if (!uri || !password) {
@@ -23,6 +28,24 @@ export function getNeo4jDriver(): Driver | null {
   }
   driver = neo4j.driver(uri, neo4j.auth.basic(serverEnv.neo4jUser(), password));
   return driver;
+}
+
+/** Skip further Neo4j connection attempts in this process (e.g. after a failed preflight). */
+export function markNeo4jUnavailable(reason: string): void {
+  driverDisabledReason = reason;
+  if (driver) {
+    void driver.close();
+  }
+  driver = null;
+}
+
+function isNeo4jTransportError(message: string): boolean {
+  return (
+    message.includes("Failed to connect to server") ||
+    message.includes("Cannot destructure property 'subject'") ||
+    message.includes("ServiceUnavailable") ||
+    message.includes("SessionExpired")
+  );
 }
 
 export function openNeo4jSession(activeDriver: Driver): Session {
@@ -136,6 +159,15 @@ export async function syncFarmerToGraph(
       ),
     );
     return { synced: true, source: "neo4j" };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Neo4j sync failed.";
+    if (isNeo4jTransportError(message)) {
+      markNeo4jUnavailable(message);
+    }
+    const persistence = getPersistence();
+    const fallbackGraph = buildFallbackGraph(farmer);
+    await persistence.saveGraphByFarmerId(farmer.id, fallbackGraph);
+    return { synced: true, source: "local" };
   } finally {
     await session.close();
   }

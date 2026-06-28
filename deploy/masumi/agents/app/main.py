@@ -58,18 +58,9 @@ def create_app() -> FastAPI:
     job_store.register_handler("mizizi-mpesa-proxy", handle_mobile_money_job)
     job_store.register_handler("mizizi-orchestrator", handle_orchestrator_job)
 
-    app.include_router(
-        build_mip003_router("mizizi-climate-data", CLIMATE_SCHEMA),
-        prefix="/climate",
-    )
-    app.include_router(
-        build_mip003_router("mizizi-coop-data", COOP_SCHEMA),
-        prefix="/coop",
-    )
-    app.include_router(
-        build_mip003_router("mizizi-mpesa-proxy", MOBILE_SCHEMA),
-        prefix="/mobile",
-    )
+    app.include_router(build_mip003_router("mizizi-climate-data", CLIMATE_SCHEMA), prefix="/climate")
+    app.include_router(build_mip003_router("mizizi-coop-data", COOP_SCHEMA), prefix="/coop")
+    app.include_router(build_mip003_router("mizizi-mpesa-proxy", MOBILE_SCHEMA), prefix="/mobile")
     app.include_router(
         build_mip003_router("mizizi-orchestrator", ORCHESTRATOR_SCHEMA),
         prefix="/orchestrator",

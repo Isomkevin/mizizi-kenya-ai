@@ -619,7 +619,7 @@ function buildDecisions(farmers: FarmerProfile[]): DecisionDetail[] {
       "pending",
     ];
     return {
-      id: `decision-${farmer.id}`,
+      id: `dec-${farmer.id}`,
       farmerId: farmer.id,
       farmerName: farmer.name,
       applicationId: `app-${farmer.id}`,

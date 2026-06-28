@@ -19,10 +19,18 @@ export const Route = createFileRoute("/app/decisions/$decisionId")({
 
 function DecisionWorkspacePage() {
   const { decisionId } = Route.useParams();
-  const { data: decision } = useDecision(decisionId);
+  const { data: decision, isLoading, isError } = useDecision(decisionId);
   const { data: farmer } = useFarmerProfile(decision?.farmerId ?? "");
 
-  if (!decision) {
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
+        Loading application review…
+      </div>
+    );
+  }
+
+  if (isError || !decision) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
         Decision not found.

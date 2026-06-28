@@ -40,20 +40,53 @@ export interface MiziziDatabase {
 const DB_PATH = join(process.cwd(), ".data", "mizizi-db.json");
 
 let cache: MiziziDatabase | null = null;
+let filesystemWritable: boolean | null = null;
+
+async function canUseFilesystem(): Promise<boolean> {
+  if (filesystemWritable !== null) return filesystemWritable;
+  try {
+    await mkdir(dirname(DB_PATH), { recursive: true });
+    filesystemWritable = true;
+  } catch {
+    filesystemWritable = false;
+  }
+  return filesystemWritable;
+}
+
+async function readDbFromDisk(): Promise<MiziziDatabase | null> {
+  if (!(await canUseFilesystem())) return null;
+  try {
+    const raw = await readFile(DB_PATH, "utf-8");
+    const parsed = JSON.parse(raw) as MiziziDatabase;
+    if (!parsed.masumiJobs) parsed.masumiJobs = [];
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+async function writeDbToDisk(db: MiziziDatabase): Promise<void> {
+  if (!(await canUseFilesystem())) return;
+  try {
+    await mkdir(dirname(DB_PATH), { recursive: true });
+    await writeFile(DB_PATH, JSON.stringify(db, null, 2), "utf-8");
+  } catch {
+    // Serverless hosts (e.g. Lovable / Cloudflare Workers) may not allow fs writes.
+  }
+}
 
 async function ensureDb(): Promise<MiziziDatabase> {
   if (cache) return cache;
-  try {
-    const raw = await readFile(DB_PATH, "utf-8");
-    cache = JSON.parse(raw) as MiziziDatabase;
-    if (!cache.masumiJobs) cache.masumiJobs = [];
-    return cache;
-  } catch {
-    cache = buildSeedDatabase();
-    await mkdir(dirname(DB_PATH), { recursive: true });
-    await writeFile(DB_PATH, JSON.stringify(cache, null, 2), "utf-8");
+
+  const fromDisk = await readDbFromDisk();
+  if (fromDisk) {
+    cache = fromDisk;
     return cache;
   }
+
+  cache = buildSeedDatabase();
+  await writeDbToDisk(cache);
+  return cache;
 }
 
 export async function getDb(): Promise<MiziziDatabase> {
@@ -62,12 +95,11 @@ export async function getDb(): Promise<MiziziDatabase> {
 
 export async function saveDb(db: MiziziDatabase): Promise<void> {
   cache = db;
-  await mkdir(dirname(DB_PATH), { recursive: true });
-  await writeFile(DB_PATH, JSON.stringify(db, null, 2), "utf-8");
+  await writeDbToDisk(db);
 }
 
 export async function resetDb(): Promise<MiziziDatabase> {
   cache = buildSeedDatabase();
-  await saveDb(cache);
+  await writeDbToDisk(cache);
   return cache;
 }

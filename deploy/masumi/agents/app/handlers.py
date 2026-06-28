@@ -8,7 +8,6 @@ from app.jobs import JobRecord
 
 
 async def fetch_climate(county: str, lat: float, lon: float) -> dict:
-    url = settings.open_meteo_base
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -18,7 +17,7 @@ async def fetch_climate(county: str, lat: float, lon: float) -> dict:
         "forecast_days": "1",
     }
     async with httpx.AsyncClient(timeout=20.0) as client:
-        response = await client.get(url, params=params)
+        response = await client.get(settings.open_meteo_base, params=params)
         response.raise_for_status()
         data = response.json()
 
@@ -62,37 +61,17 @@ async def handle_coop_job(record: JobRecord) -> dict:
     farmer_id = params.get("farmer_id", "")
     cooperative = params.get("cooperative", "Unknown Cooperative")
     cooperative_id = params.get("cooperative_id", f"coop-{farmer_id}")
-
-    repayments = [
-        {
-            "id": f"rep-{farmer_id}-1",
-            "date": "2025-11-15",
-            "amountKes": 12500,
-            "onTime": True,
-        },
-        {
-            "id": f"rep-{farmer_id}-2",
-            "date": "2026-02-10",
-            "amountKes": 11800,
-            "onTime": True,
-        },
-    ]
-    loans = [
-        {
-            "id": f"loan-{farmer_id}",
-            "amountKes": 45000,
-            "status": "active",
-            "season": "LR2026",
-        }
-    ]
     tx = f"preprod_{record.job_id}_{record.input_hash[:16]}"
     return {
         "enrichType": "COOPERATIVE",
         "farmer_id": farmer_id,
         "cooperative": cooperative,
         "cooperative_id": cooperative_id,
-        "repayments": repayments,
-        "loans": loans,
+        "repayments": [
+            {"id": f"rep-{farmer_id}-1", "date": "2025-11-15", "amountKes": 12500, "onTime": True},
+            {"id": f"rep-{farmer_id}-2", "date": "2026-02-10", "amountKes": 11800, "onTime": True},
+        ],
+        "loans": [{"id": f"loan-{farmer_id}", "amountKes": 45000, "status": "active", "season": "LR2026"}],
         "avg_repayment_rate": 0.92,
         "data_source_id": f"ds-coop-{farmer_id}-{record.job_id}",
         "masumi_tx_hash": tx,

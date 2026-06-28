@@ -37,11 +37,12 @@ export function getAuthSessionSnapshot(): AuthSession | null {
   const hasSupabaseConfig = Boolean(
     import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY,
   );
-  if (!hasSupabaseConfig) return DEV_SESSION;
+  const demoMode =
+    import.meta.env.VITE_MIZIZI_DEMO === "true" || !hasSupabaseConfig;
 
-  if (typeof window === "undefined") return import.meta.env.DEV ? DEV_SESSION : null;
+  if (demoMode) return DEV_SESSION;
 
-  if (import.meta.env.DEV) return DEV_SESSION;
+  if (typeof window === "undefined") return null;
 
   const raw = window.localStorage.getItem("mizizi:session");
   if (!raw) return null;

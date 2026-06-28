@@ -1,4 +1,5 @@
 import type { CreateFarmerInput, FarmerProfile, SearchResult } from "@/api/types";
+import { normalizeFarmerId } from "@/server/id-aliases";
 import { getPersistence } from "@/server/services/persistence";
 import { assessFarmerRisk, computeBaseRiskAssessment } from "@/server/services/risk-engine";
 import { syncFarmerDataGaps } from "@/server/services/farmer-gaps";
@@ -30,11 +31,15 @@ export async function searchFarmers(input: FarmerSearchInput = {}): Promise<Farm
 }
 
 export async function getFarmer(id: string): Promise<FarmerProfile | null> {
-  const farmer = await getPersistence().getFarmerById(id);
+  const farmer = await getPersistence().getFarmerById(normalizeFarmerId(id));
   if (!farmer) return null;
-  const synced = await syncFarmerDataGaps(farmer);
-  await getPersistence().upsertFarmer(synced);
-  return synced;
+  try {
+    const synced = await syncFarmerDataGaps(farmer);
+    await getPersistence().upsertFarmer(synced);
+    return synced;
+  } catch {
+    return farmer;
+  }
 }
 
 function toSearchResult(farmer: FarmerProfile): SearchResult {
