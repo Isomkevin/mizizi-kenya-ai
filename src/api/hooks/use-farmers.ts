@@ -9,6 +9,7 @@ import {
   requestEnrichmentFn,
   searchFarmerProfilesFn,
 } from "@/api/functions/farmers";
+import { findDemoFarmer, listDemoFarmers } from "@/lib/demo-seed";
 import { normalizeFarmerId } from "@/lib/id-aliases";
 
 export interface FarmerFiltersInput {
@@ -20,7 +21,17 @@ export interface FarmerFiltersInput {
   status?: string;
 }
 
-export function useFarmer(id?: string) {
+function resolveFarmer(id: string) {
+  const lookupId = normalizeFarmerId(id);
+  return (
+    findDemoFarmer(lookupId) ??
+    farmerProfiles[lookupId] ??
+    farmerProfiles[id] ??
+    null
+  );
+}
+
+export function useFarmer(id?: string, initialData?: ReturnType<typeof resolveFarmer>) {
   return useQuery({
     queryKey: ["farmers", "detail", id],
     queryFn: async () => {
@@ -29,11 +40,13 @@ export function useFarmer(id?: string) {
         const result = await getFarmerFn({ data: { id: lookupId } });
         if (result) return result;
       } catch {
-        // fall through to client seed
+        // fall through to bundled seed
       }
-      return farmerProfiles[lookupId] ?? farmerProfiles[id ?? ""] ?? null;
+      return resolveFarmer(lookupId);
     },
     enabled: Boolean(id),
+    initialData: initialData ?? undefined,
+    placeholderData: () => (id ? resolveFarmer(id) : undefined),
   });
 }
 
@@ -45,14 +58,12 @@ export function useSearchFarmers(query: string, limit = 25) {
         return await searchFarmerProfilesFn({ data: { query, limit } });
       } catch {
         const q = query.trim().toLowerCase();
-        return Object.values(farmerProfiles)
-          .filter(
-            (farmer) =>
-              farmer.name.toLowerCase().includes(q) ||
-              farmer.farmerId.toLowerCase().includes(q) ||
-              farmer.county.toLowerCase().includes(q),
-          )
-          .slice(0, limit);
+        return listDemoFarmers(limit).filter(
+          (farmer) =>
+            farmer.name.toLowerCase().includes(q) ||
+            farmer.farmerId.toLowerCase().includes(q) ||
+            farmer.county.toLowerCase().includes(q),
+        );
       }
     },
     enabled: query.trim().length > 0,
@@ -79,9 +90,10 @@ export function useFarmers(filters: FarmerFiltersInput) {
           },
         });
       } catch {
-        return Object.values(farmerProfiles);
+        return listDemoFarmers();
       }
     },
+    placeholderData: () => listDemoFarmers(),
     staleTime: 30_000,
   });
 
@@ -93,8 +105,8 @@ export function useFarmers(filters: FarmerFiltersInput) {
   return { ...query, data: filtered };
 }
 
-export function useFarmerProfile(farmerId: string) {
-  return useFarmer(farmerId);
+export function useFarmerProfile(farmerId: string, initialData?: ReturnType<typeof resolveFarmer>) {
+  return useFarmer(farmerId, initialData);
 }
 
 export function useCreateFarmer() {

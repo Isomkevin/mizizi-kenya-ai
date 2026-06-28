@@ -36,6 +36,10 @@ export const serverEnv = {
   openRouterBaseUrl: () => env("OPENROUTER_BASE_URL") ?? "https://openrouter.ai/api/v1",
   openRouterModel: () => env("OPENROUTER_MODEL") ?? "meta-llama/llama-3.1-70b-instruct",
   tenantId: () => env("MIZIZI_TENANT_ID") ?? "lesom-sandbox",
+  demoMode: () =>
+    env("MIZIZI_DEMO") === "true" ||
+    env("VITE_MIZIZI_DEMO") === "true" ||
+    (!serverEnv.supabaseUrl() && env("MIZIZI_USE_LOCAL_STORE") !== "false"),
   useLocalStore: () => !serverEnv.supabaseUrl() || env("MIZIZI_USE_LOCAL_STORE") === "true",
   masumiMode: () => {
     const mode = env("MASUMI_MODE");

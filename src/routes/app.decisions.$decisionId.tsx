@@ -9,8 +9,12 @@ import { DecisionSummary } from "@/components/app/decisions/DecisionSummary";
 import { GraphPathViewer } from "@/components/app/decisions/GraphPathViewer";
 import { OfficerDecisionPanel } from "@/components/app/decisions/OfficerDecisionPanel";
 import { FarmerDataGapsPanel } from "@/components/app/farmers/FarmerDataGapsPanel";
+import { findDemoDecision } from "@/lib/demo-seed";
 
 export const Route = createFileRoute("/app/decisions/$decisionId")({
+  loader: ({ params }) => ({
+    decision: findDemoDecision(params.decisionId),
+  }),
   head: () => ({
     meta: [{ title: "Mizizi · Application Review" }],
   }),
@@ -19,10 +23,12 @@ export const Route = createFileRoute("/app/decisions/$decisionId")({
 
 function DecisionWorkspacePage() {
   const { decisionId } = Route.useParams();
-  const { data: decision, isLoading, isError } = useDecision(decisionId);
-  const { data: farmer } = useFarmerProfile(decision?.farmerId ?? "");
+  const { decision: seededDecision } = Route.useLoaderData();
+  const { data: decision, isFetching, isError } = useDecision(decisionId, seededDecision);
+  const resolvedDecision = decision ?? seededDecision;
+  const { data: farmer } = useFarmerProfile(resolvedDecision?.farmerId ?? "");
 
-  if (isLoading) {
+  if (!resolvedDecision && isFetching) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
         Loading application review…
@@ -30,7 +36,7 @@ function DecisionWorkspacePage() {
     );
   }
 
-  if (isError || !decision) {
+  if (isError || !resolvedDecision) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
         Decision not found.
@@ -48,18 +54,18 @@ function DecisionWorkspacePage() {
         Back to applications queue
       </Link>
 
-      <DecisionSummary decision={decision} />
+      <DecisionSummary decision={resolvedDecision} />
       {farmer &&
       (farmer.insufficientData ||
         (farmer.dataGaps?.some((g) => g.status === "missing") ?? false)) ? (
         <FarmerDataGapsPanel farmer={farmer} variant="compact" />
       ) : null}
-      <DecisionContextLinks decision={decision} />
+      <DecisionContextLinks decision={resolvedDecision} />
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
-        <ContributingFactors decision={decision} />
-        <OfficerDecisionPanel decision={decision} />
+        <ContributingFactors decision={resolvedDecision} />
+        <OfficerDecisionPanel decision={resolvedDecision} />
       </div>
-      <GraphPathViewer decision={decision} />
+      <GraphPathViewer decision={resolvedDecision} />
     </div>
   );
 }

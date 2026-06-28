@@ -1,5 +1,6 @@
 import type { DecisionDetail, SubmitDecisionInput } from "@/api/types";
 import { generateGroundedExplanation } from "@/server/services/explanation-service";
+import { serverEnv } from "@/server/env";
 import { normalizeDecisionId, normalizeFarmerId } from "@/server/id-aliases";
 import { getPersistence } from "@/server/services/persistence";
 import { assessFarmerRisk } from "@/server/services/risk-engine";
@@ -21,6 +22,9 @@ export async function getDecision(id: string): Promise<DecisionDetail | null> {
   const lookupId = normalizeDecisionId(id);
   const decision = await getPersistence().getDecisionById(lookupId);
   if (decision) {
+    if (serverEnv.demoMode()) {
+      return decision;
+    }
     const needsEvidence = decision.factors.some(
       (factor) =>
         !factor.graphEvidence?.length && Boolean(factor.graphPath?.length || factor.source),

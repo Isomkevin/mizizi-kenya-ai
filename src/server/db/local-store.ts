@@ -16,7 +16,7 @@ import type {
   SearchResult,
   WelcomeSnapshot,
 } from "@/api/types";
-import { buildSeedDatabase } from "@/server/db/seed-data";
+import { buildSeedDatabase } from "@/lib/seed-data";
 
 export interface MiziziDatabase {
   tenantId: string;

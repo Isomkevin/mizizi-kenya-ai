@@ -11,10 +11,14 @@ import { FarmerFinancialTab } from "@/components/app/farmers/FarmerFinancialTab"
 import { FarmerOverviewTab } from "@/components/app/farmers/FarmerOverviewTab";
 import { FarmerProfileHeader } from "@/components/app/farmers/FarmerProfileHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { findDemoFarmer } from "@/lib/demo-seed";
 
 export const Route = createFileRoute("/app/farmers/$farmerId")({
   validateSearch: (search: Record<string, unknown>) => ({
     tab: typeof search.tab === "string" ? search.tab : undefined,
+  }),
+  loader: ({ params }) => ({
+    farmer: findDemoFarmer(params.farmerId),
   }),
   head: () => ({
     meta: [{ title: "Mizizi · Farmer Profile" }],
@@ -35,11 +39,13 @@ const PROFILE_TABS = [
 function FarmerProfilePage() {
   const { farmerId } = Route.useParams();
   const { tab } = Route.useSearch();
+  const { farmer: seededFarmer } = Route.useLoaderData();
   const initialTab = PROFILE_TABS.includes(tab as (typeof PROFILE_TABS)[number])
     ? (tab as (typeof PROFILE_TABS)[number])
     : "overview";
   const [activeTab, setActiveTab] = useState(initialTab);
-  const { data: farmer, isLoading } = useFarmerProfile(farmerId);
+  const { data: farmer, isFetching, isError } = useFarmerProfile(farmerId, seededFarmer);
+  const resolvedFarmer = farmer ?? seededFarmer;
 
   useEffect(() => {
     if (tab && PROFILE_TABS.includes(tab as (typeof PROFILE_TABS)[number])) {
@@ -47,7 +53,7 @@ function FarmerProfilePage() {
     }
   }, [tab]);
 
-  if (isLoading) {
+  if (!resolvedFarmer && isFetching) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
         Loading farmer profile…
@@ -55,7 +61,7 @@ function FarmerProfilePage() {
     );
   }
 
-  if (!farmer) {
+  if (isError || !resolvedFarmer) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
         Farmer profile not found.
@@ -65,7 +71,7 @@ function FarmerProfilePage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
-      <FarmerProfileHeader farmer={farmer} />
+      <FarmerProfileHeader farmer={resolvedFarmer} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0">
@@ -79,25 +85,25 @@ function FarmerProfilePage() {
         </TabsList>
 
         <TabsContent value="overview">
-          <FarmerOverviewTab farmer={farmer} />
+          <FarmerOverviewTab farmer={resolvedFarmer} />
         </TabsContent>
         <TabsContent value="financial">
-          <FarmerFinancialTab farmer={farmer} />
+          <FarmerFinancialTab farmer={resolvedFarmer} />
         </TabsContent>
         <TabsContent value="climate">
-          <FarmerClimateTab farmer={farmer} />
+          <FarmerClimateTab farmer={resolvedFarmer} />
         </TabsContent>
         <TabsContent value="applications">
-          <FarmerApplicationsTab farmer={farmer} />
+          <FarmerApplicationsTab farmer={resolvedFarmer} />
         </TabsContent>
         <TabsContent value="decisions">
-          <FarmerDecisionsTab farmer={farmer} />
+          <FarmerDecisionsTab farmer={resolvedFarmer} />
         </TabsContent>
         <TabsContent value="documents">
-          <FarmerDocumentsTab farmer={farmer} />
+          <FarmerDocumentsTab farmer={resolvedFarmer} />
         </TabsContent>
         <TabsContent value="activity">
-          <FarmerActivityTab farmer={farmer} />
+          <FarmerActivityTab farmer={resolvedFarmer} />
         </TabsContent>
       </Tabs>
     </div>
