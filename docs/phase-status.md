@@ -76,11 +76,11 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 
 ## Phase 7 — Masumi agentic data collection — Done (2026-06-27)
 
-- [x] Python MIP-003 agents (`services/mizizi-agents/`) — climate, coop, mobile, orchestrator
+- [x] Python MIP-003 agents (`deploy/masumi/agents/`) — climate, coop, mobile, orchestrator
 - [x] TypeScript `masumi-service` — dispatch, poll, webhook, consent, job store
 - [x] Officer enrichment → Masumi dispatch; consent workflow on farmer profile
 - [x] HTTP routes: `/api/webhooks/masumi-callback`, `/api/agents/status`, orchestrator cron
-- [x] Analytics **Masumi agents** tab; Docker Compose + Render blueprint
+- [x] Analytics **Masumi agents** tab; `deploy/masumi/` bundle (Docker Compose + Render blueprint)
 - [x] `docs/masumi.md` runbook
 
 ## Next priorities

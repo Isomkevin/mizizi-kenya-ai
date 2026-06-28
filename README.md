@@ -150,13 +150,13 @@ Verify: `bun run neo4j:verify` · Graph UI: `/app/graph` (look for **Source neo4
 Local demo or Render deploy — full guide: **[docs/masumi.md](docs/masumi.md)**
 
 ```bash
-bun run masumi:local   # Docker agents on :8080 + merge .env
+bun run masumi:local   # Docker agents on :8088 + merge .env
 bun run dev
 ```
 
 Open `/app/analytics?tab=agents` · On farmer profiles, **Request missing data** dispatches Masumi jobs.
 
-Render: connect repo and use `render.yaml` (web + agents + orchestrator cron).
+Render (agents only): Blueprint path **`deploy/masumi/render.yaml`** — see [deploy/masumi/README.md](deploy/masumi/README.md). Mizizi web deploys separately.
 
 Before opening a PR that touches routes or components, run `bun run lint` and `bun run build`.
 

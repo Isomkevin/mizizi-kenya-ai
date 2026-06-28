@@ -80,13 +80,16 @@ Hosted registry (read-only): `https://registry.masumi.network/api/v1`
 
 ## Deployment (Render)
 
-Use `render.yaml` in repo root:
+Masumi agents deploy from **`deploy/masumi/render.yaml`** — not the repo root. Mizizi web deploys separately (Lovable, Vercel, or another Render service).
 
-- **mizizi-web** — TanStack Start app
-- **mizizi-agents** — Python Docker service
-- **mizizi-orchestrator-cron** — hits `/api/agents/orchestrator/run` every 6 hours
+1. Render → **New** → **Blueprint** → set **Blueprint file path** to `deploy/masumi/render.yaml`.
+2. After apply, set on **mizizi-masumi-agents**:
+   - `MIZIZI_CALLBACK_URL` — public Mizizi web URL (e.g. `https://your-app.com`)
+   - `MIZIZI_CALLBACK_SECRET` — same value as Mizizi web `MASUMI_CALLBACK_SECRET`
+3. On Mizizi web, set `MASUMI_AGENTS_URL` to the agents service URL (e.g. `https://mizizi-masumi-agents.onrender.com`).
+4. Optional cron **mizizi-masumi-orchestrator** — set `MIZIZI_WEB_URL` and `MASUMI_CALLBACK_SECRET`.
 
-Set `MIZIZI_CALLBACK_URL` on agents to your public web URL (e.g. `https://mizizi-web.onrender.com`).
+Step-by-step: [deploy/masumi/README.md](../deploy/masumi/README.md).
 
 ## Agent endpoints (MIP-003)
 
@@ -113,7 +116,7 @@ Mobile money enrichment requires `ConsentRecord.status === ACTIVE` for the curre
 | Symptom                             | Fix                                                                                                     |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | Agents unavailable on analytics tab | Run `bun run masumi:up` and `bun run masumi:wait`                                                       |
-| Jobs stuck in RUNNING               | Poll via farmer profile refresh; check agent logs `docker compose -f docker-compose.masumi.yml logs -f` |
+| Jobs stuck in RUNNING               | Poll via farmer profile refresh; check agent logs `bun run masumi:logs` |
 | Webhook 401                         | Match `MIZIZI_CALLBACK_SECRET` on web + agents                                                          |
 | `MASUMI_MODE=disabled`              | Set `MASUMI_MODE=demo` and `MASUMI_AGENTS_URL`                                                          |
 

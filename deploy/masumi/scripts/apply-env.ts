@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const envPath = join(root, ".env");
-const examplePath = join(root, ".env.masumi.example");
+const examplePath = join(root, "deploy/masumi/.env.example");
 
 const MASUMI_VARS = `
 # Masumi agentic data collection
