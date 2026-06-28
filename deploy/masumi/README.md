@@ -19,6 +19,12 @@ deploy/masumi/
 
 ## Render deploy (step-by-step)
 
+> **Important:** Use **New → Blueprint**, not **New → Web Service → Docker**.  
+> `render.yaml` is infrastructure-as-code, not a Dockerfile.  
+> If you see `unknown instruction: services:`, delete the bad service and re-apply the Blueprint.
+
+Full guide: **[docs/masumi-deploy.md](../../docs/masumi-deploy.md)**.
+
 Render does **not** auto-detect `render.yaml` in subfolders. You must set the blueprint path.
 
 1. Push repo to GitHub.

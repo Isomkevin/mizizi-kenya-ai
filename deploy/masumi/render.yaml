@@ -1,27 +1,44 @@
-# Mizizi Masumi stack — deploy from this folder only
-# Render: New → Blueprint → set Blueprint Path to deploy/masumi/render.yaml
+# Mizizi Masumi agents — Render Blueprint (NOT a Dockerfile)
 #
-# Mizizi web app deploys separately (Lovable/Vercel/Render root). Point MIZIZI_WEB_URL
-# at that URL after both are live.
+# Apply via: Render Dashboard → New → Blueprint → Blueprint path:
+#   deploy/masumi/render.yaml
+#
+# Do NOT create a "Web Service → Docker" and point Dockerfile Path at this file.
+# Mizizi web (TanStack Start) deploys separately; wire MASUMI_* vars there after agents are live.
+
+envVarGroups:
+  - name: masumi-preprod-payment
+    envVars:
+      # Python agents (Pydantic: payment_service_url / payment_api_key)
+      - key: PAYMENT_SERVICE_URL
+        sync: false
+      - key: PAYMENT_API_KEY
+        sync: false
+      # Mizizi web uses these names — set the same values on your web deployment
+      - key: MASUMI_PAYMENT_URL
+        sync: false
+      - key: MASUMI_PAYMENT_API_KEY
+        sync: false
 
 services:
   - type: web
     name: mizizi-masumi-agents
     runtime: docker
     plan: starter
-    dockerfilePath: ./deploy/masumi/agents/Dockerfile
-    dockerContext: ./deploy/masumi/agents
+    rootDir: deploy/masumi/agents
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
     envVars:
       - key: MASUMI_MODE
         value: demo
+      - key: CARDANO_NETWORK
+        value: Preprod
       - key: MIZIZI_CALLBACK_URL
         sync: false
       - key: MIZIZI_CALLBACK_SECRET
         sync: false
-      - key: PAYMENT_SERVICE_URL
-        sync: false
-      - key: PAYMENT_API_KEY
-        sync: false
+      - fromGroup: masumi-preprod-payment
 
   - type: cron
     name: mizizi-masumi-orchestrator
@@ -30,9 +47,11 @@ services:
     buildCommand: echo "orchestrator cron"
     startCommand: >-
       curl -sf -X POST "$MIZIZI_WEB_URL/api/agents/orchestrator/run"
-      -H "x-mizizi-callback-secret: $MIZIZI_CALLBACK_SECRET"
+      -H "x-mizizi-callback-secret: $MASUMI_CALLBACK_SECRET"
     envVars:
       - key: MIZIZI_WEB_URL
         sync: false
       - key: MASUMI_CALLBACK_SECRET
+        sync: false
+      - key: MASUMI_AGENTS_URL
         sync: false

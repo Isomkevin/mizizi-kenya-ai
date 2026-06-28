@@ -156,7 +156,7 @@ bun run dev
 
 Open `/app/analytics?tab=agents` · On farmer profiles, **Request missing data** dispatches Masumi jobs.
 
-Render (agents only): Blueprint path **`deploy/masumi/render.yaml`** — see [deploy/masumi/README.md](deploy/masumi/README.md). Mizizi web deploys separately.
+Render (agents only): Blueprint path **`deploy/masumi/render.yaml`** — see [docs/masumi-deploy.md](docs/masumi-deploy.md). Mizizi web deploys separately.
 
 Before opening a PR that touches routes or components, run `bun run lint` and `bun run build`.
 
