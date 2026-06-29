@@ -15,4 +15,6 @@ Deployment docs live in the deploy bundle:
 
 Render Blueprint path: `deploy/masumi/blueprint.yaml`
 
+**Payment Node (Railway):** https://masumi-payment-service-production-7ec9.up.railway.app/ — API `…/api/v1`
+
 Product integration (UI, API, scripts): [masumi.md](./masumi.md)

@@ -15,6 +15,28 @@ Use the **same values**; only variable names differ.
 
 ---
 
+## Mizizi Payment Node (Railway)
+
+| | URL |
+| --- | --- |
+| Admin | https://masumi-payment-service-production-7ec9.up.railway.app/ |
+| API (`PAYMENT_SERVICE_URL` / `MASUMI_PAYMENT_URL`) | https://masumi-payment-service-production-7ec9.up.railway.app/api/v1 |
+
+Details: [payment/README.md](./payment/README.md)
+
+---
+
+## Mizizi Payment Node (Railway)
+
+| | URL |
+| --- | --- |
+| Admin | https://masumi-payment-service-production-7ec9.up.railway.app/ |
+| API (`PAYMENT_SERVICE_URL` / `MASUMI_PAYMENT_URL`) | `https://masumi-payment-service-production-7ec9.up.railway.app/api/v1` |
+
+Details: [payment/README.md](./payment/README.md)
+
+---
+
 ## Render blueprint prompts (`sync: false`)
 
 These are defined in [blueprint.yaml](./blueprint.yaml). Render asks for values when you **Apply** the Blueprint.
@@ -25,7 +47,7 @@ These are defined in [blueprint.yaml](./blueprint.yaml). Render asks for values 
 | -------- | -------- | ------- | ----- |
 | `MIZIZI_CALLBACK_URL` | Yes | `https://your-mizizi-app.com` | No trailing slash |
 | `MIZIZI_CALLBACK_SECRET` | Yes | strong random string | Must match Mizizi web `MASUMI_CALLBACK_SECRET` |
-| `PAYMENT_SERVICE_URL` | Live only | `https://payment.up.railway.app/api/v1` | From Payment Node |
+| `PAYMENT_SERVICE_URL` | Live only | `https://masumi-payment-service-production-7ec9.up.railway.app/api/v1` | Mizizi Railway Payment Node |
 | `PAYMENT_API_KEY` | Live only | Payment admin key | From Payment Node |
 | `MASUMI_PAYMENT_URL` | Live only | same as `PAYMENT_SERVICE_URL` | Copy to Mizizi web |
 | `MASUMI_PAYMENT_API_KEY` | Live only | same as `PAYMENT_API_KEY` | Copy to Mizizi web |
@@ -51,7 +73,7 @@ Set on your **separate** Mizizi deployment (repo root — Lovable, Vercel, Rende
 | `MASUMI_MODE` | `demo` or `live` |
 | `MASUMI_AGENTS_URL` | `https://mizizi-masumi-agents.onrender.com` |
 | `MASUMI_CALLBACK_SECRET` | shared secret (same as agents `MIZIZI_CALLBACK_SECRET`) |
-| `MASUMI_PAYMENT_URL` | Payment Node `/api/v1` URL (live only) |
+| `MASUMI_PAYMENT_URL` | `https://masumi-payment-service-production-7ec9.up.railway.app/api/v1` (live) |
 | `MASUMI_PAYMENT_API_KEY` | Payment admin key (live only) |
 
 Optional path overrides: `MASUMI_CLIMATE_AGENT_PATH`, `MASUMI_COOP_AGENT_PATH`, etc.

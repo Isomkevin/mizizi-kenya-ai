@@ -54,7 +54,7 @@ On a farmer profile, use **Request missing data** on the Data completeness panel
 | `MASUMI_MODE`            | `demo`                  | `demo` \| `live` \| `disabled`   |
 | `MASUMI_AGENTS_URL`      | `http://localhost:8088` | Python agents base URL           |
 | `MASUMI_CALLBACK_SECRET` | dev secret              | Webhook auth header              |
-| `MASUMI_PAYMENT_URL`     | —                       | Payment service `/api/v1` (live) |
+| `MASUMI_PAYMENT_URL`     | —                       | `https://masumi-payment-service-production-7ec9.up.railway.app/api/v1` (live) |
 | `MASUMI_PAYMENT_API_KEY` | —                       | Payment service API key          |
 
 Agent path overrides: `MASUMI_CLIMATE_AGENT_PATH`, `MASUMI_COOP_AGENT_PATH`, etc.
@@ -71,10 +71,19 @@ Server functions (TanStack): `getMasumiStatusFn`, `listMasumiJobsFn`, `grantCons
 
 ## Live mode (Cardano Preprod)
 
-1. Deploy [Masumi Payment Service](https://github.com/masumi-network/masumi-payment-service) (Docker or Railway template).
+**Mizizi Payment Node (Railway):** https://masumi-payment-service-production-7ec9.up.railway.app/
+
+| Env var | Live value |
+| ------- | ---------- |
+| `MASUMI_PAYMENT_URL` / `PAYMENT_SERVICE_URL` | `https://masumi-payment-service-production-7ec9.up.railway.app/api/v1` |
+| `MASUMI_PAYMENT_API_KEY` / `PAYMENT_API_KEY` | From Payment admin UI (secret) |
+
+1. Open Payment admin at the URL above; create API key if needed.
 2. Fund Preprod wallets (ADA + test USDM) via [Masumi faucet](https://faucet.masumi.network).
-3. Register agents in admin UI; set `MASUMI_MODE=live` and payment env vars.
+3. Register agents in admin UI; set `MASUMI_MODE=live` and payment env vars on agents + Mizizi web.
 4. Agents call `POST /purchase` when `MASUMI_MODE=live`.
+
+Full wiring: [deploy/masumi/payment/README.md](../deploy/masumi/payment/README.md)
 
 Hosted registry (read-only): `https://registry.masumi.network/api/v1`
 

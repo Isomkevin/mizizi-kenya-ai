@@ -109,11 +109,17 @@ Agents POST to `{MIZIZI_CALLBACK_URL}/api/webhooks/masumi-callback` with header 
 
 ## Step 3 — Payment Node (Preprod, live mode only)
 
+**Mizizi Payment Node:** https://masumi-payment-service-production-7ec9.up.railway.app/  
+API: `https://masumi-payment-service-production-7ec9.up.railway.app/api/v1`
+
 Follow [payment/README.md](./payment/README.md).
 
 Verify:
 
 ```bash
+export PAYMENT_SERVICE_URL=https://masumi-payment-service-production-7ec9.up.railway.app/api/v1
+export PAYMENT_API_KEY=your-admin-key
+
 curl -sS "$PAYMENT_SERVICE_URL/health" | jq
 curl -sS "$PAYMENT_SERVICE_URL/api-key-status" -H "token: $PAYMENT_API_KEY" | jq
 ```

@@ -4,6 +4,8 @@ Self-contained folder for **local agents**, **Render Blueprint**, and **Preprod 
 
 **Render Blueprint path:** `deploy/masumi/blueprint.yaml`
 
+**Payment Node (live):** https://masumi-payment-service-production-7ec9.up.railway.app/ — API base `/api/v1` ([payment/README.md](./payment/README.md))
+
 ---
 
 ## Documentation

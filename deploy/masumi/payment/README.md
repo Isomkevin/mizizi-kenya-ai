@@ -6,7 +6,22 @@ Deploy the Payment Node **separately** from the Render Masumi blueprint (Railway
 
 ---
 
-## Quick start
+## Mizizi Payment Node (Railway)
+
+| | URL |
+| --- | --- |
+| **Admin / dashboard** | https://masumi-payment-service-production-7ec9.up.railway.app/ |
+| **API base** (`PAYMENT_SERVICE_URL` / `MASUMI_PAYMENT_URL`) | https://masumi-payment-service-production-7ec9.up.railway.app/api/v1 |
+| **OpenAPI docs** | https://masumi-payment-service-production-7ec9.up.railway.app/docs |
+
+Set on Render agents: `PAYMENT_SERVICE_URL=https://masumi-payment-service-production-7ec9.up.railway.app/api/v1`  
+Set on Mizizi web: `MASUMI_PAYMENT_URL=https://masumi-payment-service-production-7ec9.up.railway.app/api/v1`  
+Add `PAYMENT_API_KEY` / `MASUMI_PAYMENT_API_KEY` from the Payment admin UI (do not commit keys).  
+Set `MASUMI_MODE=live` on both agents and Mizizi web.
+
+---
+
+## Quick start (new Payment Node)
 
 1. Deploy [Masumi Payment Service](https://github.com/masumi-network/masumi-payment-service):
    - **Recommended:** [Railway template](https://railway.com) — search “Masumi Payment Service”
@@ -26,7 +41,7 @@ After Payment Node is live:
 
 | Service | Variable | Value |
 | ------- | -------- | ----- |
-| Render agents | `PAYMENT_SERVICE_URL` | `https://your-host/api/v1` |
+| Render agents | `PAYMENT_SERVICE_URL` | `https://masumi-payment-service-production-7ec9.up.railway.app/api/v1` |
 | Render agents | `PAYMENT_API_KEY` | admin API key |
 | Mizizi web | `MASUMI_PAYMENT_URL` | same URL as above |
 | Mizizi web | `MASUMI_PAYMENT_API_KEY` | same key as above |
@@ -38,7 +53,7 @@ Set `MASUMI_MODE=live` on both agents and Mizizi web.
 ## Verify
 
 ```bash
-export PAYMENT_SERVICE_URL=https://your-host/api/v1
+export PAYMENT_SERVICE_URL=https://masumi-payment-service-production-7ec9.up.railway.app/api/v1
 export PAYMENT_API_KEY=your-admin-key
 
 curl -sS "$PAYMENT_SERVICE_URL/health" | jq
