@@ -1,6 +1,6 @@
 # Build phase status
 
-Last updated: 2026-06-27
+Last updated: 2026-06-30
 
 Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up where the last session left off. Update this file when you complete a milestone.
 
@@ -84,8 +84,20 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 - [x] `deploy/masumi/` deploy docs (DEPLOY, ENV, LOCAL, payment, agents)
 - [x] `docs/masumi.md` runbook
 
+## Stellar Hacks: Real-World ZK (2026-07-03 deadline)
+
+**Pivot:** Mizizi ZK Credit Rails — Groth16 credit credential on Soroban testnet.  
+**Plan:** [docs/stellar-hacks-zk-submission-plan.md](stellar-hacks-zk-submission-plan.md)
+
+| Day | Gate |
+| --- | --- |
+| 1 | Circom circuit + Soroban verify on testnet (CLI only) |
+| 2 | Mizizi UI: farmer prove → decision credential badge |
+| 3 | README, demo video, DoraHacks submission |
+
 ## Next priorities
 
+- **Hackathon (P0):** Execute [stellar-hacks-zk-submission-plan.md](stellar-hacks-zk-submission-plan.md) Day 1 gate
 - Harden production Supabase auth session flows (replace dev bypass in production runtime)
 - Add decision pipeline tests for risk/explanation grounding and audit transitions
 
