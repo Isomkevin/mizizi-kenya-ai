@@ -1,7 +1,4 @@
 import { createMiddleware } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
-
-import { serverEnv } from "@/server/env";
 
 /**
  * Server auth middleware for all createServerFn handlers.
