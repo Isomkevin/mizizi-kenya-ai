@@ -15,7 +15,7 @@ import {
   stageDocumentUpload,
 } from "@/server/services/ingestion-service";
 
-export const uploadFarmerDocumentFn = createServerFn({ method: "POST" })
+export const uploadFarmerDocumentFn = createServerFn({ method: "POST" }).middleware([requireAuth])
   .validator((data: UploadFarmerDocumentInput) => data)
   .handler(async ({ data }) => {
     const upload = await stageDocumentUpload(data);
@@ -25,19 +25,19 @@ export const uploadFarmerDocumentFn = createServerFn({ method: "POST" })
     return upload;
   });
 
-export const confirmFarmerDocumentFn = createServerFn({ method: "POST" })
+export const confirmFarmerDocumentFn = createServerFn({ method: "POST" }).middleware([requireAuth])
   .validator((data: ConfirmFarmerDocumentInput) => data)
   .handler(async ({ data }) => {
     return confirmDocumentClassification(data.farmerId, data.documentId);
   });
 
-export const reclassifyFarmerDocumentFn = createServerFn({ method: "POST" })
+export const reclassifyFarmerDocumentFn = createServerFn({ method: "POST" }).middleware([requireAuth])
   .validator((data: ReclassifyFarmerDocumentInput) => data)
   .handler(async ({ data }) => {
     return reclassifyDocument(data);
   });
 
-export const removeFarmerDocumentFn = createServerFn({ method: "POST" })
+export const removeFarmerDocumentFn = createServerFn({ method: "POST" }).middleware([requireAuth])
   .validator((data: RemoveFarmerDocumentInput) => data)
   .handler(async ({ data }) => {
     return removeFarmerDocument(data.farmerId, data.documentId);

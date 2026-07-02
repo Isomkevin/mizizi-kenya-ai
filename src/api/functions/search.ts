@@ -3,7 +3,7 @@ import { requireAuth } from "@/server/middleware/require-auth";
 
 import { globalSearch, searchFarmerResults } from "@/server/services/search";
 
-export const globalSearchFn = createServerFn({ method: "GET" })
+export const globalSearchFn = createServerFn({ method: "GET" }).middleware([requireAuth])
   .validator((data: { query: string; type?: string; limit?: number }) => data)
   .handler(async ({ data }) => {
     return globalSearch({
@@ -13,7 +13,7 @@ export const globalSearchFn = createServerFn({ method: "GET" })
     });
   });
 
-export const searchFarmersFn = createServerFn({ method: "GET" })
+export const searchFarmersFn = createServerFn({ method: "GET" }).middleware([requireAuth])
   .validator((data: { query: string; limit?: number }) => data)
   .handler(async ({ data }) => {
     return searchFarmerResults(data.query, data.limit);
