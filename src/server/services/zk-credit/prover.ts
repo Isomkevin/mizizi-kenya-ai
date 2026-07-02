@@ -46,6 +46,8 @@ export async function proveWitness(witness: WitnessJson): Promise<ProveResult> {
   const zkeyPath = join(ART, "credit_tier_final.zkey");
 
   try {
+    const groth16 = await loadGroth16();
+    if (!groth16) throw new Error("snarkjs unavailable in this runtime");
     const input = await circuitInputToWitness(circuitInput);
     const result = await groth16.fullProve(input, wasmPath, zkeyPath);
     return { proof: result.proof, publicSignals: result.publicSignals, demo: false };
