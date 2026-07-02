@@ -54,4 +54,21 @@ export const serverEnv = {
   masumiCoopAgentPath: () => env("MASUMI_COOP_AGENT_PATH") ?? "/coop",
   masumiMobileAgentPath: () => env("MASUMI_MOBILE_AGENT_PATH") ?? "/mobile",
   masumiOrchestratorPath: () => env("MASUMI_ORCHESTRATOR_PATH") ?? "/orchestrator",
+  zkMode: (): "live" | "demo" | "disabled" => {
+    const mode = env("ZK_MODE");
+    if (mode === "live" || mode === "demo" || mode === "disabled") return mode;
+    if (env("STELLAR_FUNDER_SECRET") && env("SOROBAN_CONTRACT_ID")) return "live";
+    return "demo";
+  },
+  stellarNetwork: () => env("STELLAR_NETWORK") ?? "testnet",
+  stellarNetworkPassphrase: () =>
+    env("STELLAR_NETWORK") === "public"
+      ? "Public Global Stellar Network ; September 2015"
+      : "Test SDF Network ; September 2015",
+  stellarHorizonUrl: () => env("STELLAR_HORIZON_URL") ?? "https://horizon-testnet.stellar.org",
+  stellarSorobanRpcUrl: () => env("STELLAR_SOROBAN_RPC_URL") ?? "https://soroban-testnet.stellar.org",
+  stellarFunderSecret: () => env("STELLAR_FUNDER_SECRET"),
+  sorobanContractId: () => env("SOROBAN_CONTRACT_ID"),
+  zkCredentialValidityDays: () => Number(env("ZK_CREDENTIAL_VALIDITY_DAYS") ?? "90"),
+  stellarUsdcIssuer: () => env("STELLAR_USDC_ISSUER"),
 };

@@ -1,0 +1,9 @@
+{
+  "farmerId": "f-002",
+  "phone": "+254700000002",
+  "salt": "demo-salt-peter-2026",
+  "repaymentsOnTime": [1, 1, 1, 1, 1, 1],
+  "monthlyInflowKes": [19000, 21000, 20500, 22000, 21500, 23000],
+  "minScore": 60,
+  "minTier": 2
+}

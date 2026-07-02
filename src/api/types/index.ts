@@ -277,6 +277,27 @@ export interface FarmerProfile extends FarmerSummary {
   documents: DocumentRecord[];
   communications: CommunicationRecord[];
   climate: ClimateSnapshot;
+  zkCredential?: ZkCredential;
+}
+
+export interface ZkCredential {
+  farmerCommitment: string;
+  tier: 1 | 2 | 3 | 4;
+  tierLabel: string;
+  rawScore: number;
+  maxUsdc: number;
+  validUntil: string;
+  issuedAt: string;
+  stellarTxHash?: string;
+  explorerUrl?: string;
+  mode: "live" | "demo";
+}
+
+export interface ZkCredentialStatus {
+  farmerId: string;
+  credential?: ZkCredential;
+  canProve: boolean;
+  message?: string;
 }
 
 export interface RepaymentRecord {
@@ -475,6 +496,7 @@ export interface DecisionDetail {
   farmerExplanation: string;
   overrideReason?: string;
   createdAt: string;
+  zkCredentialRequired?: boolean;
 }
 
 export interface SubmitDecisionInput {

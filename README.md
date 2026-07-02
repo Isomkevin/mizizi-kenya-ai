@@ -2,7 +2,9 @@
 
 **Enterprise agricultural risk intelligence for Kenya**
 
-Mizizi is a platform for the [Kenya AI Challenge 2026 — AgriFin Finance Challenge](https://kenyaai.go.ke). It helps lenders, cooperatives, and field officers see, verify, and explain agricultural credit risk using signals that already exist in the field — cooperative history, mobile money, input purchases, climate, and community relationships — instead of treating farmers as opaque profiles in a spreadsheet.
+Mizizi is an enterprise agricultural risk intelligence platform. It helps lenders, cooperatives, and field officers see, verify, and explain agricultural credit risk using signals that already exist in the field — cooperative history, mobile money, input purchases, climate, and community relationships.
+
+**ZK Credit Rails** (Stellar Hacks: Real-World ZK): farmers prove credit tier from simulated mobile-money turnover and repayment history **without revealing raw transactions**. Groth16 proofs anchor credentials on Stellar testnet Soroban. See [docs/stellar-hacks-zk-submission-plan.md](docs/stellar-hacks-zk-submission-plan.md).
 
 ## Built by **LESOM Dynamics**
 

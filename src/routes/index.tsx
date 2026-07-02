@@ -136,7 +136,7 @@ function Hero() {
         <Reveal>
           <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/60 px-3 py-1 font-mono-data text-[11px] uppercase tracking-[0.18em] text-muted-foreground backdrop-blur">
             <CircleDot className="h-3 w-3 text-primary" />
-            Kenya AI Challenge 2026 · AgriFin Finance
+            Kenya AI Challenge 2026 · Stellar Hacks ZK Credit Rails
           </div>
         </Reveal>
 
@@ -152,7 +152,7 @@ function Hero() {
         <Reveal delay={160}>
           <p className="max-w-2xl text-balance text-lg text-muted-foreground md:text-xl">
             Millions of smallholder farmers generate trustworthy financial signals every day.
-            Current systems simply cannot connect them. Mizizi can.
+            Mizizi proves creditworthiness with zero-knowledge credentials on Stellar — without exposing raw M-Pesa data.
           </p>
         </Reveal>
 

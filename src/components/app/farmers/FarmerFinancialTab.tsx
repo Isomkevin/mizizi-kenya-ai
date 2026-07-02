@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
 
 import type { FarmerProfile } from "@/api/types";
+import { ZkCredentialPanel } from "@/components/app/farmers/ZkCredentialPanel";
 
 export function FarmerFinancialTab({ farmer }: { farmer: FarmerProfile }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
+      <ZkCredentialPanel farmer={farmer} />
       <Panel title="Repayment history">
         {farmer.repayments.map((repayment) => (
           <Row

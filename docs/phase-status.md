@@ -89,15 +89,17 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 **Pivot:** Mizizi ZK Credit Rails — Groth16 credit credential on Soroban testnet.  
 **Plan:** [docs/stellar-hacks-zk-submission-plan.md](stellar-hacks-zk-submission-plan.md)
 
-| Day | Gate |
+| Component | Status |
 | --- | --- |
-| 1 | Circom circuit + Soroban verify on testnet (CLI only) |
-| 2 | Mizizi UI: farmer prove → decision credential badge |
-| 3 | README, demo video, DoraHacks submission |
+| Circom circuit `zk/circuits/credit_tier.circom` | **Done** |
+| Prover CLI + demo envelope | **Done** |
+| Soroban contract `contracts/credit_rails/` | **Done** (BFF verifies Groth16; contract stores credential) |
+| Mizizi UI (Financial tab + decision gate) | **Done** |
+| Demo mode (`ZK_MODE=demo`) | **Done** |
+| Testnet live deploy | Manual — see `contracts/credit_rails/README.md` |
+| Demo video + DoraHacks submit | **Pending** (human step) |
 
 ## Next priorities
-
-- **Hackathon (P0):** Execute [stellar-hacks-zk-submission-plan.md](stellar-hacks-zk-submission-plan.md) Day 1 gate
 - Harden production Supabase auth session flows (replace dev bypass in production runtime)
 - Add decision pipeline tests for risk/explanation grounding and audit transitions
 

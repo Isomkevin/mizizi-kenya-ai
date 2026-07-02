@@ -73,3 +73,15 @@ Desktop.ini
 # Local overrides
 *.local
 .data/
+
+# ZK ceremony intermediates (keep wasm, final zkey, vk)
+zk/artifacts/*.r1cs
+zk/artifacts/*.sym
+zk/artifacts/credit_tier_js/
+zk/artifacts/credit_tier_0000.zkey
+zk/artifacts/proof.json
+zk/artifacts/*.wtns
+
+# Soroban build cache
+contracts/**/target/
+!contracts/**/target/wasm32v1-none/release/*.wasm

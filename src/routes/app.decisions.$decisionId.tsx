@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 
 import { useDecision } from "@/api/hooks/use-decisions";
 import { useFarmerProfile } from "@/api/hooks/use-farmers";
@@ -8,6 +9,7 @@ import { DecisionContextLinks } from "@/components/app/decisions/DecisionContext
 import { DecisionSummary } from "@/components/app/decisions/DecisionSummary";
 import { GraphPathViewer } from "@/components/app/decisions/GraphPathViewer";
 import { OfficerDecisionPanel } from "@/components/app/decisions/OfficerDecisionPanel";
+import { ZkCredentialBadge } from "@/components/app/decisions/ZkCredentialBadge";
 import { FarmerDataGapsPanel } from "@/components/app/farmers/FarmerDataGapsPanel";
 import { findDemoDecision } from "@/lib/demo-seed";
 
@@ -27,6 +29,7 @@ function DecisionWorkspacePage() {
   const { data: decision, isFetching, isError } = useDecision(decisionId, seededDecision);
   const resolvedDecision = decision ?? seededDecision;
   const { data: farmer } = useFarmerProfile(resolvedDecision?.farmerId ?? "");
+  const [credentialVerified, setCredentialVerified] = useState(false);
 
   if (!resolvedDecision && isFetching) {
     return (
@@ -63,7 +66,16 @@ function DecisionWorkspacePage() {
       <DecisionContextLinks decision={resolvedDecision} />
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
         <ContributingFactors decision={resolvedDecision} />
-        <OfficerDecisionPanel decision={resolvedDecision} />
+        <div className="space-y-4">
+          <ZkCredentialBadge
+            decision={resolvedDecision}
+            onVerifiedChange={setCredentialVerified}
+          />
+          <OfficerDecisionPanel
+            decision={resolvedDecision}
+            credentialVerified={credentialVerified}
+          />
+        </div>
       </div>
       <GraphPathViewer decision={resolvedDecision} />
     </div>

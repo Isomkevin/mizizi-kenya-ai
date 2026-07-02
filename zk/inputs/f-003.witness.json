@@ -1,0 +1,9 @@
+{
+  "farmerId": "f-003",
+  "phone": "+254700000003",
+  "salt": "demo-salt-faith-2026",
+  "repaymentsOnTime": [1, 1, 0, 1, 0, 0],
+  "monthlyInflowKes": [12000, 14000, 11000, 13000, 12500, 11500],
+  "minScore": 60,
+  "minTier": 2
+}

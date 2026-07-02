@@ -19,6 +19,9 @@ NEO4J_DATABASE=neo4j
 NEO4J_GDS=false
 
 MASUMI_MODE=disabled
+
+# ZK Credit Rails — demo mode (no Stellar secrets required)
+ZK_MODE=demo
 ```
 
 Optional (document AI on farmer profiles):
@@ -46,7 +49,8 @@ Lovable syncs from the connected Git branch. Commit and push fixes, then wait fo
 | --- | -------- |
 | `/app` | Dashboard loads (no redirect to `/`) |
 | `/app/decisions` | Pending applications list |
-| `/app/decisions/dec-f-002` | Decision workspace (not “Decision not found”) |
+| `/app/decisions/dec-f-002` | Decision workspace — ZK credential gate before approve |
+| `/app/farmers/f-002` | Peter Ochieng — generate ZK credential on Financial tab |
 | `/app/farmers/f-001` | Wanjiru Kamau profile |
 | `/app/graph?farmerId=f-001` | Graph canvas; **Source: neo4j** when Aura is wired |
 
@@ -55,3 +59,4 @@ Lovable syncs from the connected Git branch. Commit and push fixes, then wait fo
 - **Auth:** `VITE_MIZIZI_DEMO=true` (or empty Supabase vars) keeps the officer dev session on production.
 - **Data:** Local store uses in-memory seed on serverless; each worker cold start reloads seed data (fine for demos).
 - **Masumi:** Disable on Lovable (`MASUMI_MODE=disabled`); deploy agents via `deploy/masumi/blueprint.yaml` if needed later.
+- **ZK:** `ZK_MODE=demo` runs Groth16 prove locally and skips Soroban tx (no `STELLAR_FUNDER_SECRET` needed).

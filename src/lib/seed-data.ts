@@ -205,10 +205,13 @@ function buildProfile(seed: FarmerSeed, index: number): FarmerProfile {
       factor(`${seed.id}-f5`, "Data freshness", 0.07, "positive", "platform_metadata", 0.93),
     ],
     repayments: [
-      { id: `${seed.id}-rp-1`, date: "2026-04-08", amountKes: 12000 + index * 350, onTime: true },
-      { id: `${seed.id}-rp-2`, date: "2026-05-08", amountKes: 12000 + index * 350, onTime: true },
+      { id: `${seed.id}-rp-1`, date: "2026-01-08", amountKes: 12000 + index * 350, onTime: true },
+      { id: `${seed.id}-rp-2`, date: "2026-02-08", amountKes: 12000 + index * 350, onTime: true },
+      { id: `${seed.id}-rp-3`, date: "2026-03-08", amountKes: 12000 + index * 350, onTime: seed.risk !== "high" && seed.risk !== "critical" },
+      { id: `${seed.id}-rp-4`, date: "2026-04-08", amountKes: 12000 + index * 350, onTime: seed.risk !== "high" && seed.risk !== "critical" },
+      { id: `${seed.id}-rp-5`, date: "2026-05-08", amountKes: 12000 + index * 350, onTime: seed.risk !== "high" && seed.risk !== "critical" },
       {
-        id: `${seed.id}-rp-3`,
+        id: `${seed.id}-rp-6`,
         date: "2026-06-08",
         amountKes: 12000 + index * 350,
         onTime: seed.risk !== "high" && seed.risk !== "critical",
@@ -644,6 +647,7 @@ function buildDecisions(farmers: FarmerProfile[]): DecisionDetail[] {
         statuses[index] === "override"
           ? "Officer verified additional collateral off-platform."
           : undefined,
+      zkCredentialRequired: statuses[index] === "pending",
       createdAt: `2026-06-${12 + index}T10:30:00Z`,
     };
   });
