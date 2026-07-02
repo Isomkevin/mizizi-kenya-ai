@@ -1,6 +1,7 @@
 import { CloudSun, Copy, Network, ShieldCheck, Sparkles } from "lucide-react";
 
 import { useDashboard } from "@/api/hooks/use-dashboard";
+import { EmptyState } from "@/components/app/EmptyState";
 import type { DashboardInsight } from "@/api/types";
 import { RiskBadge } from "@/components/app/RiskBadge";
 
@@ -23,11 +24,19 @@ export function AiInsightsPanel() {
           Alerts · today
         </div>
       </div>
-      <ul className="mt-4 space-y-4">
-        {dashboardInsights.map((insight) => (
-          <InsightCard key={insight.id} insight={insight} />
-        ))}
-      </ul>
+      {dashboardInsights.length === 0 ? (
+        <EmptyState
+          icon={Sparkles}
+          title="No active alerts"
+          description="Your AI risk monitor hasn't flagged any issues today. All borrowers are within expected risk parameters."
+        />
+      ) : (
+        <ul className="mt-4 space-y-4">
+          {dashboardInsights.map((insight) => (
+            <InsightCard key={insight.id} insight={insight} />
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

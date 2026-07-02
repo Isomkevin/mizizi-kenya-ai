@@ -1,8 +1,12 @@
 # Mizizi ZK — Credit Tier Circuit
 
-Groth16 circuit for agricultural credit credentials. See [docs/stellar-hacks-zk-submission-plan.md](../docs/stellar-hacks-zk-submission-plan.md).
+Groth16 circuit for agricultural credit credentials. This is a core component of the **Stellar Hacks: Real-World ZK** submission.
+
+## 🎯 Purpose
+This circuit allows a farmer to prove they meet a specific credit threshold (Tier) based on private financial data (turnover, repayments) without revealing the data itself. This proof is then anchored to a Soroban smart contract on Stellar to enable private credit access.
 
 ## Prerequisites
+... (rest of the content preserved)
 
 - [Circom 2.x](https://docs.circom.io/getting-started/installation/)
 - [snarkjs](https://github.com/iden3/snarkjs) (`npm i -g snarkjs` or use project devDependency)

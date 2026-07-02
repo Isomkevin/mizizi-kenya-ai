@@ -36,7 +36,12 @@ export function useIssueZkCredential(farmerId: string) {
 }
 
 export function useSimulateDrawdown(farmerId: string) {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (amount?: number) => simulateDrawdownFn({ data: { farmerId, amount } }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["zk-credential", farmerId] });
+      void queryClient.invalidateQueries({ queryKey: ["farmers", farmerId] });
+    },
   });
 }

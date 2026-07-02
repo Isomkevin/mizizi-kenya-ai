@@ -11,7 +11,7 @@ import { FarmerFinancialTab } from "@/components/app/farmers/FarmerFinancialTab"
 import { FarmerOverviewTab } from "@/components/app/farmers/FarmerOverviewTab";
 import { FarmerProfileHeader } from "@/components/app/farmers/FarmerProfileHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { findDemoFarmer } from "@/lib/demo-seed";
+import { FarmerProfileSkeleton } from "@/components/skeletons/farmer-skeletons";
 
 export const Route = createFileRoute("/app/farmers/$farmerId")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -55,8 +55,8 @@ function FarmerProfilePage() {
 
   if (!resolvedFarmer && isFetching) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10 text-sm text-muted-foreground sm:px-6">
-        Loading farmer profile…
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+        <FarmerProfileSkeleton />
       </div>
     );
   }

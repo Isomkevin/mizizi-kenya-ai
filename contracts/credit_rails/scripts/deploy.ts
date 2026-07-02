@@ -5,6 +5,7 @@
  */
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { execSync } from "node:child_process";
 
 import { env } from "./shared";
 
@@ -31,11 +32,30 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("WASM found. Deploy with Soroban CLI:");
-  console.log(
-    `  soroban contract deploy --wasm ${WASM_PATH} --source ${env("STELLAR_FUNDER_SECRET")?.slice(0, 6)}… --network testnet`,
-  );
-  console.log("Then add SOROBAN_CONTRACT_ID to .env and set ZK_MODE=live");
+  console.log("WASM found. Deploying to Stellar Testnet...");
+
+  try {
+    // We use the secret to identify the source account for the CLI
+    // Note: Soroban CLI usually expects the secret in a specific format or via an identity file.
+    // For this script, we assume the user has soroban-cli installed and configured.
+    const cmd = `soroban contract deploy --wasm ${WASM_PATH} --source ${secret} --network testnet`;
+    const output = execSync(cmd, { encoding: "utf8" });
+    console.log(output);
+
+    const contractIdMatch = output.match(/Contract ID: ([A-Z0-9_]+)/);
+    if (contractIdMatch) {
+      console.log(`\n✅ Successfully deployed!`);
+      console.log(`Contract ID: ${contractIdMatch[1]}`);
+      console.log(`\nNext step: Add SOROBAN_CONTRACT_ID=${contractIdMatch[1]} to your .env file.`);
+    } else {
+      console.log(`\nDeployment finished, but could not parse Contract ID from output.`);
+      console.log(`Please manually extract the Contract ID from the output above.`);
+    }
+  } catch (e: any) {
+    console.error(`\n❌ Deployment failed: ${e.message}`);
+    console.error(`Ensure soroban-cli is installed and STELLAR_FUNDER_SECRET is a valid secret key.`);
+    process.exit(1);
+  }
 }
 
 main();

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { useDashboard } from "@/api/hooks/use-dashboard";
+import { EmptyState } from "@/components/app/EmptyState";
 import type { ActivityItem, ActivityType } from "@/api/types";
 import { RiskBadge } from "@/components/app/RiskBadge";
 import { Button } from "@/components/ui/button";
@@ -37,11 +38,19 @@ export function RecentActivityFeed() {
           Recent activity
         </div>
       </div>
-      <ul className="mt-4 divide-y divide-border">
-        {recentActivity.map((item) => (
-          <ActivityRow key={item.id} item={item} />
-        ))}
-      </ul>
+      {recentActivity.length === 0 ? (
+        <EmptyState
+          icon={Activity}
+          title="No recent activity"
+          description="There are no recent actions to display. Activities will appear here as they occur."
+        />
+      ) : (
+        <ul className="mt-4 divide-y divide-border">
+          {recentActivity.map((item) => (
+            <ActivityRow key={item.id} item={item} />
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Search } from "lucide-react";
 
 import { useFarmers, type FarmerFiltersInput } from "@/api/hooks/use-farmers";
 import { CreateFarmerDialog } from "@/components/app/farmers/CreateFarmerDialog";
 import { FarmerFilters } from "@/components/app/farmers/FarmerFilters";
 import { FarmerResultCard } from "@/components/app/farmers/FarmerResultCard";
 import { FarmerSearchBar } from "@/components/app/farmers/FarmerSearchBar";
+import { FarmerSearchSkeleton } from "@/components/skeletons/farmer-skeletons";
+import { EmptyState } from "@/components/app/EmptyState";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/farmers/")({
@@ -40,7 +42,7 @@ function FarmerSearchPage() {
   }, [create, navigate]);
 
   const mergedFilters = useMemo(() => ({ ...filters, query }), [filters, query]);
-  const { data: farmers = [] } = useFarmers(mergedFilters);
+  const { data: farmers = [], isLoading } = useFarmers(mergedFilters);
   const { data: allFarmers = [] } = useFarmers({});
 
   return (
@@ -64,19 +66,31 @@ function FarmerSearchPage() {
       <FarmerFilters farmers={allFarmers} filters={mergedFilters} onChange={setFilters} />
 
       <section className="space-y-3">
-        <div className="font-mono-data text-[10px] uppercase tracking-wider text-muted-foreground">
-          {farmers.length} result{farmers.length === 1 ? "" : "s"}
-        </div>
-        {farmers.length ? (
-          <div className="grid gap-3">
-            {farmers.map((farmer) => (
-              <FarmerResultCard key={farmer.id} farmer={farmer} />
-            ))}
-          </div>
+        {isLoading ? (
+          <FarmerSearchSkeleton />
         ) : (
-          <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-            No farmers match your current filters.
-          </div>
+          <>
+            <div className="font-mono-data text-[10px] uppercase tracking-wider text-muted-foreground">
+              {farmers.length} result{farmers.length === 1 ? "" : "s"}
+            </div>
+            {farmers.length ? (
+              <div className="grid gap-3">
+                {farmers.map((farmer) => (
+                  <FarmerResultCard key={farmer.id} farmer={farmer} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={Search}
+                title="No borrowers found"
+                description="We couldn't find any farmers matching your current filters. Try adjusting your search or creating a new profile."
+                action={{
+                  label: "Create new farmer",
+                  onClick: () => setCreateOpen(true),
+                }}
+              />
+            )}
+          </>
         )}
       </section>
 
