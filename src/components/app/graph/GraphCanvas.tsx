@@ -171,7 +171,7 @@ export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasPr
 
   const linkLineDash = useCallback((link: LinkObject) => {
     const data = link as ForceGraphLink;
-    return graphLinkCanvasDash(data.type ?? "");
+    return graphLinkCanvasDash(data.type ?? "") ?? null;
   }, []);
 
   const linkLabel = useCallback((link: LinkObject) => {
@@ -212,11 +212,11 @@ export function GraphCanvas({ graph, selectedNode, onSelectNode }: GraphCanvasPr
             linkDirectionalArrowLength={5}
             linkDirectionalArrowRelPos={1}
             linkLabel={linkLabel}
-            linkLabelSize={0.65}
+            
             backgroundColor="transparent"
             warmupTicks={80}
             cooldownTicks={100}
-            nodePointerArea={10}
+            
             enableNodeDrag
             onNodeClick={handleNodeClick}
             onBackgroundClick={handleBackgroundClick}

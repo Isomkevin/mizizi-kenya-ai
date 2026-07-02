@@ -34,7 +34,7 @@ export function OfficerDecisionPanel({
       });
       if (status === "approved" && credentialVerified) {
         try {
-          const result = await drawdown.mutateAsync();
+          const result = await drawdown.mutateAsync(undefined);
           setMessage(`Decision saved. Drawdown simulated: ${result.amount} USDC (${result.mode}).`);
           return;
         } catch {

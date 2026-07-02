@@ -17,8 +17,8 @@ export const Route = createFileRoute("/app/farmers/$farmerId")({
   validateSearch: (search: Record<string, unknown>) => ({
     tab: typeof search.tab === "string" ? search.tab : undefined,
   }),
-  loader: ({ params }) => ({
-    farmer: findDemoFarmer(params.farmerId),
+  loader: () => ({
+    farmer: undefined,
   }),
   head: () => ({
     meta: [{ title: "Mizizi · Farmer Profile" }],
@@ -73,7 +73,7 @@ function FarmerProfilePage() {
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
       <FarmerProfileHeader farmer={resolvedFarmer} />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as (typeof PROFILE_TABS)[number])} className="space-y-4">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="financial">Financial</TabsTrigger>

@@ -1,5 +1,6 @@
 import type {
   ActivityItem,
+  AgentEvent,
   AnalyticsPayload,
   CountyIntel,
   DashboardInsight,
@@ -30,4 +31,5 @@ export interface MiziziDatabase {
   graphViews: { id: string; userId: string; name: string; farmerId?: string; filters: string }[];
   masumiJobs: MasumiJob[];
   masumiOrchestratorLastRun?: string;
+  agentEvents: AgentEvent[];
 }
