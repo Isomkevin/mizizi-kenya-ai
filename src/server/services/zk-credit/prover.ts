@@ -4,9 +4,13 @@ import { join } from "node:path";
 // snarkjs is a Node-only package (not compatible with Cloudflare Workers).
 // Load it dynamically so bundling for the workerd target doesn't fail; if the
 // import throws at runtime, callers fall back to the demo proof envelope.
-async function loadGroth16(): Promise<typeof import("snarkjs").groth16 | null> {
+async function loadGroth16(): Promise<{
+  fullProve: (input: unknown, wasm: string, zkey: string) => Promise<{ proof: unknown; publicSignals: string[] }>;
+  verify: (vk: unknown, publicSignals: string[], proof: unknown) => Promise<boolean>;
+} | null> {
   try {
-    const mod = await import(/* @vite-ignore */ "snarkjs");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mod: any = await import(/* @vite-ignore */ "snarkjs" as string);
     return mod.groth16 ?? null;
   } catch {
     return null;
