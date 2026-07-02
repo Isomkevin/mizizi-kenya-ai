@@ -21,42 +21,14 @@ export interface AuthedSession {
   demo: boolean;
 }
 
-async function verifySupabaseToken(token: string): Promise<AuthedSession | null> {
-  const url = serverEnv.supabaseUrl();
-  const anon = serverEnv.supabaseAnonKey();
-  if (!url || !anon) return null;
-  try {
-    const res = await fetch(`${url}/auth/v1/user`, {
-      headers: {
-        apikey: anon,
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!res.ok) return null;
-    const user = (await res.json()) as {
-      id: string;
-      email?: string;
-      app_metadata?: { role?: string };
-      user_metadata?: { role?: string };
-    };
-    if (!user?.id) return null;
-    return {
-      userId: user.id,
-      email: user.email,
-      // Trust only server-side role claim (app_metadata), never user_metadata.
-      role: user.app_metadata?.role,
-      demo: false,
-    };
-  } catch {
-    return null;
-  }
-}
-
 function unauthorized(message = "Unauthorized"): never {
   throw new Response(message, { status: 401 });
 }
 
 export const requireAuth = createMiddleware({ type: "function" }).server(async ({ next }) => {
+  const { serverEnv } = await import("@/server/env");
+  const { getRequestHeader } = await import("@tanstack/react-start/server");
+
   if (serverEnv.demoMode()) {
     const session: AuthedSession = {
       userId: "dev-kevin-m",
@@ -66,15 +38,42 @@ export const requireAuth = createMiddleware({ type: "function" }).server(async (
     return next({ context: { session } });
   }
 
-  const authHeader = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
+  const authHeader =
+    getRequestHeader("authorization") ?? getRequestHeader("Authorization");
   if (!authHeader?.toLowerCase().startsWith("bearer ")) {
     unauthorized();
   }
   const token = authHeader.slice(7).trim();
   if (!token) unauthorized();
 
-  const session = await verifySupabaseToken(token);
-  if (!session) unauthorized("Invalid or expired session");
+  const url = serverEnv.supabaseUrl();
+  const anon = serverEnv.supabaseAnonKey();
+  if (!url || !anon) unauthorized("Invalid or expired session");
 
+  let session: AuthedSession | null = null;
+  try {
+    const res = await fetch(`${url}/auth/v1/user`, {
+      headers: { apikey: anon, Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const user = (await res.json()) as {
+        id: string;
+        email?: string;
+        app_metadata?: { role?: string };
+      };
+      if (user?.id) {
+        session = {
+          userId: user.id,
+          email: user.email,
+          role: user.app_metadata?.role,
+          demo: false,
+        };
+      }
+    }
+  } catch {
+    session = null;
+  }
+
+  if (!session) unauthorized("Invalid or expired session");
   return next({ context: { session } });
 });
