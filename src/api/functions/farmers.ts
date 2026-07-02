@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireAuth } from "@/server/middleware/require-auth";
 
 import type { CreateFarmerInput, RequestEnrichmentInput } from "@/api/types";
 import { createFarmer, getFarmer, searchFarmers } from "@/server/services/farmers";

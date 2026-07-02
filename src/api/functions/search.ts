@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireAuth } from "@/server/middleware/require-auth";
 
 import { globalSearch, searchFarmerResults } from "@/server/services/search";
 
