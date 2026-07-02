@@ -1,11 +1,20 @@
-import { buildPoseidon } from "circomlibjs";
-
 import { computeRawScore, DEFAULT_MIN_SCORE, DEFAULT_MIN_TIER, tierFromRawScore } from "./scoring";
 
-let poseidonPromise: ReturnType<typeof buildPoseidon> | null = null;
+// circomlibjs (via ffjavascript) is Node-only and cannot be bundled for
+// Cloudflare Workers. Load dynamically at call time so the workerd build
+// succeeds; the ZK service falls back to a demo envelope when unavailable.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PoseidonFn = ((inputs: any[]) => any) & { F: { p: bigint | string; toObject: (v: any) => bigint } };
+let poseidonPromise: Promise<PoseidonFn> | null = null;
 
-async function getPoseidon() {
-  if (!poseidonPromise) poseidonPromise = buildPoseidon();
+async function getPoseidon(): Promise<PoseidonFn> {
+  if (!poseidonPromise) {
+    poseidonPromise = (async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mod: any = await import(/* @vite-ignore */ ("circomlibjs" as string));
+      return mod.buildPoseidon();
+    })();
+  }
   return poseidonPromise;
 }
 
