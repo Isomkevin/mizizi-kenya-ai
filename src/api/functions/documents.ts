@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireAuth } from "@/server/middleware/require-auth";
+import { requireAuth } from "@/api/middleware/require-auth";
 
 import type {
   ConfirmFarmerDocumentInput,

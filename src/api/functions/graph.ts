@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireAuth } from "@/server/middleware/require-auth";
+import { requireAuth } from "@/api/middleware/require-auth";
 
 import { expandGraph, getGraph } from "@/server/services/graph";
 import { verifyNeo4jConnectivity } from "@/server/services/neo4j";
