@@ -150,6 +150,12 @@ export function ZkCredentialPanel({ farmer }: { farmer: FarmerProfile }) {
       <p className="mt-4 text-xs text-muted-foreground">
         Lenders see tier, score band, and limit only — not individual M-Pesa or repayment rows.
       </p>
+      <CreditPipelineDialog
+        open={pipelineOpen}
+        onOpenChange={setPipelineOpen}
+        farmerId={farmer.id}
+        amount={credential?.maxUsdc}
+      />
     </section>
   );
 }
