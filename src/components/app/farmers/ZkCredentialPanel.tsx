@@ -119,13 +119,24 @@ export function ZkCredentialPanel({ farmer }: { farmer: FarmerProfile }) {
             {status?.message ??
               "Generate a Groth16 proof bound to your repayment and M-Pesa turnover signals."}
           </p>
-          <Button
-            size="sm"
-            onClick={() => void handleIssue()}
-            disabled={issueCredential.isPending || status?.canProve === false}
-          >
-            {issueCredential.isPending ? "Generating proof…" : "Generate ZK credential"}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              onClick={() => void handleIssue()}
+              disabled={issueCredential.isPending || status?.canProve === false}
+            >
+              {issueCredential.isPending ? "Generating proof…" : "Generate ZK credential"}
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setPipelineOpen(true)}
+              disabled={status?.canProve === false}
+            >
+              <Workflow className="mr-1 h-3.5 w-3.5" />
+              Run full pipeline
+            </Button>
+          </div>
           {issueCredential.isError ? (
             <p className="text-xs text-destructive" role="alert">
               {issueCredential.error instanceof Error
