@@ -548,3 +548,59 @@ export interface RefreshClimateInput {
   lat: number;
   lon: number;
 }
+
+export type AgentEventStep =
+  | "input-validation"
+  | "witness-build"
+  | "proof-generation"
+  | "proof-verification"
+  | "stellar-submission"
+  | "credential-issued"
+  | "drawdown-submitted"
+  | "orchestration";
+
+export type AgentEventStatus = "pending" | "running" | "success" | "failed";
+
+export type AgentEventPayloadValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | AgentEventPayloadValue[]
+  | { [key: string]: AgentEventPayloadValue };
+export type AgentEventPayload = { [key: string]: AgentEventPayloadValue };
+
+export interface AgentEvent {
+  id: string;
+  pipelineId: string;
+  farmerId: string;
+  agent: string;
+  step: AgentEventStep;
+  status: AgentEventStatus;
+  message: string;
+  input?: AgentEventPayload;
+  output?: AgentEventPayload;
+  txHash?: string;
+  explorerUrl?: string;
+  startedAt: string;
+  completedAt?: string;
+  durationMs?: number;
+  error?: string;
+}
+
+export interface CreditPipelineResult {
+  pipelineId: string;
+  farmerId: string;
+  status: "success" | "failed";
+  events: AgentEvent[];
+  credential?: ZkCredential;
+  drawdown?: {
+    amount: number;
+    txHash?: string;
+    explorerUrl?: string;
+    mode: "live" | "demo";
+  };
+  error?: string;
+}
+
