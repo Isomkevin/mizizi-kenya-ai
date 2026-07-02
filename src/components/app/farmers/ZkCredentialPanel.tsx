@@ -1,14 +1,17 @@
-import { ExternalLink, ShieldCheck, ShieldOff, Wallet } from "lucide-react";
+import { ExternalLink, ShieldCheck, ShieldOff, Wallet, Workflow } from "lucide-react";
+import { useState } from "react";
 
 import { useIssueZkCredential, useSimulateDrawdown, useZkCredentialStatus } from "@/api/hooks/use-zk-credential";
 import type { FarmerProfile } from "@/api/types";
 import { Button } from "@/components/ui/button";
+import { CreditPipelineDialog } from "@/components/app/farmers/CreditPipelineDialog";
 
 export function ZkCredentialPanel({ farmer }: { farmer: FarmerProfile }) {
   const { data: status, isLoading } = useZkCredentialStatus(farmer.id);
   const issueCredential = useIssueZkCredential(farmer.id);
   const drawdown = useSimulateDrawdown(farmer.id);
   const credential = status?.credential ?? farmer.zkCredential;
+  const [pipelineOpen, setPipelineOpen] = useState(false);
 
   async function handleIssue() {
     await issueCredential.mutateAsync();
