@@ -1,7 +1,17 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { groth16 } from "snarkjs";
+// snarkjs is a Node-only package (not compatible with Cloudflare Workers).
+// Load it dynamically so bundling for the workerd target doesn't fail; if the
+// import throws at runtime, callers fall back to the demo proof envelope.
+async function loadGroth16(): Promise<typeof import("snarkjs").groth16 | null> {
+  try {
+    const mod = await import(/* @vite-ignore */ "snarkjs");
+    return mod.groth16 ?? null;
+  } catch {
+    return null;
+  }
+}
 
 import { meetsThreshold, tierFromRawScore, computeRawScore } from "../../../../zk/lib/scoring";
 import {
