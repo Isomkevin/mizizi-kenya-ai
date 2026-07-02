@@ -71,6 +71,8 @@ export async function verifyProofLocally(
   publicSignals: string[],
 ): Promise<boolean> {
   try {
+    const groth16 = await loadGroth16();
+    if (!groth16) throw new Error("snarkjs unavailable in this runtime");
     const vk = JSON.parse(await readFile(join(ART, "verification_key.json"), "utf-8"));
     return groth16.verify(vk, publicSignals, proof);
   } catch {
