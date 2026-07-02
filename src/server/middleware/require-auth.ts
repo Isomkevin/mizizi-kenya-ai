@@ -61,15 +61,12 @@ function unauthorized(message = "Unauthorized"): never {
 
 export const requireAuth = createMiddleware({ type: "function" }).server(async ({ next }) => {
   if (serverEnv.demoMode()) {
-    return next({
-      context: {
-        session: {
-          userId: "dev-kevin-m",
-          role: "loan_officer",
-          demo: true,
-        } satisfies AuthedSession,
-      },
-    });
+    const session: AuthedSession = {
+      userId: "dev-kevin-m",
+      role: "loan_officer",
+      demo: true,
+    };
+    return next({ context: { session } });
   }
 
   const authHeader = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
