@@ -34,12 +34,16 @@ export function useAuth() {
 }
 
 export function getAuthSessionSnapshot(): AuthSession | null {
-  // Demo/dev session is ONLY available when explicitly enabled or in local dev.
-  // In production, an unconfigured Supabase MUST NOT silently grant an
-  // authenticated session — the user is signed-out until they log in.
+  // Demo/dev session is available when explicitly enabled, in local dev, or
+  // when Supabase is not configured (preview/hackathon environments). This
+  // mirrors the server-side requireAuth middleware behavior so client-side
+  // route guards don't lock users out of an unauthenticated demo build.
   const explicitDemo = import.meta.env.VITE_MIZIZI_DEMO === "true";
   const isDev = Boolean(import.meta.env.DEV);
-  if (explicitDemo || isDev) return DEV_SESSION;
+  const supabaseConfigured = Boolean(
+    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY,
+  );
+  if (explicitDemo || isDev || !supabaseConfigured) return DEV_SESSION;
 
   if (typeof window === "undefined") return null;
 
