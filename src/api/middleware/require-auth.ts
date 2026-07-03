@@ -29,7 +29,8 @@ export const requireAuth = createMiddleware({ type: "function" }).server(async (
   const { serverEnv } = await import("@/server/env");
   const { getRequestHeader } = await import("@tanstack/react-start/server");
 
-  if (serverEnv.demoMode()) {
+  const supabaseConfigured = Boolean(serverEnv.supabaseUrl() && serverEnv.supabaseAnonKey());
+  if (serverEnv.demoMode() || !supabaseConfigured) {
     const session: AuthedSession = {
       userId: "dev-kevin-m",
       role: "loan_officer",
