@@ -9,7 +9,9 @@ import { KpiGrid } from "@/components/app/dashboard/KpiGrid";
 import { QuickActions } from "@/components/app/dashboard/QuickActions";
 import { RecentActivityFeed } from "@/components/app/dashboard/RecentActivityFeed";
 import { RiskDistributionChart } from "@/components/app/dashboard/RiskDistributionChart";
+import { StellarZkCallout } from "@/components/app/dashboard/StellarZkCallout";
 import { DashboardSkeleton } from "@/components/skeletons/dashboard-skeletons";
+
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
