@@ -66,10 +66,12 @@ function LandingPage() {
       <Statistics />
       <WhyExistingFail />
       <PlatformPreview />
+      <StellarZkRails />
       <Ecosystem />
       <FutureVision />
       <FinalCTA />
       <Footer />
+
     </div>
   );
 }
