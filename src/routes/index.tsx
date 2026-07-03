@@ -3,6 +3,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Building2,
+  CheckCircle2,
   CircleDot,
   CloudSun,
   Compass,
@@ -11,6 +12,7 @@ import {
   Landmark,
   Leaf,
   LineChart,
+  Lock,
   MessageSquare,
   Network,
   ShieldCheck,
@@ -21,10 +23,13 @@ import {
   Users,
   Wallet,
   Wheat,
+  Workflow,
+  Zap,
 } from "lucide-react";
 import { GraphBackdrop } from "@/components/landing/GraphBackdrop";
 import { Counter } from "@/components/landing/Counter";
 import { Reveal } from "@/components/landing/Reveal";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -61,10 +66,12 @@ function LandingPage() {
       <Statistics />
       <WhyExistingFail />
       <PlatformPreview />
+      <StellarZkRails />
       <Ecosystem />
       <FutureVision />
       <FinalCTA />
       <Footer />
+
     </div>
   );
 }
@@ -94,6 +101,9 @@ function Nav() {
           <a className="hover:text-foreground" href="#platform">
             Platform
           </a>
+          <a className="hover:text-foreground" href="#zk-rails">
+            ZK Rails
+          </a>
           <a className="hover:text-foreground" href="#ecosystem">
             Ecosystem
           </a>
@@ -101,6 +111,7 @@ function Nav() {
             Vision
           </a>
         </nav>
+
         <div className="flex items-center gap-2">
           <Link
             to="/app"
@@ -794,7 +805,202 @@ const personas = [
   },
 ];
 
+/* ---------------- Stellar ZK Credit Rails ---------------- */
+
+const zkPipelineSteps = [
+  {
+    label: "Signal capture",
+    note: "M-Pesa turnover, repayment history, cooperative tenure — private inputs.",
+    icon: Smartphone,
+  },
+  {
+    label: "Witness build",
+    note: "Mizizi agents assemble the circuit witness locally on the farmer's behalf.",
+    icon: Workflow,
+  },
+  {
+    label: "Groth16 proof",
+    note: "A zero-knowledge proof binds the score tier without revealing any row.",
+    icon: Lock,
+  },
+  {
+    label: "Stellar submission",
+    note: "Proof + public commitment anchored on Stellar. Explorer link, every time.",
+    icon: Zap,
+  },
+  {
+    label: "Credential issued",
+    note: "Lenders see tier, band and limit. Never the raw mobile money data.",
+    icon: ShieldCheck,
+  },
+  {
+    label: "On-chain drawdown",
+    note: "Farmer draws USDC against the credential — verifiable, portable, revocable.",
+    icon: Wallet,
+  },
+];
+
+const zkGuarantees = [
+  {
+    title: "Privacy by cryptography",
+    body: "Raw M-Pesa rows never leave the farmer's device or the Mizizi vault. The proof is the only thing that travels.",
+  },
+  {
+    title: "Portable creditworthiness",
+    body: "One credential works across every SACCO, bank and microlender integrated with Stellar. No repeated KYC theatre.",
+  },
+  {
+    title: "Auditable on Stellar",
+    body: "Every issued credential and drawdown lands on a public ledger with a verifiable transaction hash.",
+  },
+];
+
+function StellarZkRails() {
+  return (
+    <section
+      id="zk-rails"
+      className="relative border-b border-border/60 bg-[color:var(--moss-deep)] text-[color:var(--primary-foreground)]"
+    >
+      <div className="absolute inset-0 bg-grid opacity-[0.08]" />
+      <div className="relative mx-auto max-w-7xl px-6 py-28">
+        <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+          <Reveal>
+            <SectionLabel className="text-white/60">
+              08 · Stellar Hacks ZK Credit Rails
+            </SectionLabel>
+            <h2 className="font-display mt-4 text-balance text-4xl leading-[1.05] text-white md:text-6xl">
+              Prove creditworthiness. <br />
+              <span className="italic text-white/70">Reveal nothing.</span>
+            </h2>
+            <p className="mt-6 max-w-lg text-white/70">
+              Smallholder farmers already generate rich financial signals — mobile money turnover,
+              repayment history, cooperative membership. Mizizi turns them into a
+              <span className="text-white"> zero-knowledge credit credential </span>
+              anchored on Stellar, so lenders can trust the score without ever touching the raw data.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3 font-mono-data text-[11px] uppercase tracking-[0.18em] text-white/60">
+              <span className="rounded-full border border-white/15 px-3 py-1">Groth16</span>
+              <span className="rounded-full border border-white/15 px-3 py-1">Circom</span>
+              <span className="rounded-full border border-white/15 px-3 py-1">Stellar Soroban</span>
+              <span className="rounded-full border border-white/15 px-3 py-1">USDC drawdown</span>
+            </div>
+
+            <div className="mt-10 space-y-4">
+              {zkGuarantees.map((g) => (
+                <div
+                  key={g.title}
+                  className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-4"
+                >
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-[color:var(--moss)]" />
+                  <div>
+                    <div className="text-sm font-medium text-white">{g.title}</div>
+                    <div className="mt-1 text-xs text-white/60">{g.body}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <Link
+                to="/app"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-medium text-[color:var(--moss-deep)] transition hover:opacity-95"
+              >
+                Try the live pipeline
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a
+                href="https://stellar.org/soroban"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-5 py-3 text-sm font-medium text-white/90 transition hover:bg-white/5"
+              >
+                About Stellar
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            </div>
+          </Reveal>
+
+          <Reveal delay={120}>
+            <div className="rounded-2xl border border-white/10 bg-[color:var(--moss-deep)]/60 p-6 shadow-elevated backdrop-blur">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="grid h-7 w-7 place-items-center rounded-md bg-white/10">
+                    <Lock className="h-3.5 w-3.5 text-white" />
+                  </span>
+                  <div>
+                    <div className="text-sm font-medium text-white">
+                      ZK credit pipeline
+                    </div>
+                    <div className="font-mono-data text-[10px] uppercase tracking-widest text-white/50">
+                      farmer F-10384 · testnet
+                    </div>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--moss)]/40 bg-[color:var(--moss)]/15 px-2 py-1 font-mono-data text-[10px] uppercase tracking-widest text-[color:var(--moss)]">
+                  <CircleDot className="h-3 w-3" /> Verified
+                </span>
+              </div>
+
+              <ol className="mt-5 space-y-3">
+                {zkPipelineSteps.map((s, i) => (
+                  <li
+                    key={s.label}
+                    className="grid grid-cols-[32px_1fr_auto] items-start gap-3 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-3"
+                  >
+                    <span className="mt-0.5 grid h-7 w-7 place-items-center rounded-md bg-white/10">
+                      <s.icon className="h-3.5 w-3.5 text-white" />
+                    </span>
+                    <div>
+                      <div className="text-sm font-medium text-white">
+                        {String(i + 1).padStart(2, "0")} · {s.label}
+                      </div>
+                      <div className="mt-0.5 text-xs text-white/60">{s.note}</div>
+                    </div>
+                    <span className="mt-1 font-mono-data text-[10px] uppercase tracking-widest text-[color:var(--moss)]">
+                      ok
+                    </span>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="mt-5 grid grid-cols-3 gap-3 border-t border-white/10 pt-5">
+                <div>
+                  <div className="font-mono-data text-[10px] uppercase tracking-widest text-white/50">
+                    Tier
+                  </div>
+                  <div className="mt-1 font-display text-2xl text-white">B</div>
+                </div>
+                <div>
+                  <div className="font-mono-data text-[10px] uppercase tracking-widest text-white/50">
+                    Score band
+                  </div>
+                  <div className="mt-1 font-display text-2xl text-white">72/100</div>
+                </div>
+                <div>
+                  <div className="font-mono-data text-[10px] uppercase tracking-widest text-white/50">
+                    Max USDC
+                  </div>
+                  <div className="mt-1 font-display text-2xl text-white">450</div>
+                </div>
+              </div>
+
+              <p className="mt-5 text-[11px] text-white/50">
+                Lenders receive tier + band + limit. Raw M-Pesa transactions stay private —
+                cryptographically, not contractually.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Ecosystem ---------------- */
+
 function Ecosystem() {
+
   return (
     <section id="ecosystem" className="border-b border-border/60">
       <div className="mx-auto max-w-7xl px-6 py-28">
