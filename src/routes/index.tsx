@@ -101,6 +101,9 @@ function Nav() {
           <a className="hover:text-foreground" href="#platform">
             Platform
           </a>
+          <a className="hover:text-foreground" href="#zk-rails">
+            ZK Rails
+          </a>
           <a className="hover:text-foreground" href="#ecosystem">
             Ecosystem
           </a>
@@ -108,6 +111,7 @@ function Nav() {
             Vision
           </a>
         </nav>
+
         <div className="flex items-center gap-2">
           <Link
             to="/app"
