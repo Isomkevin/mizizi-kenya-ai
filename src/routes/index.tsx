@@ -3,6 +3,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Building2,
+  CheckCircle2,
   CircleDot,
   CloudSun,
   Compass,
@@ -11,6 +12,7 @@ import {
   Landmark,
   Leaf,
   LineChart,
+  Lock,
   MessageSquare,
   Network,
   ShieldCheck,
@@ -21,10 +23,13 @@ import {
   Users,
   Wallet,
   Wheat,
+  Workflow,
+  Zap,
 } from "lucide-react";
 import { GraphBackdrop } from "@/components/landing/GraphBackdrop";
 import { Counter } from "@/components/landing/Counter";
 import { Reveal } from "@/components/landing/Reveal";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
