@@ -604,3 +604,25 @@ export interface CreditPipelineResult {
   error?: string;
 }
 
+export interface PipelineRunSummary {
+  pipelineId: string;
+  farmerId: string;
+  farmerName?: string;
+  startedAt: string;
+  completedAt?: string;
+  durationMs?: number;
+  status: AgentEventStatus;
+  proofVerified: boolean;
+  stellarTxHash?: string;
+  stellarExplorerUrl?: string;
+  stellarMode?: "live" | "demo";
+  drawdownAmount?: number;
+  drawdownTxHash?: string;
+  drawdownExplorerUrl?: string;
+  credentialTier?: string;
+  steps: number;
+  failedStep?: AgentEventStep;
+  error?: string;
+}
+
+
