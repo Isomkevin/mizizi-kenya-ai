@@ -159,7 +159,7 @@ export function CreditPipelineDialog({
                   ? "Running..."
                   : ""}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="secondary"
               size="sm"
@@ -172,10 +172,20 @@ export function CreditPipelineDialog({
             >
               Retry
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!pipelineId}
+              onClick={() => setShowProofDetails(true)}
+            >
+              <ExternalLink className="mr-1 h-3.5 w-3.5" />
+              Proof & transaction
+            </Button>
             <Button size="sm" onClick={() => onOpenChange(false)}>
               Close
             </Button>
           </div>
+
         </DialogFooter>
       </DialogContent>
     </Dialog>
