@@ -3,8 +3,10 @@ import type {
   AgentEventPayload,
   AgentEventStep,
   CreditPipelineResult,
+  PipelineRunSummary,
   ZkCredential,
 } from "@/api/types";
+
 import { serverEnv } from "@/server/env";
 import { getPersistence } from "@/server/services/persistence";
 import {
