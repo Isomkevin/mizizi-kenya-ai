@@ -38,6 +38,8 @@ function Dashboard() {
           <KpiGrid />
 
           <StellarZkCallout />
+          <RecentZkRunsPanel />
+
 
           <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
 
