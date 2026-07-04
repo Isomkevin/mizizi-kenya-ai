@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ExternalLink } from "lucide-react";
 import type { AgentEvent, AgentEventStep } from "@/api/types";
 import {
   usePipelineEvents,
@@ -13,6 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ProofTransactionDialog } from "@/components/app/zk/ProofTransactionDialog";
+
 
 const STEP_ORDER: AgentEventStep[] = [
   "input-validation",
