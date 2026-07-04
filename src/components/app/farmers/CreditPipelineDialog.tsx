@@ -190,6 +190,12 @@ export function CreditPipelineDialog({
 
         </DialogFooter>
       </DialogContent>
+      <ProofTransactionDialog
+        open={showProofDetails}
+        onOpenChange={setShowProofDetails}
+        pipelineId={pipelineId}
+      />
     </Dialog>
   );
 }
+
