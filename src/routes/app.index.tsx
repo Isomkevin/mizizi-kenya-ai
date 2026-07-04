@@ -10,7 +10,9 @@ import { QuickActions } from "@/components/app/dashboard/QuickActions";
 import { RecentActivityFeed } from "@/components/app/dashboard/RecentActivityFeed";
 import { RiskDistributionChart } from "@/components/app/dashboard/RiskDistributionChart";
 import { StellarZkCallout } from "@/components/app/dashboard/StellarZkCallout";
+import { RecentZkRunsPanel } from "@/components/app/dashboard/RecentZkRunsPanel";
 import { DashboardSkeleton } from "@/components/skeletons/dashboard-skeletons";
+
 
 
 export const Route = createFileRoute("/app/")({
@@ -36,6 +38,8 @@ function Dashboard() {
           <KpiGrid />
 
           <StellarZkCallout />
+          <RecentZkRunsPanel />
+
 
           <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
 

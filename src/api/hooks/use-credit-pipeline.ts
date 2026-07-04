@@ -3,8 +3,10 @@ import {
   getFarmerAgentEventsFn,
   getPipelineEventsFn,
   getRecentAgentEventsFn,
+  listRecentPipelinesFn,
   runCreditPipelineFn,
 } from "@/api/functions/credit-pipeline";
+
 
 export function useRunCreditPipeline() {
   return useMutation({
@@ -35,5 +37,15 @@ export function useFarmerAgentEvents(farmerId: string, limit = 25) {
     queryKey: ["farmer-agent-events", farmerId, limit],
     queryFn: () => getFarmerAgentEventsFn({ data: { farmerId, limit } }),
     enabled: Boolean(farmerId),
+  });
+}
+
+
+
+export function useRecentPipelines(limit = 10) {
+  return useQuery({
+    queryKey: ["recent-pipelines", limit],
+    queryFn: () => listRecentPipelinesFn({ data: { limit } }),
+    refetchInterval: 5000,
   });
 }

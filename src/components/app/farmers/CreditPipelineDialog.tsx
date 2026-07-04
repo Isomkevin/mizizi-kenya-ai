@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ExternalLink } from "lucide-react";
 import type { AgentEvent, AgentEventStep } from "@/api/types";
 import {
   usePipelineEvents,
@@ -13,6 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ProofTransactionDialog } from "@/components/app/zk/ProofTransactionDialog";
+
 
 const STEP_ORDER: AgentEventStep[] = [
   "input-validation",
@@ -55,6 +58,8 @@ export function CreditPipelineDialog({
 }) {
   const runPipeline = useRunCreditPipeline();
   const [pipelineId, setPipelineId] = useState<string | undefined>();
+  const [showProofDetails, setShowProofDetails] = useState(false);
+
   const eventsQuery = usePipelineEvents(pipelineId);
 
   const events: AgentEvent[] = eventsQuery.data ?? runPipeline.data?.events ?? [];
@@ -156,7 +161,7 @@ export function CreditPipelineDialog({
                   ? "Running..."
                   : ""}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="secondary"
               size="sm"
@@ -169,12 +174,28 @@ export function CreditPipelineDialog({
             >
               Retry
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!pipelineId}
+              onClick={() => setShowProofDetails(true)}
+            >
+              <ExternalLink className="mr-1 h-3.5 w-3.5" />
+              Proof & transaction
+            </Button>
             <Button size="sm" onClick={() => onOpenChange(false)}>
               Close
             </Button>
           </div>
+
         </DialogFooter>
       </DialogContent>
+      <ProofTransactionDialog
+        open={showProofDetails}
+        onOpenChange={setShowProofDetails}
+        pipelineId={pipelineId}
+      />
     </Dialog>
   );
 }
+
