@@ -58,6 +58,8 @@ export function CreditPipelineDialog({
 }) {
   const runPipeline = useRunCreditPipeline();
   const [pipelineId, setPipelineId] = useState<string | undefined>();
+  const [showProofDetails, setShowProofDetails] = useState(false);
+
   const eventsQuery = usePipelineEvents(pipelineId);
 
   const events: AgentEvent[] = eventsQuery.data ?? runPipeline.data?.events ?? [];
