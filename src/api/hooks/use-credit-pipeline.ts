@@ -40,7 +40,7 @@ export function useFarmerAgentEvents(farmerId: string, limit = 25) {
   });
 }
 
-import { listRecentPipelinesFn } from "@/api/functions/credit-pipeline";
+
 
 export function useRecentPipelines(limit = 10) {
   return useQuery({
