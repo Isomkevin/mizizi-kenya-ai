@@ -292,3 +292,59 @@ export async function getPipelineEvents(pipelineId: string): Promise<AgentEvent[
 export async function getRecentAgentEvents(limit = 50): Promise<AgentEvent[]> {
   return listAgentEvents({ limit });
 }
+
+export async function listRecentPipelines(limit = 20): Promise<PipelineRunSummary[]> {
+  const events = await listAgentEvents({ limit: 500 });
+  const groups = new Map<string, AgentEvent[]>();
+  for (const ev of events) {
+    if (!groups.has(ev.pipelineId)) groups.set(ev.pipelineId, []);
+    groups.get(ev.pipelineId)!.push(ev);
+  }
+  const persistence = getPersistence();
+  const summaries: PipelineRunSummary[] = [];
+  for (const [pipelineId, evs] of groups) {
+    const sorted = [...evs].sort(
+      (a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime(),
+    );
+    const orch = sorted.find((e) => e.step === "orchestration") ?? sorted[0];
+    const verify = sorted.find((e) => e.step === "proof-verification");
+    const stellar = sorted.find((e) => e.step === "stellar-submission");
+    const credential = sorted.find((e) => e.step === "credential-issued");
+    const drawdown = sorted.find((e) => e.step === "drawdown-submitted");
+    const failed = sorted.find((e) => e.status === "failed");
+    const farmerId = orch.farmerId;
+    let farmerName: string | undefined;
+    try {
+      const f = await persistence.getFarmerById(farmerId);
+      farmerName = f?.name;
+    } catch {
+      // ignore
+    }
+    summaries.push({
+      pipelineId,
+      farmerId,
+      farmerName,
+      startedAt: orch.startedAt,
+      completedAt: orch.completedAt,
+      durationMs: orch.durationMs,
+      status: orch.status,
+      proofVerified: verify?.status === "success",
+      stellarTxHash: stellar?.txHash,
+      stellarExplorerUrl: stellar?.explorerUrl,
+      stellarMode:
+        (stellar?.output?.mode as "live" | "demo" | undefined) ??
+        (stellar?.input?.mode as "live" | "demo" | undefined),
+      drawdownAmount: drawdown?.output?.amount as number | undefined,
+      drawdownTxHash: drawdown?.txHash,
+      drawdownExplorerUrl: drawdown?.explorerUrl,
+      credentialTier: credential?.output?.tierLabel as string | undefined,
+      steps: sorted.length,
+      failedStep: failed?.step,
+      error: failed?.error ?? orch.error,
+    });
+  }
+  return summaries
+    .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
+    .slice(0, limit);
+}
+
