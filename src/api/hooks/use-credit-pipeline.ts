@@ -37,3 +37,13 @@ export function useFarmerAgentEvents(farmerId: string, limit = 25) {
     enabled: Boolean(farmerId),
   });
 }
+
+import { listRecentPipelinesFn } from "@/api/functions/credit-pipeline";
+
+export function useRecentPipelines(limit = 10) {
+  return useQuery({
+    queryKey: ["recent-pipelines", limit],
+    queryFn: () => listRecentPipelinesFn({ data: { limit } }),
+    refetchInterval: 5000,
+  });
+}
