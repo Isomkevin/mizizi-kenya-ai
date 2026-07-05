@@ -16,7 +16,28 @@ function commitmentToBytes(commitmentDecimal: string): Buffer {
   return Buffer.from(hex.slice(0, 64), "hex");
 }
 
-function proofHash(proof: unknown): Buffer {
+function bigIntToBytes48(n: string): Buffer {
+  const hex = BigInt(n).toString(16).padStart(96, "0");
+  return Buffer.from(hex.slice(0, 96), "hex");
+}
+
+function buildG1Point(p: string[]): xdr.ScVal {
+  return xdr.ScVal.scvMap([
+    new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("x"), val: xdr.ScVal.scvBytes(bigIntToBytes48(p[0]!)) }),
+    new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("y"), val: xdr.ScVal.scvBytes(bigIntToBytes48(p[1]!)) }),
+  ]);
+}
+
+function buildG2Point(p: string[][]): xdr.ScVal {
+  return xdr.ScVal.scvMap([
+    new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("x1"), val: xdr.ScVal.scvBytes(bigIntToBytes48(p[0]![0]!)) }),
+    new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("x2"), val: xdr.ScVal.scvBytes(bigIntToBytes48(p[0]![1]!)) }),
+    new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("y1"), val: xdr.ScVal.scvBytes(bigIntToBytes48(p[1]![0]!)) }),
+    new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("y2"), val: xdr.ScVal.scvBytes(bigIntToBytes48(p[1]![1]!)) }),
+  ]);
+}
+
+function proofHash(proof: any): Buffer {
   // Stable canonicalization of proof object for hashing
   const canonical = JSON.stringify(proof, Object.keys(proof && typeof proof === 'object' ? proof : {}).sort());
   return createHash("sha256").update(canonical).digest();
@@ -61,6 +82,12 @@ export async function submitCredentialToStellar(
           contract: contractId,
           function: "issue_credential",
           args: [
+            xdr.ScVal.scvMap([
+              new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("a"), val: buildG1Point((proof as any).pi_a) }),
+              new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("b"), val: buildG2Point((proof as any).pi_b) }),
+              new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("c"), val: buildG1Point((proof as any).pi_c) }),
+            ]),
+            nativeToScVal(publicSignals.map(s => bigIntToBytes48(s)), { type: "vec" }), // or xdr.ScVal.scvVec
             xdr.ScVal.scvBytes(commitmentToBytes(publicSignals[0]!)),
             nativeToScVal(Number(publicSignals[1]), { type: "u32" }),
             nativeToScVal(Number(publicSignals[2]), { type: "u32" }),

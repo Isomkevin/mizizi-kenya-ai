@@ -1,6 +1,8 @@
 #![no_std]
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, BytesN, Env, Symbol,
+    crypto::bls12_381::{Fr, G1Affine, G2Affine},
+    vec, Vec,
 };
 
 const VALIDITY_SECONDS: u64 = 90 * 24 * 60 * 60;
@@ -9,6 +11,41 @@ const VALIDITY_SECONDS: u64 = 90 * 24 * 60 * 60;
 #[derive(Clone)]
 pub enum DataKey {
     Credential(BytesN<32>),
+    VerificationKey,
+}
+
+#[derive(Clone)]
+#[contracttype]
+pub struct G1Point {
+    pub x: BytesN<48>,
+    pub y: BytesN<48>,
+}
+
+#[derive(Clone)]
+#[contracttype]
+pub struct G2Point {
+    pub x1: BytesN<48>,
+    pub x2: BytesN<48>,
+    pub y1: BytesN<48>,
+    pub y2: BytesN<48>,
+}
+
+#[derive(Clone)]
+#[contracttype]
+pub struct VerificationKey {
+    pub alpha: G1Point,
+    pub beta: G2Point,
+    pub gamma: G2Point,
+    pub delta: G2Point,
+    pub ic: Vec<G1Point>,
+}
+
+#[derive(Clone)]
+#[contracttype]
+pub struct Proof {
+    pub a: G1Point,
+    pub b: G2Point,
+    pub c: G1Point,
 }
 
 #[contracttype]
@@ -32,6 +69,9 @@ pub enum Error {
     Expired = 3,
     DrawdownExceedsLimit = 4,
     InsufficientBalance = 5,
+    MalformedVerifyingKey = 6,
+    InvalidProof = 7,
+    VkNotSet = 8,
 }
 
 fn max_usdc_for_tier(tier: u32) -> i128 {
@@ -58,10 +98,41 @@ pub struct CreditRails;
 
 #[contractimpl]
 impl CreditRails {
+    pub fn init_vk(env: Env, vk: VerificationKey) {
+        env.storage().instance().set(&DataKey::VerificationKey, &vk);
+    }
+
+    fn g1_from_point(env: &Env, p: &G1Point) -> G1Affine {
+        use ark_ff::PrimeField;
+        use ark_serialize::CanonicalSerialize;
+        let x = ark_bls12_381::Fq::from_be_bytes_mod_order(&p.x.to_array());
+        let y = ark_bls12_381::Fq::from_be_bytes_mod_order(&p.y.to_array());
+        let ark_g1 = ark_bls12_381::G1Affine::new(x, y);
+        let mut buf = [0u8; 96];
+        ark_g1.serialize_uncompressed(&mut buf[..]).unwrap();
+        G1Affine::from_array(env, &buf)
+    }
+
+    fn g2_from_point(env: &Env, p: &G2Point) -> G2Affine {
+        use ark_ff::PrimeField;
+        use ark_serialize::CanonicalSerialize;
+        let x1 = ark_bls12_381::Fq::from_be_bytes_mod_order(&p.x1.to_array());
+        let x2 = ark_bls12_381::Fq::from_be_bytes_mod_order(&p.x2.to_array());
+        let y1 = ark_bls12_381::Fq::from_be_bytes_mod_order(&p.y1.to_array());
+        let y2 = ark_bls12_381::Fq::from_be_bytes_mod_order(&p.y2.to_array());
+        let x = ark_bls12_381::Fq2::new(x1, x2);
+        let y = ark_bls12_381::Fq2::new(y1, y2);
+        let ark_g2 = ark_bls12_381::G2Affine::new(x, y);
+        let mut buf = [0u8; 192];
+        ark_g2.serialize_uncompressed(&mut buf[..]).unwrap();
+        G2Affine::from_array(env, &buf)
+    }
+
     /// Issue a ZK credit credential after off-chain Groth16 verification.
-    /// Public signals are passed on-chain; proof_hash binds the verified proof bytes.
     pub fn issue_credential(
         env: Env,
+        proof: Proof,
+        public_signals: Vec<Fr>,
         farmer_commitment: BytesN<32>,
         tier: u32,
         raw_score: u32,
@@ -80,6 +151,40 @@ impl CreditRails {
         }
         if tier > min_tier {
             return Err(Error::InvalidTier);
+        }
+
+        let vk: VerificationKey = env
+            .storage()
+            .instance()
+            .get(&DataKey::VerificationKey)
+            .ok_or(Error::VkNotSet)?;
+
+        let bls = env.crypto().bls12_381();
+        if public_signals.len() + 1 != vk.ic.len() as usize {
+            return Err(Error::MalformedVerifyingKey);
+        }
+        
+        let mut vk_x = Self::g1_from_point(&env, &vk.ic.get(0).unwrap());
+        for (s, v_point) in public_signals.iter().zip(vk.ic.iter().skip(1)) {
+            let v = Self::g1_from_point(&env, &v_point);
+            let prod = bls.g1_mul(&v, &s);
+            vk_x = bls.g1_add(&vk_x, &prod);
+        }
+
+        let a = Self::g1_from_point(&env, &proof.a);
+        let b = Self::g2_from_point(&env, &proof.b);
+        let c = Self::g1_from_point(&env, &proof.c);
+        let alpha = Self::g1_from_point(&env, &vk.alpha);
+        let beta = Self::g2_from_point(&env, &vk.beta);
+        let gamma = Self::g2_from_point(&env, &vk.gamma);
+        let delta = Self::g2_from_point(&env, &vk.delta);
+
+        let neg_a = -a;
+        let vp1 = vec![&env, neg_a, alpha, vk_x, c];
+        let vp2 = vec![&env, b, beta, gamma, delta];
+
+        if !bls.pairing_check(vp1, vp2) {
+            return Err(Error::InvalidProof);
         }
 
         let now = env.ledger().timestamp();

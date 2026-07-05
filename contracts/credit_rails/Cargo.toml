@@ -8,7 +8,10 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
-soroban-sdk = "22.0.0"
+soroban-sdk = "25.1.0"
+ark-bls12-381 = { version = "0.4.0", default-features = false }
+ark-serialize = { version = "0.4.2", default-features = false }
+ark-ff = { version = "0.4.2", default-features = false }
 
 [profile.release]
 opt-level = "z"

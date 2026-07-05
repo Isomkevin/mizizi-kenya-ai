@@ -6,6 +6,7 @@ Mizizi is an enterprise agricultural risk intelligence platform. It helps lender
 
 **ZK Credit Rails** (Stellar Hacks: Real-World ZK): farmers prove credit tier from simulated mobile-money turnover and repayment history **without revealing raw transactions**. Groth16 proofs anchor credentials on Stellar testnet Soroban. See [docs/stellar-hacks-zk-submission-plan.md](docs/stellar-hacks-zk-submission-plan.md).
 
+
 ## Built by **LESOM Dynamics**
 
 ## The problem

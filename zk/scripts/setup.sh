@@ -18,12 +18,20 @@ if [ ! -d "$ROOT/node_modules/circomlib" ]; then
   cd "$ROOT" && bun add -d circomlib
 fi
 
-echo "Compiling circuit..."
-circom "$CIRCUIT" --r1cs --wasm --sym -o "$ART" -l "$ROOT/node_modules"
+echo "Compiling circuit with BLS12-381..."
+circom "$CIRCUIT" --r1cs --wasm --sym -o "$ART" -l "$ROOT/node_modules" -p bls12381
 
-echo "Running Groth16 trusted setup (local, hackathon only)..."
+echo "Running Groth16 trusted setup (local, hackathon only) for BLS12-381..."
 cd "$ART"
-snarkjs groth16 setup credit_tier.r1cs "$ROOT/node_modules/circomlib/circuits/powersOfTau28_hez_final_18.ptau" credit_tier_0000.zkey
+
+if [ ! -f "pot12_final.ptau" ]; then
+  echo "Generating local BLS12-381 powers of tau..."
+  snarkjs powersoftau new bls12381 14 pot14_0000.ptau -v
+  echo "hackathon-entropy" | snarkjs powersoftau contribute pot14_0000.ptau pot14_0001.ptau --name="First contribution" -v
+  snarkjs powersoftau prepare phase2 pot14_0001.ptau pot12_final.ptau -v
+fi
+
+snarkjs groth16 setup credit_tier.r1cs pot12_final.ptau credit_tier_0000.zkey
 echo "hackathon-local-setup" | snarkjs zkey contribute credit_tier_0000.zkey credit_tier_final.zkey --name="mizizi-local" -v
 snarkjs zkey export verificationkey credit_tier_final.zkey verification_key.json
 
