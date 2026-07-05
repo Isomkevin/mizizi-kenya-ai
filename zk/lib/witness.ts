@@ -1,38 +1,58 @@
 import { computeRawScore, DEFAULT_MIN_SCORE, DEFAULT_MIN_TIER, tierFromRawScore } from "./scoring";
 
 // circomlibjs (via ffjavascript) is Node-only and cannot be bundled for
-// Cloudflare Workers. Load dynamically at call time so the workerd build
-// succeeds; the ZK service falls back to a demo envelope when unavailable.
+// Cloudflare Workers. Hide the specifier from static analysis so nitro/rollup
+// doesn't try to include it (`No such module "_ssr/circomlibjs"`).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PoseidonFn = ((inputs: any[]) => any) & { F: { p: bigint | string; toObject: (v: any) => bigint } };
 let poseidonPromise: Promise<PoseidonFn> | null = null;
 
-async function getPoseidon(): Promise<PoseidonFn> {
+const nodeDynamicImport: ((s: string) => Promise<unknown>) | null =
+  typeof process !== "undefined" && !!(process as { versions?: { node?: string } }).versions?.node
+    ? (new Function("s", "return import(s)") as (s: string) => Promise<unknown>)
+    : null;
+
+// BN254 scalar field modulus — used as fallback modulus when circomlibjs
+// isn't available (e.g. Cloudflare Workers demo runtime).
+const FIELD_MODULUS =
+  21888242871839275222246405745257275088548364400416034343698204186575808495617n;
+
+async function tryGetPoseidon(): Promise<PoseidonFn | null> {
+  if (!nodeDynamicImport) return null;
   if (!poseidonPromise) {
     poseidonPromise = (async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mod: any = await import(/* @vite-ignore */ ("circomlibjs" as string));
+      const mod: any = await nodeDynamicImport(["circomlib", "js"].join(""));
       return mod.buildPoseidon();
     })();
   }
-  return poseidonPromise;
+  try {
+    return await poseidonPromise;
+  } catch {
+    poseidonPromise = null;
+    return null;
+  }
 }
 
 function fieldToString(value: bigint): string {
   return value.toString();
 }
 
-/** Hash phone string to field element (Poseidon input). */
-export async function phoneHashField(phone: string): Promise<string> {
-  const poseidon = await getPoseidon();
-  const fieldModulus = BigInt(poseidon.F.p);
+function hashBytesToField(input: string, modulus: bigint): bigint {
   const encoder = new TextEncoder();
-  const bytes = encoder.encode(phone);
+  const bytes = encoder.encode(input);
   let acc = 0n;
   for (const byte of bytes) {
-    acc = (acc * 256n + BigInt(byte)) % fieldModulus;
+    acc = (acc * 256n + BigInt(byte)) % modulus;
   }
-  return fieldToString(acc);
+  return acc;
+}
+
+/** Hash phone string to field element (Poseidon input). */
+export async function phoneHashField(phone: string): Promise<string> {
+  const poseidon = await tryGetPoseidon();
+  const modulus = poseidon ? BigInt(poseidon.F.p) : FIELD_MODULUS;
+  return fieldToString(hashBytesToField(phone, modulus));
 }
 
 /** Hash salt string to field element. */
@@ -41,11 +61,16 @@ export async function saltField(salt: string): Promise<string> {
 }
 
 export async function farmerCommitment(phone: string, salt: string): Promise<string> {
-  const poseidon = await getPoseidon();
+  const poseidon = await tryGetPoseidon();
   const phoneF = BigInt(await phoneHashField(phone));
   const saltF = BigInt(await saltField(salt));
-  const hash = poseidon([phoneF, saltF]);
-  return fieldToString(poseidon.F.toObject(hash));
+  if (poseidon) {
+    const hash = poseidon([phoneF, saltF]);
+    return fieldToString(poseidon.F.toObject(hash));
+  }
+  // Deterministic non-Poseidon fallback so demo runs work on workerd.
+  const mix = (phoneF * 1000003n + saltF) % FIELD_MODULUS;
+  return fieldToString(hashBytesToField(`${phoneF}:${saltF}:${mix}`, FIELD_MODULUS));
 }
 
 export interface WitnessJson {
