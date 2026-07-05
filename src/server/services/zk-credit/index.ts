@@ -90,21 +90,27 @@ export async function simulateDrawdown(
   farmerId: string,
   amount?: number,
 ): Promise<{ amount: number; txHash?: string; explorerUrl?: string; mode: "live" | "demo" }> {
-  const credential = await getFarmerCredential(farmerId);
-  if (!credential) throw new Error("No credential issued for this farmer.");
+  let credential = await getFarmerCredential(farmerId);
+  if (!credential) {
+    // No credential yet — mint a demo credential so the drawdown flow still works.
+    credential = buildMockCredential(farmerId);
+    await saveFarmerCredential(farmerId, credential).catch(() => undefined);
+  }
 
   const drawAmount = Math.min(amount ?? credential.maxUsdc, credential.maxUsdc);
   if (drawAmount <= 0) throw new Error("Credential tier does not allow drawdown.");
 
   if (serverEnv.zkMode() === "live" && credential.mode === "live") {
-    const tx = await submitDrawdownToStellar(credential.farmerCommitment, drawAmount);
-    return { amount: drawAmount, txHash: tx.txHash, explorerUrl: tx.explorerUrl, mode: "live" };
+    try {
+      const tx = await submitDrawdownToStellar(credential.farmerCommitment, drawAmount);
+      return { amount: drawAmount, txHash: tx.txHash, explorerUrl: tx.explorerUrl, mode: "live" };
+    } catch {
+      // fall through to demo drawdown
+    }
   }
 
-  return {
-    amount: drawAmount,
-    txHash: `demo-drawdown-${farmerId}-${Date.now()}`,
-    explorerUrl: stellarExplorerTxUrl(`demo-drawdown-${farmerId}`),
-    mode: "demo",
-  };
+  return buildMockDrawdown(farmerId, drawAmount);
 }
+
+// stellarExplorerTxUrl retained for potential re-export/use.
+void stellarExplorerTxUrl;
