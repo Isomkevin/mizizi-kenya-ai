@@ -1,14 +1,17 @@
-import { ExternalLink, ShieldCheck, ShieldOff, Wallet } from "lucide-react";
+import { ExternalLink, ShieldCheck, ShieldOff, Wallet, Workflow } from "lucide-react";
+import { useState } from "react";
 
 import { useIssueZkCredential, useSimulateDrawdown, useZkCredentialStatus } from "@/api/hooks/use-zk-credential";
 import type { FarmerProfile } from "@/api/types";
 import { Button } from "@/components/ui/button";
+import { CreditPipelineDialog } from "@/components/app/farmers/CreditPipelineDialog";
 
 export function ZkCredentialPanel({ farmer }: { farmer: FarmerProfile }) {
   const { data: status, isLoading } = useZkCredentialStatus(farmer.id);
   const issueCredential = useIssueZkCredential(farmer.id);
   const drawdown = useSimulateDrawdown(farmer.id);
   const credential = status?.credential ?? farmer.zkCredential;
+  const [pipelineOpen, setPipelineOpen] = useState(false);
 
   async function handleIssue() {
     await issueCredential.mutateAsync();
@@ -116,13 +119,24 @@ export function ZkCredentialPanel({ farmer }: { farmer: FarmerProfile }) {
             {status?.message ??
               "Generate a Groth16 proof bound to your repayment and M-Pesa turnover signals."}
           </p>
-          <Button
-            size="sm"
-            onClick={() => void handleIssue()}
-            disabled={issueCredential.isPending || status?.canProve === false}
-          >
-            {issueCredential.isPending ? "Generating proof…" : "Generate ZK credential"}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              onClick={() => void handleIssue()}
+              disabled={issueCredential.isPending || status?.canProve === false}
+            >
+              {issueCredential.isPending ? "Generating proof…" : "Generate ZK credential"}
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setPipelineOpen(true)}
+              disabled={status?.canProve === false}
+            >
+              <Workflow className="mr-1 h-3.5 w-3.5" />
+              Run full pipeline
+            </Button>
+          </div>
           {issueCredential.isError ? (
             <p className="text-xs text-destructive" role="alert">
               {issueCredential.error instanceof Error
@@ -136,6 +150,12 @@ export function ZkCredentialPanel({ farmer }: { farmer: FarmerProfile }) {
       <p className="mt-4 text-xs text-muted-foreground">
         Lenders see tier, score band, and limit only — not individual M-Pesa or repayment rows.
       </p>
+      <CreditPipelineDialog
+        open={pipelineOpen}
+        onOpenChange={setPipelineOpen}
+        farmerId={farmer.id}
+        amount={credential?.maxUsdc}
+      />
     </section>
   );
 }

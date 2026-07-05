@@ -1,7 +1,21 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import { groth16 } from "snarkjs";
+// snarkjs is a Node-only package (not compatible with Cloudflare Workers).
+// Load it dynamically so bundling for the workerd target doesn't fail; if the
+// import throws at runtime, callers fall back to the demo proof envelope.
+async function loadGroth16(): Promise<{
+  fullProve: (input: unknown, wasm: string, zkey: string) => Promise<{ proof: unknown; publicSignals: string[] }>;
+  verify: (vk: unknown, publicSignals: string[], proof: unknown) => Promise<boolean>;
+} | null> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mod: any = await import(/* @vite-ignore */ "snarkjs" as string);
+    return mod.groth16 ?? null;
+  } catch {
+    return null;
+  }
+}
 
 import { meetsThreshold, tierFromRawScore, computeRawScore } from "../../../../zk/lib/scoring";
 import {
@@ -32,6 +46,8 @@ export async function proveWitness(witness: WitnessJson): Promise<ProveResult> {
   const zkeyPath = join(ART, "credit_tier_final.zkey");
 
   try {
+    const groth16 = await loadGroth16();
+    if (!groth16) throw new Error("snarkjs unavailable in this runtime");
     const input = await circuitInputToWitness(circuitInput);
     const result = await groth16.fullProve(input, wasmPath, zkeyPath);
     return { proof: result.proof, publicSignals: result.publicSignals, demo: false };
@@ -55,6 +71,8 @@ export async function verifyProofLocally(
   publicSignals: string[],
 ): Promise<boolean> {
   try {
+    const groth16 = await loadGroth16();
+    if (!groth16) throw new Error("snarkjs unavailable in this runtime");
     const vk = JSON.parse(await readFile(join(ART, "verification_key.json"), "utf-8"));
     return groth16.verify(vk, publicSignals, proof);
   } catch {

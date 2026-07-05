@@ -34,16 +34,21 @@ export function useAuth() {
 }
 
 export function getAuthSessionSnapshot(): AuthSession | null {
-  const hasSupabaseConfig = Boolean(
+  // Demo/dev session is available when explicitly enabled, in local dev, or
+  // when Supabase is not configured (preview/hackathon environments). This
+  // mirrors the server-side requireAuth middleware behavior so client-side
+  // route guards don't lock users out of an unauthenticated demo build.
+  const explicitDemo = import.meta.env.VITE_MIZIZI_DEMO === "true";
+  const isDev = Boolean(import.meta.env.DEV);
+  const supabaseConfigured = Boolean(
     import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY,
   );
-  const demoMode =
-    import.meta.env.VITE_MIZIZI_DEMO === "true" || !hasSupabaseConfig;
-
-  if (demoMode) return DEV_SESSION;
+  if (explicitDemo || isDev || !supabaseConfigured) return DEV_SESSION;
 
   if (typeof window === "undefined") return null;
 
+  // NOTE: The client-side session is a UI hint only. Roles here are NOT
+  // trusted — server functions re-verify identity/role via Supabase JWT.
   const raw = window.localStorage.getItem("mizizi:session");
   if (!raw) return null;
 
@@ -53,3 +58,4 @@ export function getAuthSessionSnapshot(): AuthSession | null {
     return null;
   }
 }
+

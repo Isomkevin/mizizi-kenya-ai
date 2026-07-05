@@ -25,7 +25,7 @@ export async function syncFarmerDataGaps(farmer: FarmerProfile): Promise<FarmerP
   const persistence = getPersistence();
   const graph = await persistence.getGraphByFarmerId(farmer.id);
   const jobs = farmer.enrichmentJobs ?? [];
-  const dataGaps = detectDataGaps(farmer, graph, jobs);
+  const dataGaps = detectDataGaps(farmer, graph ?? null, jobs);
   const dataCompleteness = Math.round(computeCompletenessFromGaps(dataGaps) * 100);
   const enrichmentStatus = deriveEnrichmentStatus(dataGaps, jobs);
   const insufficientData = dataCompleteness < 70;

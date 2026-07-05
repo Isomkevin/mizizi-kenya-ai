@@ -576,9 +576,12 @@ function buildFarmerGraph(farmer: FarmerProfile): GraphPayload {
       },
       {
         id: loanId,
-        label: `Loan ${farmer.loanAmountKes.toLocaleString()}`,
+        label: `Loan ${(farmer.loanAmountKes ?? 0).toLocaleString()}`,
         type: "Loan",
-        properties: { amountKes: farmer.loanAmountKes, status: farmer.applicationStatus },
+        properties: {
+          amountKes: farmer.loanAmountKes ?? 0,
+          status: farmer.applicationStatus ?? "unknown",
+        },
       },
       {
         id: dealerId,
@@ -747,5 +750,6 @@ export function buildSeedDatabase(): MiziziDatabase {
       },
     ],
     masumiJobs: [],
+    agentEvents: [],
   };
 }

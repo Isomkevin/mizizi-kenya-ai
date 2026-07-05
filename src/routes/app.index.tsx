@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { AgentsActivityTimeline } from "@/components/app/dashboard/AgentsActivityTimeline";
 import { AiInsightsPanel } from "@/components/app/dashboard/AiInsightsPanel";
 import { DashboardWelcome } from "@/components/app/dashboard/DashboardWelcome";
 import { KenyaMap } from "@/components/app/dashboard/KenyaMap";
@@ -8,7 +9,11 @@ import { KpiGrid } from "@/components/app/dashboard/KpiGrid";
 import { QuickActions } from "@/components/app/dashboard/QuickActions";
 import { RecentActivityFeed } from "@/components/app/dashboard/RecentActivityFeed";
 import { RiskDistributionChart } from "@/components/app/dashboard/RiskDistributionChart";
+import { StellarZkCallout } from "@/components/app/dashboard/StellarZkCallout";
+import { RecentZkRunsPanel } from "@/components/app/dashboard/RecentZkRunsPanel";
 import { DashboardSkeleton } from "@/components/skeletons/dashboard-skeletons";
+
+
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -32,14 +37,22 @@ function Dashboard() {
           <DashboardWelcome />
           <KpiGrid />
 
+          <StellarZkCallout />
+          <RecentZkRunsPanel />
+
+
           <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+
             <RiskDistributionChart />
             <AiInsightsPanel />
           </section>
 
           <KenyaMap />
           <QuickActions />
-          <RecentActivityFeed />
+          <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+            <RecentActivityFeed />
+            <AgentsActivityTimeline />
+          </section>
         </>
       )}
     </div>
