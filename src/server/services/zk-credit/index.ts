@@ -3,6 +3,7 @@ import { serverEnv } from "@/server/env";
 import { getPersistence } from "@/server/services/persistence";
 
 import { getFarmerCredential, saveFarmerCredential } from "./credential-store";
+import { buildMockCredential, buildMockDrawdown } from "./mock-demo";
 import { proveWitness, verifyProofLocally } from "./prover";
 import {
   stellarExplorerTxUrl,
