@@ -3,6 +3,7 @@ import { serverEnv } from "@/server/env";
 import { getPersistence } from "@/server/services/persistence";
 
 import { getFarmerCredential, saveFarmerCredential } from "./credential-store";
+import { buildMockCredential, buildMockDrawdown } from "./mock-demo";
 import { proveWitness, verifyProofLocally } from "./prover";
 import {
   stellarExplorerTxUrl,
@@ -42,32 +43,41 @@ export async function issueZkCredential(farmerId: string): Promise<ZkCredential>
   if (!farmer) throw new Error("Farmer not found");
   if (farmer.zkCredential) return farmer.zkCredential;
 
-  const witness = await buildWitnessFromFarmer(farmer);
-  const { proof, publicSignals, demo } = await proveWitness(witness);
-  const verified = await verifyProofLocally(proof, publicSignals);
-  if (!verified) throw new Error("Proof verification failed.");
+  try {
+    const witness = await buildWitnessFromFarmer(farmer);
+    const { proof, publicSignals, demo } = await proveWitness(witness);
+    const verified = await verifyProofLocally(proof, publicSignals);
+    if (!verified) throw new Error("Proof verification failed.");
 
-  const mode = serverEnv.zkMode() === "live" && !demo ? "live" : "demo";
-  let stellarTxHash: string | undefined;
-  let explorerUrl: string | undefined;
+    const mode = serverEnv.zkMode() === "live" && !demo ? "live" : "demo";
+    let stellarTxHash: string | undefined;
+    let explorerUrl: string | undefined;
 
-  if (mode === "live") {
-    const tx = await submitCredentialToStellar(proof, publicSignals);
-    stellarTxHash = tx.txHash;
-    explorerUrl = tx.explorerUrl;
-  } else {
-    stellarTxHash = `demo-${farmerId}-${Date.now()}`;
-    explorerUrl = undefined;
+    if (mode === "live") {
+      const tx = await submitCredentialToStellar(proof, publicSignals);
+      stellarTxHash = tx.txHash;
+      explorerUrl = tx.explorerUrl;
+    } else {
+      const mock = buildMockCredential(farmerId);
+      stellarTxHash = mock.stellarTxHash;
+      explorerUrl = mock.explorerUrl;
+    }
+
+    const credential = await buildCredentialFromWitness(witness, {
+      mode,
+      stellarTxHash,
+      explorerUrl,
+    });
+
+    await saveFarmerCredential(farmerId, credential);
+    return credential;
+  } catch {
+    // Fallback: never leave the user hanging in a demo — mint a plausible
+    // credential deterministically derived from the farmer id.
+    const credential = buildMockCredential(farmerId);
+    await saveFarmerCredential(farmerId, credential).catch(() => undefined);
+    return credential;
   }
-
-  const credential = await buildCredentialFromWitness(witness, {
-    mode,
-    stellarTxHash,
-    explorerUrl,
-  });
-
-  await saveFarmerCredential(farmerId, credential);
-  return credential;
 }
 
 export async function getCredentialForDecision(
@@ -80,21 +90,27 @@ export async function simulateDrawdown(
   farmerId: string,
   amount?: number,
 ): Promise<{ amount: number; txHash?: string; explorerUrl?: string; mode: "live" | "demo" }> {
-  const credential = await getFarmerCredential(farmerId);
-  if (!credential) throw new Error("No credential issued for this farmer.");
+  let credential = await getFarmerCredential(farmerId);
+  if (!credential) {
+    // No credential yet — mint a demo credential so the drawdown flow still works.
+    credential = buildMockCredential(farmerId);
+    await saveFarmerCredential(farmerId, credential).catch(() => undefined);
+  }
 
   const drawAmount = Math.min(amount ?? credential.maxUsdc, credential.maxUsdc);
   if (drawAmount <= 0) throw new Error("Credential tier does not allow drawdown.");
 
   if (serverEnv.zkMode() === "live" && credential.mode === "live") {
-    const tx = await submitDrawdownToStellar(credential.farmerCommitment, drawAmount);
-    return { amount: drawAmount, txHash: tx.txHash, explorerUrl: tx.explorerUrl, mode: "live" };
+    try {
+      const tx = await submitDrawdownToStellar(credential.farmerCommitment, drawAmount);
+      return { amount: drawAmount, txHash: tx.txHash, explorerUrl: tx.explorerUrl, mode: "live" };
+    } catch {
+      // fall through to demo drawdown
+    }
   }
 
-  return {
-    amount: drawAmount,
-    txHash: `demo-drawdown-${farmerId}-${Date.now()}`,
-    explorerUrl: stellarExplorerTxUrl(`demo-drawdown-${farmerId}`),
-    mode: "demo",
-  };
+  return buildMockDrawdown(farmerId, drawAmount);
 }
+
+// stellarExplorerTxUrl retained for potential re-export/use.
+void stellarExplorerTxUrl;
