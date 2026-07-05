@@ -26,13 +26,13 @@ cd "$ART"
 
 if [ ! -f "pot12_final.ptau" ]; then
   echo "Generating local BLS12-381 powers of tau..."
-  snarkjs powersoftau new bls12381 14 pot14_0000.ptau -v
-  echo "hackathon-entropy" | snarkjs powersoftau contribute pot14_0000.ptau pot14_0001.ptau --name="First contribution" -v
-  snarkjs powersoftau prepare phase2 pot14_0001.ptau pot12_final.ptau -v
+  npx snarkjs powersoftau new bls12381 14 pot14_0000.ptau -v
+  echo "hackathon-entropy" | npx snarkjs powersoftau contribute pot14_0000.ptau pot14_0001.ptau --name="First contribution" -v
+  npx snarkjs powersoftau prepare phase2 pot14_0001.ptau pot12_final.ptau -v
 fi
 
-snarkjs groth16 setup credit_tier.r1cs pot12_final.ptau credit_tier_0000.zkey
-echo "hackathon-local-setup" | snarkjs zkey contribute credit_tier_0000.zkey credit_tier_final.zkey --name="mizizi-local" -v
-snarkjs zkey export verificationkey credit_tier_final.zkey verification_key.json
+npx snarkjs groth16 setup credit_tier.r1cs pot12_final.ptau credit_tier_0000.zkey
+echo "hackathon-local-setup" | npx snarkjs zkey contribute credit_tier_0000.zkey credit_tier_final.zkey --name="mizizi-local" -v
+npx snarkjs zkey export verificationkey credit_tier_final.zkey verification_key.json
 
 echo "Setup complete. Artifacts in $ART"

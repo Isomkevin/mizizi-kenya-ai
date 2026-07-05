@@ -87,7 +87,7 @@ export async function submitCredentialToStellar(
               new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("b"), val: buildG2Point((proof as any).pi_b) }),
               new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("c"), val: buildG1Point((proof as any).pi_c) }),
             ]),
-            nativeToScVal(publicSignals.map(s => bigIntToBytes48(s)), { type: "vec" }), // or xdr.ScVal.scvVec
+            xdr.ScVal.scvVec(publicSignals.map(s => xdr.ScVal.scvBytes(bigIntToBytes48(s)))),
             xdr.ScVal.scvBytes(commitmentToBytes(publicSignals[0]!)),
             nativeToScVal(Number(publicSignals[1]), { type: "u32" }),
             nativeToScVal(Number(publicSignals[2]), { type: "u32" }),
