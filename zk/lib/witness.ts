@@ -1,17 +1,23 @@
 import { computeRawScore, DEFAULT_MIN_SCORE, DEFAULT_MIN_TIER, tierFromRawScore } from "./scoring";
 
 // circomlibjs (via ffjavascript) is Node-only and cannot be bundled for
-// Cloudflare Workers. Load dynamically at call time so the workerd build
-// succeeds; the ZK service falls back to a demo envelope when unavailable.
+// Cloudflare Workers. Hide the specifier from static analysis so nitro/rollup
+// doesn't try to include it (`No such module "_ssr/circomlibjs"`).
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PoseidonFn = ((inputs: any[]) => any) & { F: { p: bigint | string; toObject: (v: any) => bigint } };
 let poseidonPromise: Promise<PoseidonFn> | null = null;
 
+const nodeDynamicImport: ((s: string) => Promise<unknown>) | null =
+  typeof process !== "undefined" && !!(process as { versions?: { node?: string } }).versions?.node
+    ? (new Function("s", "return import(s)") as (s: string) => Promise<unknown>)
+    : null;
+
 async function getPoseidon(): Promise<PoseidonFn> {
+  if (!nodeDynamicImport) throw new Error("circomlibjs unavailable in this runtime");
   if (!poseidonPromise) {
     poseidonPromise = (async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mod: any = await import(/* @vite-ignore */ ("circomlibjs" as string));
+      const mod: any = await nodeDynamicImport(["circomlib", "js"].join(""));
       return mod.buildPoseidon();
     })();
   }
