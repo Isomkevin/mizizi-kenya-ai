@@ -21,6 +21,11 @@ function bigIntToBytes48(n: string): Buffer {
   return Buffer.from(hex.slice(0, 96), "hex");
 }
 
+function bigIntToBytes32(n: string): Buffer {
+  const hex = BigInt(n).toString(16).padStart(64, "0");
+  return Buffer.from(hex.slice(0, 64), "hex");
+}
+
 function buildG1Point(p: string[]): xdr.ScVal {
   return xdr.ScVal.scvMap([
     new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("x"), val: xdr.ScVal.scvBytes(bigIntToBytes48(p[0]!)) }),
@@ -87,7 +92,7 @@ export async function submitCredentialToStellar(
               new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("b"), val: buildG2Point((proof as any).pi_b) }),
               new xdr.ScMapEntry({ key: xdr.ScVal.scvSymbol("c"), val: buildG1Point((proof as any).pi_c) }),
             ]),
-            xdr.ScVal.scvVec(publicSignals.map(s => xdr.ScVal.scvBytes(bigIntToBytes48(s)))),
+            xdr.ScVal.scvVec(publicSignals.map(s => xdr.ScVal.scvBytes(bigIntToBytes32(s)))),
             xdr.ScVal.scvBytes(commitmentToBytes(publicSignals[0]!)),
             nativeToScVal(Number(publicSignals[1]), { type: "u32" }),
             nativeToScVal(Number(publicSignals[2]), { type: "u32" }),

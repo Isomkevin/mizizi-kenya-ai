@@ -111,8 +111,9 @@ zk/
   circuits/credit_tier.circom    # main circuit
   inputs/witness.schema.json     # witness JSON schema
   inputs/f-001.witness.json      # Wanjiru demo witness
-  scripts/setup.sh               # circom compile + snarkjs ceremony
+  scripts/setup.sh               # circom BLS12-381 compile + snarkjs ceremony
   scripts/prove.ts               # witness → proof.json
+  scripts/init-vk.ts             # deploys verification key to Soroban
   artifacts/                     # gitignored: zkey, wasm, vk
 
 contracts/
@@ -200,7 +201,7 @@ pub fn get_credential(env, farmer_commitment: BytesN<32>) -> Option<Credential>;
 pub fn drawdown(env, farmer_commitment: BytesN<32>, amount: i128);
 ```
 
-**Tech stack:** Rust + Soroban SDK; adapt [groth16_verifier](https://github.com/stellar/soroban-examples/tree/main/groth16_verifier) from `stellar/soroban-examples`. Follow [Circom on Stellar](https://jamesbachini.com/circom-on-stellar/) for vk/proof encoding.
+**Tech stack:** Rust (`wasm32v1-none`) + Soroban SDK v25.1.0. We use `ark-bls12-381` and `ark-serialize` within the contract to securely parse public signals and coordinate Groth16 pairing precompiles via `env.crypto().bls12_381().pairing_check()`. To avoid passing heavy proving keys on every execution, we run `bun run zk/scripts/init-vk.ts` to deploy the `VerificationKey` to the Soroban state first.
 
 ---
 
@@ -224,7 +225,7 @@ pub fn drawdown(env, farmer_commitment: BytesN<32>, amount: i128);
 3. **Farmer flow (40s):** Open Wanjiru profile → Financial tab → Generate credential → terminal/log shows proof → Stellar explorer tx success.
 4. **Lender flow (40s):** Open pending decision → credential verified Tier 2 → approve → optional USDC drawdown tx.
 5. **Privacy punchline (20s):** Lender screen shows tier/limit only; expand “raw transactions” — not available by design.
-6. **Stack (20s):** Circom, Groth16, BN254, Soroban Protocol 26, Mizizi ag credit context.
+6. **Stack (20s):** Circom, Groth16, BLS12-381, Soroban Protocol 22+ (Native pairings), Mizizi ag credit context.
 7. **Honesty (10s):** Simulated M-Pesa data; testnet USDC; hackathon MVP.
 
 ---

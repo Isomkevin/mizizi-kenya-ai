@@ -93,10 +93,10 @@ Track progress here so any agent (Cursor, Lovable, Copilot, etc.) can pick up wh
 | --- | --- |
 | Circom circuit `zk/circuits/credit_tier.circom` | **Done** |
 | Prover CLI + demo envelope | **Done** |
-| Soroban contract `contracts/credit_rails/` | **Done** (BFF verifies Groth16; contract stores credential) |
+| Soroban contract `contracts/credit_rails/` | **Done** (Native Soroban testnet verification via BLS12-381 `pairing_check`) |
 | Mizizi UI (Financial tab + decision gate) | **Done** |
 | Demo mode (`ZK_MODE=demo`) | **Done** |
-| Testnet live deploy | Manual — see `contracts/credit_rails/README.md` |
+| Testnet live deploy | Manual — run `cargo build` in WSL with `wasm32v1-none` target and run `init-vk.ts` to push state |
 | Demo video + DoraHacks submit | **Pending** (human step) |
 
 ## Next priorities

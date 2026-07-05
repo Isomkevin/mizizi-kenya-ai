@@ -132,7 +132,7 @@ impl CreditRails {
     pub fn issue_credential(
         env: Env,
         proof: Proof,
-        public_signals: Vec<Fr>,
+        public_signals: Vec<BytesN<32>>,
         farmer_commitment: BytesN<32>,
         tier: u32,
         raw_score: u32,
@@ -165,7 +165,9 @@ impl CreditRails {
         }
         
         let mut vk_x = Self::g1_from_point(&env, &vk.ic.get(0).unwrap());
-        for (s, v_point) in public_signals.iter().zip(vk.ic.iter().skip(1)) {
+        for (s_bytes, v_point) in public_signals.iter().zip(vk.ic.iter().skip(1)) {
+            // Fr is 32 bytes
+            let s = soroban_sdk::crypto::bls12_381::Fr::from_bytes(&env, &s_bytes);
             let v = Self::g1_from_point(&env, &v_point);
             let prod = bls.g1_mul(&v, &s);
             vk_x = bls.g1_add(&vk_x, &prod);
