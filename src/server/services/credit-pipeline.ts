@@ -16,6 +16,7 @@ import {
   updateAgentEvent,
 } from "@/server/services/agent-events";
 import { saveFarmerCredential } from "./zk-credit/credential-store";
+import { runMockCreditPipeline } from "./zk-credit/mock-demo";
 import { proveWitness, verifyProofLocally } from "./zk-credit/prover";
 import {
   stellarExplorerTxUrl,
