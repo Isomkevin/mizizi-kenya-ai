@@ -32,6 +32,7 @@
     "zk:verify": "bun run zk/scripts/verify-local.ts",
     "zk:test-vectors": "bun run zk/scripts/test-vectors.ts",
     "zk:deploy": "bun run contracts/credit_rails/scripts/deploy.ts",
+    "zk:info": "bun run contracts/credit_rails/scripts/dev-access.ts",
     "zk:invoke-issue": "bun run contracts/credit_rails/scripts/invoke-issue.ts",
     "zk:invoke-drawdown": "bun run contracts/credit_rails/scripts/invoke-drawdown.ts",
     "format": "prettier --write ."
