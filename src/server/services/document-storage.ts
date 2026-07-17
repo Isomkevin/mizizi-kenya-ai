@@ -1,7 +1,15 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 
-const UPLOAD_ROOT = join(process.cwd(), ".data", "uploads");
+const UPLOAD_ROOT = resolve(join(process.cwd(), ".data", "uploads"));
+
+const SAFE_ID_RE = /^[a-zA-Z0-9_-]+$/;
+
+function assertSafeId(id: string, label: string): void {
+  if (!id || !SAFE_ID_RE.test(id)) {
+    throw new Error(`Invalid ${label}.`);
+  }
+}
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -38,10 +46,18 @@ export async function saveFarmerDocumentFile(
   fileName: string,
   buffer: Buffer,
 ): Promise<string> {
+  assertSafeId(farmerId, "farmerId");
+  assertSafeId(documentId, "documentId");
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const dir = join(UPLOAD_ROOT, farmerId);
+  const dir = resolve(UPLOAD_ROOT, farmerId);
+  if (dir !== UPLOAD_ROOT && !dir.startsWith(UPLOAD_ROOT + sep)) {
+    throw new Error("Invalid upload path.");
+  }
   await mkdir(dir, { recursive: true });
-  const storagePath = join(dir, `${documentId}-${safeName}`);
+  const storagePath = resolve(dir, `${documentId}-${safeName}`);
+  if (!storagePath.startsWith(dir + sep)) {
+    throw new Error("Invalid upload path.");
+  }
   await writeFile(storagePath, buffer);
   return storagePath;
 }
@@ -59,11 +75,16 @@ export function toDataUrl(mimeType: string, buffer: Buffer): string {
 }
 
 export async function deleteFarmerDocumentFile(storagePath: string): Promise<void> {
+  const resolved = resolve(storagePath);
+  if (!resolved.startsWith(UPLOAD_ROOT + sep)) {
+    throw new Error("Refusing to delete file outside upload root.");
+  }
   try {
-    await unlink(storagePath);
+    await unlink(resolved);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       throw error;
     }
   }
 }
+

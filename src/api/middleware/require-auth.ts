@@ -29,14 +29,18 @@ export const requireAuth = createMiddleware({ type: "function" }).server(async (
   const { serverEnv } = await import("@/server/env");
   const { getRequestHeader } = await import("@tanstack/react-start/server");
 
-  const supabaseConfigured = Boolean(serverEnv.supabaseUrl() && serverEnv.supabaseAnonKey());
-  if (serverEnv.demoMode() || !supabaseConfigured) {
+  if (serverEnv.demoMode()) {
     const session: AuthedSession = {
       userId: "dev-kevin-m",
       role: "loan_officer",
       demo: true,
     };
     return next({ context: { session } });
+  }
+
+  const supabaseConfigured = Boolean(serverEnv.supabaseUrl() && serverEnv.supabaseAnonKey());
+  if (!supabaseConfigured) {
+    unauthorized("Authentication is not configured");
   }
 
   const authHeader =

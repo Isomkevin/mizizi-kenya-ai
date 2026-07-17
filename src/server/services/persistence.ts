@@ -139,6 +139,7 @@ class SupabasePersistence implements PersistenceAdapter {
 
   async getFarmerById(id: string): Promise<FarmerProfile | undefined> {
     if (!this.client) return this.fallback.getFarmerById(id);
+    if (!/^[a-zA-Z0-9_-]+$/.test(id)) return this.fallback.getFarmerById(id);
     try {
       const { data, error } = await this.client
         .from("farmers")
