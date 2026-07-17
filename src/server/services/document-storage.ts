@@ -1,7 +1,15 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 
-const UPLOAD_ROOT = join(process.cwd(), ".data", "uploads");
+const UPLOAD_ROOT = resolve(join(process.cwd(), ".data", "uploads"));
+
+const SAFE_ID_RE = /^[a-zA-Z0-9_-]+$/;
+
+function assertSafeId(id: string, label: string): void {
+  if (!id || !SAFE_ID_RE.test(id)) {
+    throw new Error(`Invalid ${label}.`);
+  }
+}
 
 const MAX_BYTES = 10 * 1024 * 1024;
 

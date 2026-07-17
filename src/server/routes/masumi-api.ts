@@ -11,8 +11,9 @@ import { getPersistence } from "@/server/services/persistence";
 import { serverEnv } from "@/server/env";
 
 export async function processMasumiWebhookRequest(request: Request): Promise<Response> {
+  const expected = serverEnv.masumiCallbackSecret();
   const secret = request.headers.get("x-mizizi-callback-secret");
-  if (secret !== serverEnv.masumiCallbackSecret()) {
+  if (!expected || secret !== expected) {
     return new Response(JSON.stringify({ ok: false, message: "Unauthorized" }), {
       status: 401,
       headers: { "content-type": "application/json" },
@@ -45,8 +46,9 @@ export async function getMasumiHealthResponse(): Promise<Response> {
 }
 
 export async function triggerOrchestratorRequest(request: Request): Promise<Response> {
+  const expected = serverEnv.masumiCallbackSecret();
   const secret = request.headers.get("x-mizizi-callback-secret");
-  if (secret !== serverEnv.masumiCallbackSecret()) {
+  if (!expected || secret !== expected) {
     return new Response(JSON.stringify({ ok: false }), { status: 401 });
   }
   const result = await runOrchestratorBatch(20);
